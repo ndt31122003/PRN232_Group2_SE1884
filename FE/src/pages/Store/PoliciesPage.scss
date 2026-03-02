@@ -1,0 +1,317 @@
+.policies-page {
+    padding: 2rem !important;
+    min-height: 100vh;
+    background: #f8f9fa !important;
+
+    .container {
+        max-width: 1000px !important;
+        margin: 0 auto !important;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #666;
+        }
+    }
+
+    .tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 2px solid #e0e0e0;
+        margin-bottom: 2rem;
+
+        .tab {
+            background: none;
+            border: none;
+            padding: 1rem 2rem 2rem 2rem; // Extra bottom padding for underline
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+
+            &:hover {
+                color: #3665f3;
+            }
+
+            &--active {
+                color: #3665f3;
+                
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -2px;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    background: #3665f3;
+                    border-radius: 2px 2px 0 0;
+                }
+            }
+        }
+    }
+
+    .tab-content {
+        background: white !important;
+        border-radius: 8px !important;
+        padding: 2rem !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        display: block !important;
+
+        .form-section {
+            margin-bottom: 2rem;
+
+            h2 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                color: #333;
+            }
+        }
+
+        .policy-form {
+            .form-row {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+
+                label {
+                    display: block;
+                    font-weight: bold;
+                    margin-bottom: 0.5rem;
+                    color: #333;
+
+                    &.checkbox-label {
+                        display: flex;
+                        align-items: center;
+                        font-weight: normal;
+                        gap: 0rem; // Tight spacing between checkbox and text
+
+                        input[type="checkbox"] {
+                            margin-right: 0; // Remove margin since we use gap
+                            margin-left: 100px;
+                            cursor: pointer;
+                        }
+                    }
+                }
+
+                input, select {
+                    width: 100%;
+                    padding: 0.75rem;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 1rem;
+
+                    &:focus {
+                        outline: none;
+                        border-color: #3665f3;
+                    }
+                }
+
+                small {
+                    display: block;
+                    margin-top: 0.25rem;
+                    color: #666;
+                    font-size: 0.875rem;
+                }
+            }
+
+            .form-actions {
+                margin-top: 1.5rem;
+                display: flex;
+                gap: 1rem;
+
+                button {
+                    padding: 0.75rem 2rem;
+                    background: #3665f3;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 1rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+
+                    &:hover:not(:disabled) {
+                        background: #2952d8;
+                    }
+
+                    &:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                }
+
+                .btn-secondary {
+                    background: white;
+                    color: #666;
+                    border: 1px solid #ddd;
+
+                    &:hover:not(:disabled) {
+                        border-color: #999;
+                    }
+                }
+            }
+        }
+
+        .policies-list {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 2rem;
+
+            h2 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: #333;
+            }
+
+            .empty-message {
+                color: #666;
+                font-style: italic;
+            }
+
+            ul {
+                list-style: none;
+                padding: 0;
+
+                .policy-item {
+                    padding: 1rem 1.25rem;
+                    border: 1px solid #e0e7ed;
+                    border-radius: 8px;
+                    margin-bottom: 0.75rem;
+                    background: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        border-color: #cbd5e1;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+                    }
+
+                    .policy-info {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.25rem;
+                        flex: 1;
+
+                        .policy-title {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+
+                            strong {
+                                font-size: 0.95rem;
+                                font-weight: 600;
+                                color: #1f2937;
+                            }
+
+                            .badge {
+                                display: inline-block;
+                                padding: 0.125rem 0.5rem;
+                                background: #3665f3;
+                                color: white;
+                                border-radius: 12px;
+                                font-size: 0.75rem;
+                                font-weight: 600;
+                            }
+                        }
+
+                        .policy-cost {
+                            font-size: 0.875rem;
+                            color: #6b7280;
+                        }
+                    }
+
+                    .policy-actions {
+                        display: flex;
+                        gap: 0.5rem;
+
+                        button {
+                            padding: 0.5rem 1rem;
+                            font-size: 0.875rem;
+                            font-weight: 600;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            border: 1px solid transparent;
+
+                            &:disabled {
+                                opacity: 0.5;
+                                cursor: not-allowed;
+                            }
+
+                            &.btn-edit {
+                                background: #f3f4f6;
+                                color: #4b5563;
+                                border-color: #e5e7eb;
+
+                                &:hover:not(:disabled) {
+                                    background: #e5e7eb;
+                                    border-color: #d1d5db;
+                                    color: #1f2937;
+                                }
+                            }
+
+                            &.btn-delete {
+                                background: #fee2e2;
+                                color: #dc2626;
+                                border-color: #fecaca;
+
+                                &:hover:not(:disabled) {
+                                    background: #fecaca;
+                                    border-color: #fca5a5;
+                                    color: #b91c1c;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 4rem 0;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 0;
+            font-size: 1.2rem;
+            color: #666;
+        }
+    }
+
+    .error-message {
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+
+        p {
+            color: #c00;
+            font-size: 1.1rem;
+        }
+    }
+}
+

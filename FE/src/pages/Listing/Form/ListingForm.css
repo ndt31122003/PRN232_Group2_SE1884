@@ -1,0 +1,68 @@
+.listing-form {
+    font-family: inherit;
+    /* giữ font eBay */
+}
+
+/* Chỉ revert các tag HTML bị Tailwind reset */
+.listing-form p,
+.listing-form h1,
+.listing-form h2,
+.listing-form h3,
+.listing-form h4,
+.listing-form h5,
+.listing-form h6,
+.listing-form ul,
+.listing-form li,
+.listing-form ol {
+    margin: revert;
+    padding: revert;
+    list-style: revert;
+    line-height: revert;
+}
+
+.listing-form a {
+    color: revert;
+    text-decoration: revert;
+}
+
+.listing-form button,
+.listing-form input,
+.listing-form textarea,
+.listing-form select {
+    font: revert;
+    line-height: revert;
+}
+
+.listing-form img,
+.listing-form picture,
+.listing-form video,
+.listing-form canvas,
+.listing-form svg {
+    display: revert;
+    max-width: revert;
+}
+
+.date__select_listing .select {
+    padding-inline-end: 0;
+    padding-inline-start: 0;
+    height: 42px;
+    min-height: 42px;
+}
+
+.listing-select--no-icon .select__icon {
+    display: none;
+}
+
+.listing-select--no-icon select {
+    padding-inline-end: 12px;
+}
+
+.listing-form__loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 2000;
+}

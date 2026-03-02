@@ -1,0 +1,211 @@
+.payments-summary {
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: #f5f7fa;
+  min-height: 100%;
+  color: #1f1f1f;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__crumb {
+    font-size: 12px;
+    color: #6f6f6f;
+  }
+
+  &__message {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    font-size: 14px;
+
+    &.is-error {
+      color: #b91c1c;
+    }
+  }
+
+  &__funds {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  &__funds-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #1f1f1f;
+    }
+
+    strong {
+      font-size: 26px;
+    }
+
+    small {
+      font-size: 12px;
+      color: #6f6f6f;
+    }
+
+    &--primary {
+      grid-column: span 2;
+      background: linear-gradient(130deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      justify-content: space-between;
+
+      span {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      strong {
+        font-size: 32px;
+      }
+
+      button {
+        align-self: flex-start;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #ffffff;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  &__card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    min-height: 260px;
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px 0;
+      gap: 12px;
+
+      h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      button {
+        border: none;
+        background-color: transparent;
+        color: #1d4ed8;
+        font-size: 14px;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  &__card-body {
+    padding: 0 24px 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+
+    span {
+      font-size: 12px;
+      color: #6f6f6f;
+    }
+
+    strong {
+      font-size: 16px;
+    }
+  }
+
+  &__activity-list {
+    list-style: none;
+    margin: 0;
+    padding: 16px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+  }
+
+  &__activity-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  &__activity-meta {
+    display: block;
+    font-size: 12px;
+    color: #6f6f6f;
+    margin-top: 4px;
+  }
+
+  &__activity-amount {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+
+    small {
+      font-size: 12px;
+      color: #6f6f6f;
+    }
+  }
+
+  &__activity-message {
+    margin: 0 24px 24px;
+    padding: 24px;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px;
+
+    &.is-error {
+      color: #b91c1c;
+    }
+  }
+
+  @media (max-width: 920px) {
+    padding: 24px;
+
+    &__funds-card--primary {
+      grid-column: span 1;
+    }
+
+    &__activity-list li {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__activity-amount {
+      align-items: flex-start;
+    }
+  }
+}

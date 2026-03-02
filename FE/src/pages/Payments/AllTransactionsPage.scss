@@ -1,0 +1,322 @@
+.payments-transactions {
+  width: 100%;
+  padding: 32px 24px 48px;
+  font-family: "Segoe UI", Arial, sans-serif;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1c1c1c;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__helper {
+    margin: 0 0 20px;
+    color: #5f6368;
+    max-width: 720px;
+    line-height: 1.4;
+  }
+
+  &__filters {
+    display: grid;
+    gap: 16px;
+  grid-template-columns: repeat(3, minmax(120px, 180px)) minmax(320px, 1fr);
+    padding: 24px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    margin-bottom: 20px;
+    align-items: end;
+  }
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-right: 8px;
+    align-items: center;
+  }
+
+  &__funds {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    margin-bottom: 24px;
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 24px;
+      margin-bottom: 18px;
+
+      h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #1c1c1c;
+      }
+    }
+  }
+
+  &__funds-hint {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  &__funds-balance {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    border-radius: 10px;
+  }
+
+  &__funds-label {
+    font-size: 14px;
+    color: #475569;
+  }
+
+  &__table {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+    width: 100%;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    th,
+    td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+      color: #1f2937;
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  &__empty {
+    padding: 80px 16px;
+    text-align: center;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  &__table-scroll {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  &__type {
+    text-transform: capitalize;
+  }
+}
+
+.pt-btn {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &--primary {
+    background-color: #3665f3;
+    color: #fff;
+
+    &:hover {
+      background-color: #1d4ed8;
+    }
+  }
+
+  &--secondary {
+    background-color: #f8fafc;
+    color: #1f2937;
+    border-color: #dbeafe;
+
+    &:hover {
+      background-color: #e2e8f0;
+    }
+  }
+}
+
+.pt-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: #1f2937;
+
+  span {
+    font-weight: 600;
+  }
+
+  select,
+  input {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #3665f3;
+      box-shadow: 0 0 0 3px rgba(54, 101, 243, 0.2);
+    }
+  }
+
+  &__search {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 8px;
+
+    select,
+    input {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+}
+
+@media (max-width: 1280px) {
+  .payments-transactions__filters {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.pt-summary-chip {
+  background-color: #fff;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #1f2937;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #3665f3;
+    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.2);
+  }
+
+  &--active {
+    background-color: #3665f3;
+    color: #fff;
+    border-color: #1d4ed8;
+  }
+
+  &__count {
+    font-weight: 600;
+  }
+}
+
+.is-right {
+  text-align: right;
+}
+
+.is-positive {
+  color: #15803d;
+}
+
+.is-negative {
+  color: #b91c1c;
+}
+
+@media (max-width: 768px) {
+  .payments-transactions {
+    padding: 24px 16px 40px;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__filters {
+      grid-template-columns: 1fr;
+      padding: 20px;
+    }
+
+    &__funds-balance {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    &__table {
+      box-shadow: none;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .payments-transactions {
+    padding: 20px 12px 32px;
+
+    &__actions {
+      width: 100%;
+      justify-content: stretch;
+
+      .pt-btn {
+        flex: 1 1 100%;
+      }
+    }
+
+    &__summary {
+      gap: 8px;
+    }
+
+    &__filters {
+      padding: 16px;
+    }
+
+    .pt-filter__search {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      select,
+      input {
+        width: 100%;
+      }
+    }
+  }
+}

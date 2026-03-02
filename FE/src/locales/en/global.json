@@ -1,0 +1,156 @@
+{
+  "language": {
+    "en": "English",
+    "vi": "Vietnamese"
+  },
+  "webname": "Bóc Băng",
+  "search": {
+    "placeholder": "Enter a name to search"
+  },
+  "homepage": {
+    "title": "Choose a session to start",
+    "describe": "Create or select a session to start taking notes"
+  },
+  "represent": {},
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "record": "Meeting history",
+  "explore": "Explore BocBang",
+  "languageVoice": "en-US",
+  "editSession": {
+    "titleModal": "Update session name",
+    "title": "Edit"
+  },
+  "editPlaceholder": "Enter a session name to update",
+  "addFolder": "Add to folder",
+  "deleteSession": "Delete",
+  "deleteConfirm": "Are you sure you want to delete this session?",
+  "deleteAlert": "This action cannot be undone. All data, including records, will be deleted.",
+  "removeSession": "Remove session",
+  "confirm": "Confirm",
+  "Reject": "Cancel",
+  "searchRecord": "Search Record",
+  "noResultsFound": "No results found",
+  "setting": "Settings",
+  "settingText": "Customize your settings",
+  "newFolder": "Create a new folder",
+  "timeSave": "Time Saving",
+  "languageTitle": "Language",
+  "chooseTimeSave": "Choose a time to save records",
+  "day": "days",
+  "sendNoticeTime": "Send notifications before data expires",
+  "save": "Save",
+  "settingGeneral": "General Settings",
+  "settingRecord": "Record Settings",
+  "settingPrivacy": "Privacy Settings",
+  "preferences": "Preferences",
+  "integration": "System Integration",
+  "help": "Help",
+  "resetSetting": "Reset Settings",
+  "recentSearch": "Recent Searches",
+  "newRecord": "New Record",
+  "liveRecord": {
+    "title": "Live Recording",
+    "describe": "Record directly using your device's microphone.",
+    "time": "Maximum recording time: 5 hours",
+    "placeholder": "Enter a name for the new recording"
+  },
+  "selectSpeaker": "Select Speaker",
+  "uploadRecord": {
+    "title": "Your Recordings",
+    "describe": "Supports recordings from YouTube, Facebook, Vimeo, etc.",
+    "time": "Processing time ranges from 3 to 5 minutes depending on video length",
+    "placeholder": "Paste the link to an available recording here"
+  },
+  "empty": {
+    "noItems": "No Data"
+  },
+  "continue": "Continue",
+  "option": "Or",
+  "hello": "Hello, ",
+  "myAccount": "My Account",
+  "logIn": "Login",
+  "logOut": "Log Out",
+  "toast": {
+    "deleteSuccess": "Session deleted successfully",
+    "deleteFail": "Session deleted fail",
+    "getSessionFail": "Cannot get session",
+    "createSessionSuccess": "New session created successfully",
+    "createSessionFailed": "Failed to create session",
+    "createSessionError": "Please enter a name for the new session",
+    "updateSuccess": "Session name updated successfully",
+    "updateFailed": "Failed to update session name",
+    "addFolderSuccess": "New folder added successfully",
+    "renameFolderSuccess": "Folder renamed successfully",
+    "deleteFolderSuccess": "Folder deleted successfully",
+    "moveFolderSuccess": "Folder moved successfully",
+    "moveFolderFail": "Failed to move folder"
+  },
+  "playRecord": "Play Recording",
+  "summarize": "Summarize",
+  "export": "Export File",
+  "infor": "Information",
+  "target": "Session Goal",
+  "task": "Task Plan",
+  "fileExport": {
+    "title": "Export file type",
+    "addSummarize": "Include summary",
+    "addSpeaker": "Include speaker",
+    "addTime": "Include timestamps",
+    "loading": "Loading..."
+  },
+  "homePage": "Home Page",
+  "removeFiles": "Removed selected files",
+  "settingMeeting": {
+    "title": "Record Settings",
+    "timeStart": "Start Timer",
+    "check": "Check your device"
+  },
+  "privacyAuth": {
+    "title": "User Authentication",
+    "enable": "Enable two-factor authentication",
+    "enableRequire": "Require a password to access important content",
+    "buttonOn": "On",
+    "buttonOff": "Off"
+  },
+  "share": {
+    "title": "Access Rights",
+    "describe": "Manage sharing permissions",
+    "button": "Share"
+  },
+  "shareModal": {
+    "describe": "People with access",
+    "roleView": "Viewer",
+    "roleCommenter": "Commenter",
+    "roleEditor": "Editor",
+    "roleOwner": "Owner",
+    "role": "Role"
+  },
+  "login": {
+    "title": "Voice-to-Text Conversion System",
+    "username": "Username",
+    "password": "Password",
+    "remember": "Remember me",
+    "save": "Login",
+    "username_required": "Username is required",
+    "password_required": "Password is required"
+  },
+  "register": {
+    "title": "Create an account",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "email": "Email",
+    "save": "Register",
+    "username_required": "Username is required",
+    "password_required": "Password is required",
+    "confirmPassword_required": "Confirm password is required",
+    "email_required": "Email is required",
+    "email": "Email"
+  },
+  "logout": {
+    "describe": "Are you sure you want to log out?",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
+}

@@ -1,0 +1,147 @@
+.sale-events-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 24px;
+}
+
+.sale-events-summary__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sale-events-summary__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.sale-events-summary__header p {
+  margin: 0.35rem 0 0;
+  color: #4a5568;
+}
+
+.sale-events-summary__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.sale-events-summary__empty {
+  padding: 48px;
+  text-align: center;
+  border: 1px dashed #d2d6dc;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #4a5568;
+}
+
+.sale-events-summary__table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.sale-events-summary__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sale-events-summary__table thead tr {
+  background: #f1f5f9;
+}
+
+.sale-events-summary__table th,
+.sale-events-summary__table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.sale-events-summary__actions-header {
+  width: 120px;
+  text-align: right;
+}
+
+.sale-events-summary__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sale-events-summary__name {
+  font-weight: 600;
+}
+
+.sale-events-summary__meta {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.sale-events-summary__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  background: #e2e8f0;
+  color: #1f2937;
+}
+
+.sale-events-summary__status--draft {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.sale-events-summary__status--scheduled {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.sale-events-summary__status--active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.sale-events-summary__status--ended {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.sale-events-summary__status--cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.sale-events-summary__flag-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.sale-events-summary__flag-list li {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.sale-events-summary__actions-cell {
+  text-align: right;
+}
+
+.sale-events-summary .btn-link {
+  background: none;
+  border: none;
+  color: #d11a2a;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+}
+
+.sale-events-summary .btn-link:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

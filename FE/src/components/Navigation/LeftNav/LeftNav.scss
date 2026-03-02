@@ -1,0 +1,206 @@
+// src/components/LeftNav/LeftNav.scss
+
+// Variables - có thể override từ component cha
+$left-nav-width: 236px !default;
+$left-nav-collapsed-width: 64px !default;
+$left-nav-bg: #ffffff !default;
+$left-nav-border-color: #e5e5e5 !default;
+$left-nav-item-color: #111820 !default;
+$left-nav-item-hover-bg: #f7f7f7 !default;
+$left-nav-item-active-bg: #f0f0f0 !default;
+$left-nav-item-padding: 10px 12px !default;
+$left-nav-font-size: 14px !default;
+$left-nav-transition: all 0.3s ease !default;
+
+.left-nav {
+    width: $left-nav-width;
+    background-color: $left-nav-bg;
+    transition: $left-nav-transition;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 16px 24px 0;
+
+    // Collapsed state
+    &--collapsed {
+        width: $left-nav-collapsed-width;
+        border-right: 0px;
+        padding: 0 8px 16px 0;
+
+        .left-nav__collapse-btn {
+            border: none;
+
+            &:hover {
+                background: none;
+            }
+        }
+
+        .left-nav__collapse-text,
+        .left-nav__label,
+        .left-nav__arrow {
+            display: none;
+
+        }
+
+        .left-nav__item {
+            justify-content: center;
+            padding: 12px;
+            display: none;
+        }
+
+        .left-nav__submenu,
+        .left-nav__divider {
+            display: none;
+        }
+    }
+
+    // Collapse button
+    &__collapse-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: $left-nav-item-padding;
+        background: transparent;
+        border: none;
+        color: $left-nav-item-color;
+        font-size: $left-nav-font-size;
+        cursor: pointer;
+
+        width: 100%;
+        text-align: left;
+
+
+        svg {
+            flex-shrink: 0;
+        }
+    }
+
+    &__collapse-text {
+        transition: opacity 0.2s, width 0.2s;
+        white-space: nowrap;
+    }
+
+    // Menu container
+    &__menu {
+        display: flex;
+        flex-direction: column;
+        padding: 8px 0;
+    }
+
+    // Menu item
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: $left-nav-item-padding;
+        background: transparent;
+        border: none;
+        color: $left-nav-item-color;
+        font-size: $left-nav-font-size;
+        cursor: pointer;
+        text-align: left;
+        position: relative;
+        border-radius: 5px;
+        margin: 2px 10px;
+
+        &:hover:not(&--disabled) {
+            background-color: $left-nav-item-hover-bg;
+
+        }
+
+        &--active {
+            background-color: $left-nav-item-active-bg;
+            font-weight: 600;
+        }
+
+        &--disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        &--group {
+            font-weight: 400;
+        }
+
+        &--open {
+            .left-nav__arrow {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    &__icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        font-size: 16px;
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    &__label {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: opacity 0.2s, width 0.2s;
+    }
+
+    &__arrow {
+        flex-shrink: 0;
+        transition: transform 0.2s, opacity 0.2s, width 0.2s;
+        margin-left: auto;
+    }
+
+    // Group container
+    &__group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    // Submenu
+    &__submenu {
+        display: flex;
+        flex-direction: column;
+        padding-left: 16px;
+        background-color: rgba(0, 0, 0, 0.02);
+
+        .left-nav__item {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+    }
+
+    // Divider
+    &__divider {
+        height: 1px;
+        background-color: $left-nav-border-color;
+        margin: 8px 0;
+    }
+}
+
+// Scrollbar styling
+.left-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.left-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.left-nav::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+    border-radius: 3px;
+
+    &:hover {
+        background: #b4b4b4;
+    }
+}

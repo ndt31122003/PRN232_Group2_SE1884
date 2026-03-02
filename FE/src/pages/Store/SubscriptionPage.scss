@@ -1,0 +1,203 @@
+.subscription-page {
+    padding: 2rem;
+    min-height: 100vh;
+    background: #f8f9fa;
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #666;
+        }
+    }
+
+    .current-plan {
+        margin-bottom: 3rem;
+
+        .plan-card-large {
+            background: white;
+            border-radius: 8px;
+            padding: 3rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 3px solid;
+            position: relative;
+
+            .plan-badge {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                padding: 0.5rem 1.5rem;
+                border-radius: 20px;
+                color: white;
+                font-weight: 600;
+                font-size: 0.875rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+                font-weight: 600;
+                margin-bottom: 2rem;
+                color: #333;
+            }
+        }
+
+        .plan-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+
+            .detail-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+
+                .label {
+                    font-size: 0.875rem;
+                    color: #666;
+                    font-weight: 500;
+                }
+
+                .value {
+                    font-size: 1.75rem;
+                    font-weight: 600;
+                    color: #333;
+                }
+            }
+        }
+
+        .subscription-dates {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+
+            .date-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .label {
+                    font-size: 0.875rem;
+                    color: #666;
+                }
+
+                .value {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: #333;
+                }
+            }
+        }
+    }
+
+    .upgrade-section {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 3rem;
+        text-align: center;
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .info-text {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            padding: 0.75rem 2rem;
+            background: white;
+            color: #3665f3;
+            border: 2px solid #3665f3;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover:not(:disabled) {
+                background: #3665f3;
+                color: white;
+            }
+
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    .fees-info {
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+
+            h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: #333;
+            }
+
+            p {
+                font-size: 0.875rem;
+                color: #666;
+                margin-bottom: 1.5rem;
+            }
+
+            .fee-amount {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #3665f3;
+            }
+        }
+    }
+
+    .loading, .error-message {
+        text-align: center;
+        padding: 4rem 0;
+        
+        p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+    }
+}
+

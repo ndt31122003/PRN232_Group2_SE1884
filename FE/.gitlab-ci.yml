@@ -1,0 +1,42 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  FE_DEPLOYMENT_NAME: "ebay-frontend-deployment"
+  FE_NAMESPACE: "ebay-fe"
+
+build_fe:
+  image: docker:cli
+  stage: build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  script:
+    - echo "Building frontend..."
+    - cd FE
+    - docker build -t $FE_IMAGE_NAME -f Dockerfile .
+    - docker push $FE_IMAGE_NAME
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - FE/**/*
+  tags:
+    - hhsk_be
+
+deploy_fe:
+  image: alpine:latest
+  stage: deploy
+  script:
+    - echo "Deploying frontend..."
+    - kubectl rollout restart deployment/$FE_DEPLOYMENT_NAME -n $FE_NAMESPACE
+    - kubectl rollout status deployment/$FE_DEPLOYMENT_NAME -n $FE_NAMESPACE
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - FE/**/*
+  tags:
+    - hhsk_be

@@ -1,0 +1,156 @@
+{
+  "language": {
+    "en": "English",
+    "vi": "Tiếng Việt"
+  },
+  "webname": "Bóc Băng",
+  "search": {
+    "placeholder": "Tìm kiếm"
+  },
+  "homepage": {
+    "title": "Chọn phiên họp để bắt đầu",
+    "describe": "Tạo hoặc chọn phiên họp để bắt đầu ghi chú"
+  },
+  "represent": {},
+  "today": "Hôm nay",
+  "yesterday": "Hôm qua",
+  "record": "Văn bản được ghi",
+  "explore": "Khám phá Bóc Băng",
+  "languageVoice": "vi-VN",
+  "editPlaceholder": "Điền thông tin tại đây",
+  "addFolder": "Thêm vào thư mục",
+  "deleteSession": "Xóa",
+  "editSession": {
+    "titleModal": "Thay đổi tên",
+    "title": "Sửa"
+  },
+  "deleteConfirm": "Bạn có chắc muốn xóa?",
+  "deleteAlert": "Hành động này không thể hoàn tác. Tất cả dữ liệu, bao gồm bản ghi âm sẽ bị xóa",
+  "removeSession": "Xóa lịch sử",
+  "confirm": "Xác Nhận",
+  "Reject": "Hủy",
+  "searchRecord": "Tìm kiếm cuộc họp",
+  "noResultsFound": "Không có kết quả",
+  "setting": "Cài đặt chung",
+  "settingText": "Truy cập tùy chỉnh cài đặt của bạn",
+  "newFolder": "Tạo thư mục mới",
+  "timeSave": "Thời Gian Lưu Trữ",
+  "languageTitle": "Ngôn Ngữ",
+  "chooseTimeSave": "Tùy chọn thời gian lưu trữ",
+  "day": "ngày",
+  "sendNoticeTime": "Gửi thông báo trước khi dữ liệu sắp hết hạn",
+  "save": "Lưu",
+  "settingGeneral": "Thiết Lập Chung",
+  "settingRecord": "Cài Đặt Cuộc Họp",
+  "settingPrivacy": "Cài Đặt Bảo Mật",
+  "preferences": "Tùy Chọn Hiển Thị",
+  "integration": "Tích Hợp Hệ Thống",
+  "help": "Hỗ Trợ Người Dùng",
+  "resetSetting": "Khôi Phục Cài Đặt",
+  "recentSearch": "Các tìm kiếm gần đây",
+  "newRecord": "Bản bóc băng mới",
+  "liveRecord": {
+    "title": "Ghi âm trực tiếp",
+    "describe": "Ghi âm trực tiếp sử dụng microphone của máy,",
+    "time": "Thời gian ghi âm tối đa: 05 giờ",
+    "placeholder": "Nhập tên bản bóc băng mới"
+  },
+  "selectSpeaker": "Chọn người nói",
+  "uploadRecord": {
+    "title": "Ghi âm có sẵn",
+    "describe": "Hỗ trợ bóc băng từ link video YouTube, Facebook, Vimeo,...",
+    "time": "Thời gian xử lý từ 3 đến 5 phút tùy độ dài video",
+    "placeholder": "Dán link cuộc ghi âm có sẵn vào đây"
+  },
+  "empty": {
+    "noItems": "Không có dữ liệu"
+  },
+  "continue": "Tiếp tục",
+  "option": "Hoặc",
+  "hello": "Xin chào, ",
+  "myAccount": "Thông tin tài khoản",
+  "logIn": "Đăng nhập",
+  "logOut": "Đăng xuất",
+  "toast": {
+    "deleteSuccess": "Xóa phiên họp thành công",
+    "deleteFail": "Xóa phiên họp thất bại",
+    "getSessionFail": "Không thể lấy được dữ liệu phiên họp",
+    "createSessionFailed": "Tạo phiên họp mới thất bại",
+    "createSessionSuccess": "Tạo thành công phiên họp mới",
+    "createSessionError": "Vui lòng nhập tên phiên họp",
+    "updateSuccess": "Cập nhật tên phiên họp thành công",
+    "updateFailed": "Cập nhật tên phiên họp thất bại",
+    "addFolderSuccess": "Tạo thư mục mới thành công",
+    "renameFolderSuccess": "Đổi tên thư mục thành công",
+    "deleteFolderSuccess": "Xóa thư mục thành công",
+    "moveFolderSuccess": "Di chuyển thư mục thành công",
+    "moveFolderFail": "Di chuyển thư mực thất bại"
+  },
+  "playRecord": "Phát bản ghi âm",
+  "summarize": "Tóm tắt & Tổng hợp",
+  "export": "Xuất tệp",
+  "infor": "Thông tin",
+  "target": "Mục tiêu cuộc họp",
+  "task": "Đầu mục công việc",
+  "fileExport": {
+    "title": "Xuất văn bản dưới dạng",
+    "addSummarize": "Thêm Tóm tắt & Tổng hợp",
+    "addSpeaker": "Thêm người nói",
+    "addTime": "Thêm mốc thời gian",
+    "loading": "Đang tạo PDF..."
+  },
+  "homePage": "Trang chủ",
+  "removeFiles": "Xóa mục đã chọn",
+  "settingMeeting": {
+    "title": "Cài đặt cuộc họp",
+    "timeStart": "Hẹn giờ bắt đầu:",
+    "check": "Kiểm tra thiết bị:"
+  },
+  "privacyAuth": {
+    "title": "Xác thực người dùng",
+    "enable": "Bật xác thực hai yếu tố",
+    "enableRequire": "Yêu cầu mật khẩu khi truy cập nội dung quan trọng",
+    "buttonOn": "Bật",
+    "buttonOff": "Tắt"
+  },
+  "share": {
+    "title": "Quyền truy cập",
+    "describe": "Chia sẻ quyền truy cập",
+    "button": "Chia sẻ"
+  },
+  "shareModal": {
+    "describe": "Những người có quyền truy cập",
+    "roleView": "Người xem",
+    "roleCommenter": "Người nhận xét",
+    "roleEditor": "Người chỉnh sửa",
+    "roleOwner": "Chủ sở hữu",
+    "role": "Vai trò"
+  },
+  "login": {
+    "title": "Hệ thống chuyển đổi giọng nói thành văn bản",
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "remember": "Lưu thông tin đăng nhập cho lần sau",
+    "save": "Đăng nhập",
+    "username_required": "Vui lòng nhập tên đăng nhập",
+    "password_required": "Vui lòng nhập mật khẩu"
+  },
+  "register": {
+    "title": "Tạo tài khoản",
+    "username": "Tên người dùng",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "email": "Email",
+    "save": "Đăng ký",
+    "username_required": "Vui lòng nhập tên người dùng",
+    "password_required": "Vui lòng nhập mật khẩu",
+    "confirmPassword_required": "Vui lòng xác nhận mật khẩu",
+    "email_required": "Vui lòng nhập email",
+    "email": "Email"
+  },
+  "logout": {
+    "describe": "Bạn chắc chắn muốn đăng xuất?",
+    "confirm": "Đăng xuất",
+    "cancel": "Hủy"
+  }
+}

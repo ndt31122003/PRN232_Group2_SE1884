@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Shipping Label</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 4in;
+            height: 6in;
+            background: #ffffff;
+        }
+        .label {
+            display: flex;
+            flex-direction: column;
+            padding: 0.25in;
+            height: 100%;
+            border: 1px solid #000;
+        }
+        .label__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.2in;
+        }
+        .label__brand {
+            display: flex;
+            gap: 2px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        .label__brand-letter {
+            display: inline-block;
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #ffffff;
+        }
+        .label__brand-letter--red { background: #e53238; }
+        .label__brand-letter--blue { background: #0064d2; }
+        .label__brand-letter--yellow { background: #f5af02; color: #1f2933; }
+        .label__brand-letter--green { background: #86b817; }
+        .label__badge {
+            text-align: right;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+        .label__badge strong {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .label__addresses {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.15in;
+            margin-bottom: 0.2in;
+            font-size: 11px;
+        }
+        .label__address-block h2 {
+            margin: 0 0 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .label__address-block p {
+            margin: 0;
+            line-height: 1.4;
+        }
+        .label__name {
+            font-weight: 700;
+        }
+        .label__details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px 10px;
+            margin-bottom: 0.25in;
+            font-size: 10px;
+        }
+        .label__details div {
+            display: flex;
+            flex-direction: column;
+        }
+        .label__details-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #4b5563;
+            letter-spacing: 0.4px;
+        }
+        .label__details-value {
+            font-weight: 600;
+            color: #111827;
+        }
+        .label__tracking {
+            text-align: center;
+            margin-top: auto;
+        }
+        .label__barcode img {
+            width: 100%;
+            height: 70px;
+            object-fit: contain;
+        }
+        .label__barcode-text {
+            margin-top: 4px;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+        .label__footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.2in;
+            padding-top: 6px;
+            border-top: 1px solid #d1d5db;
+            font-size: 9px;
+        }
+        .label__qr img {
+            width: 0.9in;
+            height: 0.9in;
+        }
+        .label__footer-text {
+            text-align: right;
+            line-height: 1.4;
+        }
+        .label__footer-text p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="label">
+        <header class="label__header">
+            <div class="label__brand">
+                <span class="label__brand-letter label__brand-letter--red">e</span>
+                <span class="label__brand-letter label__brand-letter--blue">b</span>
+                <span class="label__brand-letter label__brand-letter--yellow">a</span>
+                <span class="label__brand-letter label__brand-letter--green">y</span>
+            </div>
+            <div class="label__badge">
+                <strong>{{CarrierBadge}}</strong>
+                <span>Ship {{ShipDateFormatted}}</span>
+                <span>Origin ZIP {{OriginZip}}</span>
+            </div>
+        </header>
+
+        <section class="label__addresses">
+            <div class="label__address-block">
+                <h2>Ship To</h2>
+                <p class="label__name">{{RecipientName}}</p>
+                {{#each RecipientAddressLines}}
+                    <p>{{this}}</p>
+                {{/each}}
+            </div>
+            <div class="label__address-block">
+                <h2>Ship From</h2>
+                <p class="label__name">{{SenderName}}</p>
+                {{#each SenderAddressLines}}
+                    <p>{{this}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        <section class="label__details">
+            <div>
+                <span class="label__details-label">Order</span>
+                <span class="label__details-value">{{OrderNumber}}</span>
+            </div>
+            <div>
+                <span class="label__details-label">Tracking #</span>
+                <span class="label__details-value">{{TrackingNumber}}</span>
+            </div>
+            <div>
+                <span class="label__details-label">Service</span>
+                <span class="label__details-value">{{CarrierName}}{{#if ServiceName}} · {{ServiceName}}{{/if}}</span>
+            </div>
+            {{#if PackageType}}
+            <div>
+                <span class="label__details-label">Package</span>
+                <span class="label__details-value">{{PackageType}}</span>
+            </div>
+            {{/if}}
+            <div>
+                <span class="label__details-label">Weight</span>
+                <span class="label__details-value">{{PackageWeight}}</span>
+            </div>
+            <div>
+                <span class="label__details-label">Dimensions</span>
+                <span class="label__details-value">{{PackageDimensions}}</span>
+            </div>
+            <div>
+                <span class="label__details-label">Postage</span>
+                <span class="label__details-value">{{PostageDisplay}}</span>
+            </div>
+            <div>
+                <span class="label__details-label">Insurance</span>
+                <span class="label__details-value">{{InsuranceDisplay}}</span>
+            </div>
+        </section>
+
+        <section class="label__tracking">
+            <div class="label__barcode">
+                <img src="data:image/png;base64,{{BarcodeBase64}}" alt="Tracking barcode" />
+            </div>
+            <div class="label__barcode-text">{{FormattedBarcode}}</div>
+        </section>
+
+        <footer class="label__footer">
+            <div class="label__qr">
+                <img src="data:image/png;base64,{{QrCodeBase64}}" alt="Carrier QR code" />
+            </div>
+            <div class="label__footer-text">
+                <p>Scan at drop-off for acceptance.</p>
+                <p>Keep this label visible on the package.</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

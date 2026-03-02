@@ -1,0 +1,42 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  BE_DEPLOYMENT_NAME: "ebay-backend-deployment"
+  BE_NAMESPACE: "ebay-be"
+
+build_be:
+  image: docker:cli
+  stage: build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  script:
+    - echo "Building backend..."
+    - cd BE
+    - docker build -t $BE_IMAGE_NAME -f PRN232_EbayClone/PRN232_EbayClone.Api/Dockerfile .
+    - docker push $BE_IMAGE_NAME
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - BE/**/*
+  tags:
+    - hhsk_be
+
+deploy_be:
+  image: alpine:latest
+  stage: deploy
+  script:
+    - echo "Deploying backend..."
+    - kubectl rollout restart deployment/$BE_DEPLOYMENT_NAME -n $BE_NAMESPACE
+    - kubectl rollout status deployment/$BE_DEPLOYMENT_NAME -n $BE_NAMESPACE
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - BE/**/*
+  tags:
+    - hhsk_be

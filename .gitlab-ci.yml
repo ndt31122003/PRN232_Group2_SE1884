@@ -1,0 +1,3 @@
+include:
+  - local: 'BE/.gitlab-ci.yml'
+  - local: 'FE/.gitlab-ci.yml'

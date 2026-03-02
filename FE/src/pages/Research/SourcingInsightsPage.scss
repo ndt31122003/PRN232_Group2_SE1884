@@ -1,0 +1,536 @@
+.sourcing-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: #1f2933;
+}
+
+.sourcing-insights__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7280;
+    max-width: 520px;
+  }
+}
+
+.sourcing-insights__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  flex-wrap: wrap;
+  color: #4b5563;
+}
+
+.sourcing-insights__link {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sourcing-insights__link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.sourcing-insights__divider {
+  color: #d1d5db;
+}
+
+.sourcing-insights__site {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  label {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  select {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 14px;
+    color: #111827;
+    background-color: #fff;
+  }
+}
+
+.sourcing-insights__layout {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sourcing-insights__tabs-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.sourcing-insights__tabs {
+  display: flex;
+  gap: 24px;
+}
+
+.sourcing-insights__tab {
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 0 0 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.sourcing-insights__tab.is-active {
+  color: #111827;
+}
+
+.sourcing-insights__tab.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #111827;
+  border-radius: 999px;
+}
+
+.sourcing-insights__saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.sourcing-insights__info {
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.sourcing-insights__controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.sourcing-insights__control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4b5563;
+
+  select {
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 6px 12px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #111827;
+  }
+}
+
+.sourcing-insights__control--wide {
+  flex: 1 1 260px;
+
+  input {
+    flex: 1;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #111827;
+    width: 100%;
+  }
+
+  input::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.sourcing-insights__note {
+  margin-left: auto;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.sourcing-insights__status {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sourcing-insights__status--error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.sourcing-insights__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.sourcing-insights__card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #f9fafb;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.sourcing-insights__card:hover {
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+  transform: translateY(-2px);
+}
+
+.sourcing-insights__card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2933;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
+  }
+}
+
+.sourcing-insights__card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sourcing-insights__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sourcing-insights__tag--good-opportunity {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.sourcing-insights__tag--emerging {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.sourcing-insights__tag--watchlist {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.sourcing-insights__tag--competitive {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.sourcing-insights__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  dt {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9ca3af;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2933;
+  }
+}
+
+.sourcing-insights__details {
+  border: none;
+  background: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.sourcing-insights__details svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sourcing-insights__card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.sourcing-insights__card-footer strong {
+  color: #1f2933;
+}
+
+.sourcing-insights__save-chip {
+  border: 1px solid #c7d2fe;
+  background: #fff;
+  color: #4c51bf;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.sourcing-insights__save-chip.is-saved {
+  background: #312e81;
+  border-color: #312e81;
+  color: #f8fafc;
+}
+
+.sourcing-insights__table-wrapper {
+  overflow-x: auto;
+}
+
+.sourcing-insights__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+
+  thead {
+    background: #f9fafb;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+  }
+
+  th,
+  td {
+    padding: 16px 18px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    vertical-align: top;
+    color: #1f2933;
+  }
+
+  tbody tr:last-child th,
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: #f3f4f6;
+  }
+}
+
+.sourcing-insights__table-empty {
+  text-align: center;
+  padding: 24px;
+  color: #6b7280;
+}
+
+.sourcing-insights__table-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  span:last-child {
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+.sourcing-insights__table-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d4ed8;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sourcing-insights__table-link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.sourcing-insights__score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.sourcing-insights__score svg {
+  color: #2563eb;
+}
+
+.sourcing-insights__save-toggle {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.sourcing-insights__save-toggle.is-saved {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.sourcing-insights__header-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sourcing-insights__header-with-icon svg {
+  color: #9ca3af;
+}
+
+.sourcing-insights__empty {
+  border: 1px dashed #d1d5db;
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  background: #f9fafb;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2933;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  button {
+    align-self: center;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 999px;
+    padding: 10px 24px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+.sourcing-insights__placeholder {
+  border: 1px dashed #d1d5db;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  background: #f9fafb;
+  color: #6b7280;
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2933;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .sourcing-insights__note {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .sourcing-insights__tabs {
+    gap: 16px;
+  }
+
+  .sourcing-insights__cards {
+    grid-template-columns: 1fr;
+  }
+}

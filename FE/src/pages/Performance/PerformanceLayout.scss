@@ -1,0 +1,116 @@
+/* Custom styling cho Performance Layout - Không dùng Tailwind */
+
+.performance-layout {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    box-sizing: border-box;
+}
+
+.performance-layout__content {
+    flex: 1;
+    padding: 32px 40px 48px 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    min-width: 0;
+    background-color: transparent;
+}
+
+@media (max-width: 1024px) {
+    .performance-layout__content {
+        padding: 24px 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .performance-layout {
+        flex-direction: column;
+    }
+
+    .performance-layout__content {
+        padding: 24px 16px 32px;
+    }
+}
+
+/* Kiểu thẻ card chung */
+.performance-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    margin-bottom: 24px;
+}
+
+.card-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #111827;
+        margin: 0;
+    }
+
+    .card-subtitle {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+    }
+}
+
+.card-body {
+    padding: 24px;
+}
+
+.card-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    &:first-child {
+        padding-top: 0;
+    }
+
+    .metric-label {
+        font-size: 14px;
+        color: #374151;
+        display: flex;
+        align-items: center;
+    }
+
+    .metric-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .metric-value.positive {
+        color: #10b981; // Green
+    }
+
+    .metric-value.negative {
+        color: #ef4444; // Red
+    }
+
+    .metric-value.neutral {
+        color: #6b7280; // Gray
+    }
+}
+
+.info-icon {
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+    margin-left: 8px;
+    cursor: pointer;
+}

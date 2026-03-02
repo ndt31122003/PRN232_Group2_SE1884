@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN232_EbayClone.Domain", "PRN232_EbayClone\PRN232_EbayClone.Domain\PRN232_EbayClone.Domain.csproj", "{B33EC48A-D205-4F61-914A-B0C85E40D47B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN232_EbayClone.Application", "PRN232_EbayClone\PRN232_EbayClone.Application\PRN232_EbayClone.Application.csproj", "{3A4A7DC5-194B-4952-AEB3-668F51C1376E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN232_EbayClone.Infrastructure", "PRN232_EbayClone\PRN232_EbayClone.Infrastructure\PRN232_EbayClone.Infrastructure.csproj", "{81154CF9-5B55-4DE7-A15C-2BE16DAC240E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN232_EbayClone.Api", "PRN232_EbayClone\PRN232_EbayClone.Api\PRN232_EbayClone.Api.csproj", "{5439EF98-4EB6-4569-BAE0-EF6D65EF9349}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN232_EbayClone.Tests", "PRN232_EbayClone.Tests\PRN232_EbayClone.Tests.csproj", "{A4214FA0-A6A3-4C48-A8C9-2B087833F100}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B33EC48A-D205-4F61-914A-B0C85E40D47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B33EC48A-D205-4F61-914A-B0C85E40D47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B33EC48A-D205-4F61-914A-B0C85E40D47B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B33EC48A-D205-4F61-914A-B0C85E40D47B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A4A7DC5-194B-4952-AEB3-668F51C1376E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A4A7DC5-194B-4952-AEB3-668F51C1376E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A4A7DC5-194B-4952-AEB3-668F51C1376E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A4A7DC5-194B-4952-AEB3-668F51C1376E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81154CF9-5B55-4DE7-A15C-2BE16DAC240E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81154CF9-5B55-4DE7-A15C-2BE16DAC240E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81154CF9-5B55-4DE7-A15C-2BE16DAC240E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81154CF9-5B55-4DE7-A15C-2BE16DAC240E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5439EF98-4EB6-4569-BAE0-EF6D65EF9349}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5439EF98-4EB6-4569-BAE0-EF6D65EF9349}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5439EF98-4EB6-4569-BAE0-EF6D65EF9349}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5439EF98-4EB6-4569-BAE0-EF6D65EF9349}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4214FA0-A6A3-4C48-A8C9-2B087833F100}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4214FA0-A6A3-4C48-A8C9-2B087833F100}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4214FA0-A6A3-4C48-A8C9-2B087833F100}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4214FA0-A6A3-4C48-A8C9-2B087833F100}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
