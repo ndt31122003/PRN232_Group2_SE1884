@@ -1,12 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-
-import { ReactComponent as ChevronRightIcon } from "@ebay/skin/dist/svg/icon/icon-chevron-right-16.svg";
-import { ReactComponent as ChevronLeftIcon } from "@ebay/skin/dist/svg/icon/icon-chevron-left-24.svg";
-import { ReactComponent as SearchIcon } from "@ebay/skin/dist/svg/icon/icon-search-16.svg";
-import { ReactComponent as ClearIcon } from "@ebay/skin/dist/svg/icon/icon-clear-16.svg";
-
-import { EbayTextbox, EbayTextboxPrefixIcon, EbayTextboxPostfixIcon } from '@ebay/ui-core-react/ebay-textbox';
-import { EbayFakeLink } from '@ebay/ui-core-react/ebay-fake-link';
+import { HiChevronRight, HiChevronLeft, HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import CategoryService from '../../../services/CategoryService';
 
 const CategoryModal = ({ isOpen, onClose, onSelect, initialSelected }) => {
@@ -174,7 +167,7 @@ const CategoryModal = ({ isOpen, onClose, onSelect, initialSelected }) => {
                                 padding: 6,
                             }}
                         >
-                            <ChevronLeftIcon style={{ width: 24, height: 24 }} />
+                            <HiChevronLeft style={{ width: 24, height: 24 }} />
                         </button>
                     )}
 
@@ -217,24 +210,31 @@ const CategoryModal = ({ isOpen, onClose, onSelect, initialSelected }) => {
                                 justifyContent: "center"
                             }}
                         >
-                            <p style={{ width: "95%", margin: 0 }}>
-                                <EbayTextbox
-                                    fluid
+                            <div style={{ width: "95%", margin: 0, position: "relative", display: "flex", alignItems: "center" }}>
+                                <HiMagnifyingGlass style={{ position: "absolute", left: 12, width: 16, height: 16, color: "#767676" }} />
+                                <input
+                                    type="text"
                                     placeholder="Enter a value"
                                     value={query}
-                                    onInput={(event) => setQuery(event.target.value)}
-                                >
-                                    <EbayTextboxPrefixIcon name="search16" />
-                                    <EbayTextboxPostfixIcon name="clear16" buttonAriaLabel="Clear" />
-                                </EbayTextbox>
-                            </p>
-
-                            <div style={{ display: "none" }}>
-                                <SearchIcon id="icon-search-16" style={{ width: 16, height: 16 }} />
-                            </div>
-
-                            <div style={{ display: "none" }}>
-                                <ClearIcon id="icon-clear-16" style={{ width: 16, height: 16 }} />
+                                    onChange={(event) => setQuery(event.target.value)}
+                                    style={{
+                                        width: "100%",
+                                        padding: "10px 36px",
+                                        border: "1px solid #c7c7c7",
+                                        borderRadius: "8px",
+                                        fontSize: "14px",
+                                        outline: "none",
+                                    }}
+                                />
+                                {query && (
+                                    <button
+                                        onClick={() => setQuery("")}
+                                        style={{ position: "absolute", right: 12, border: "none", background: "none", cursor: "pointer", padding: 0 }}
+                                        aria-label="Clear"
+                                    >
+                                        <HiXMark style={{ width: 16, height: 16, color: "#767676" }} />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     )}
@@ -258,10 +258,13 @@ const CategoryModal = ({ isOpen, onClose, onSelect, initialSelected }) => {
                                             return (
                                                 <span key={p.id}>
 
-                                                    <EbayFakeLink
-                                                        onClick={() => !isLast && handleClickBreadcrumb(idx, true)} >
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => !isLast && handleClickBreadcrumb(idx, true)}
+                                                        style={{ background: "none", border: "none", color: isLast ? "#111" : "#0654ba", cursor: isLast ? "default" : "pointer", padding: 0, fontSize: "inherit", textDecoration: isLast ? "none" : "underline" }}
+                                                    >
                                                         {p.name}
-                                                    </EbayFakeLink>
+                                                    </button>
                                                     {!isLast && <>&nbsp;&gt;&nbsp;</>} {/* chỉ hiển thị dấu > nếu không phải cuối */}
                                                 </span>
                                             );
@@ -341,7 +344,7 @@ const CategoryModal = ({ isOpen, onClose, onSelect, initialSelected }) => {
                                         }}
                                     >
                                         <span style={{ color: "#222" }}>{cat.name}</span>
-                                        {!cat.isLeaf && <ChevronRightIcon style={{ width: 16, height: 16 }} />}
+                                        {!cat.isLeaf && <HiChevronRight style={{ width: 16, height: 16 }} />}
                                     </li>
                                 ))
                             )}

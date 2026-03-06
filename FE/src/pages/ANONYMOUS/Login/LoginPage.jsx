@@ -46,6 +46,11 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Login error:", err);
+      Notice({
+        msg: "Login failed",
+        desc: err?.messages?.[0] || err?.message || "Please check your credentials and try again.",
+        isSuccess: false,
+      });
     } finally {
       setLoading(false);
     }
@@ -96,7 +101,11 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-center gap-3 mb-8">
               <span className="text-gray-700">New to eBay?</span>
-              <button className="px-6 py-2 border-2 border-gray-900 rounded-full text-sm font-medium hover:bg-gray-50 transition">
+              <button
+                type="button"
+                onClick={() => navigate("/register")}
+                className="px-6 py-2 border-2 border-gray-900 rounded-full text-sm font-medium hover:bg-gray-50 transition"
+              >
                 Create account
               </button>
             </div>

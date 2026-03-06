@@ -35,6 +35,8 @@ using PRN232_EbayClone.Infrastructure.Reports;
 using PRN232_EbayClone.Infrastructure.Research;
 using PRN232_EbayClone.Infrastructure.Services;
 using PRN232_EbayClone.Infrastructure.Services.ShippingProvider;
+using PRN232_EbayClone.Infrastructure.Sms;
+using PRN232_EbayClone.Application.Abstractions.Sms;
 using Quartz;
 using Quartz.Simpl;
 using StackExchange.Redis;
@@ -52,6 +54,7 @@ public static class DependencyInjection
             .AddDatabaseServices(configuration)
             .AddIdentityServices(configuration)
             .AddEmailServices(configuration)
+            .AddSmsServices(configuration)
             .AddDomainServices()
             .AddBackgroundJobsServices(configuration)
             .AddInfrastructureHealthChecks()
@@ -192,6 +195,26 @@ public static class DependencyInjection
         return services;
     }
 
+    private static IServiceCollection AddSmsServices(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var twilioSection = configuration.GetSection("Twilio");
+        var enabled = twilioSection.GetValue<bool>("Enabled");
+
+        if (enabled)
+        {
+            services.Configure<TwilioConfiguration>(twilioSection);
+            services.AddTransient<ISmsSender, TwilioSmsSender>();
+        }
+        else
+        {
+            services.AddTransient<ISmsSender, DevSmsSender>();
+        }
+
+        return services;
+    }
+
     private static IServiceCollection AddDomainServices(this IServiceCollection services)
     {
         services.AddScoped<IEmailUniquenessChecker, UserService>();
@@ -285,33 +308,61 @@ public static class DependencyInjection
         return services;
     }
 
+    private static bool TryConnectRedis(string? connectionString, out IConnectionMultiplexer? multiplexer)
+    {
+        multiplexer = null;
+        if (string.IsNullOrWhiteSpace(connectionString) || connectionString.Contains("your_redis"))
+            return false;
+
+        try
+        {
+            multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
     {
         var redisConnection = configuration.GetConnectionString("Redis");
 
-        services.AddSingleton<IConnectionMultiplexer>(_ =>
-            ConnectionMultiplexer.Connect(redisConnection!));
-
-        services.AddStackExchangeRedisCache(options =>
+        if (TryConnectRedis(redisConnection, out var redis))
         {
-            options.Configuration = redisConnection;
-            options.InstanceName = "EbayClone_";
-        });
+            services.AddSingleton(redis!);
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConnection;
+                options.InstanceName = "EbayClone_";
+            });
+        }
+        else
+        {
+            services.AddDistributedMemoryCache();
+        }
 
         return services;
     }
 
     private static IServiceCollection AddSharedDataProtection(this IServiceCollection services)
     {
-        services
+        var dp = services
             .AddDataProtection()
-            .SetApplicationName("EbayClone")
-            .PersistKeysToStackExchangeRedis(() =>
+            .SetApplicationName("EbayClone");
+
+        var hasRedis = services.Any(d => d.ServiceType == typeof(IConnectionMultiplexer));
+        if (hasRedis)
+        {
+            dp.PersistKeysToStackExchangeRedis(() =>
             {
                 var provider = services.BuildServiceProvider();
-                var redis = provider.GetRequiredService<IConnectionMultiplexer>();
-                return redis.GetDatabase();
+                var redisConn = provider.GetRequiredService<IConnectionMultiplexer>();
+                return redisConn.GetDatabase();
             }, "DataProtection-Keys");
+        }
 
         return services;
     }
@@ -320,9 +371,20 @@ public static class DependencyInjection
     {
         services.AddScoped<IRealtimeNotifier, RealtimeNotifier>();
 
-        services
-            .AddSignalR()
-            .AddStackExchangeRedis(configuration.GetConnectionString("Redis")!);
+        var redisConnection = configuration.GetConnectionString("Redis");
+        var signalR = services.AddSignalR();
+
+        if (!string.IsNullOrWhiteSpace(redisConnection) && !redisConnection.Contains("your_redis"))
+        {
+            try
+            {
+                signalR.AddStackExchangeRedis(redisConnection);
+            }
+            catch
+            {
+                // SignalR will use in-memory backplane
+            }
+        }
 
         return services;
     }

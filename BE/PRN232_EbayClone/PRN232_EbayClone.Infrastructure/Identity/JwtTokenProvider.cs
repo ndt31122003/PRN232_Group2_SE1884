@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using PRN232_EbayClone.Application.Abstractions.Authentication;
@@ -26,7 +26,10 @@ public sealed class JwtTokenProvider : ITokenProvider
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Username),
-            new(ClaimTypes.Email,user.Email)
+            new(ClaimTypes.Email, user.Email),
+            new("is_email_verified", user.IsEmailVerified.ToString().ToLowerInvariant()),
+            new("is_phone_verified", user.IsPhoneVerified.ToString().ToLowerInvariant()),
+            new("is_business_verified", user.IsBusinessVerified.ToString().ToLowerInvariant())
         };
 
         if (user.Roles is not null && user.Roles.Any())

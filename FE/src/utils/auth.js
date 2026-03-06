@@ -83,10 +83,17 @@ export const extractUserFromToken = (token) => {
     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
   ]);
 
+  const isEmailVerified = payload["is_email_verified"] === "true";
+  const isPhoneVerified = payload["is_phone_verified"] === "true";
+  const isBusinessVerified = payload["is_business_verified"] === "true";
+
   return {
     id: id ?? null,
     name: name ?? null,
     email: email ?? null,
+    isEmailVerified,
+    isPhoneVerified,
+    isBusinessVerified,
   };
 };
 
@@ -110,7 +117,9 @@ export const mapUserProfile = (source = {}, fallback = {}) => {
     email: normalizedEmail,
     isSellerVerified: Boolean(source?.isSellerVerified ?? source?.IsSellerVerified ?? fallback?.isSellerVerified),
     isEmailVerified: Boolean(source?.isEmailVerified ?? source?.IsEmailVerified ?? fallback?.isEmailVerified),
-    isPaymentVerified: Boolean(source?.isPaymentVerified ?? source?.IsPaymentVerified ?? fallback?.isPaymentVerified)
+    isPaymentVerified: Boolean(source?.isPaymentVerified ?? source?.IsPaymentVerified ?? fallback?.isPaymentVerified),
+    isPhoneVerified: Boolean(source?.isPhoneVerified ?? source?.IsPhoneVerified ?? fallback?.isPhoneVerified),
+    isBusinessVerified: Boolean(source?.isBusinessVerified ?? source?.IsBusinessVerified ?? fallback?.isBusinessVerified)
   };
 };
 
@@ -129,7 +138,9 @@ export const storeUserInfo = (user, { notify = false } = {}) => {
     email: user.email ?? null,
     isSellerVerified: Boolean(user.isSellerVerified),
     isEmailVerified: Boolean(user.isEmailVerified),
-    isPaymentVerified: Boolean(user.isPaymentVerified)
+    isPaymentVerified: Boolean(user.isPaymentVerified),
+    isPhoneVerified: Boolean(user.isPhoneVerified),
+    isBusinessVerified: Boolean(user.isBusinessVerified)
   });
 
   setStorage(STORAGE.USER_INFO, payload);

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Microsoft.Extensions.Configuration;
 using PRN232_EbayClone.Application.Abstractions.Identity;
 using PRN232_EbayClone.Domain.Identity.Entities;
 using PRN232_EbayClone.Domain.Identity.Enums;
@@ -18,17 +19,20 @@ public sealed class ResendOtpCommandHandler : ICommandHandler<ResendOtpCommand, 
     private readonly IUserRepository _userRepository;
     private readonly IOtpGenerator _otpGenerator;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly bool _isSmsSimulation;
 
     public ResendOtpCommandHandler(
         IUserRepository userRepository,
         IOtpRepository otpRepository,
         IOtpGenerator otpGenerator,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IConfiguration configuration)
     {
         _userRepository = userRepository;
         _otpRepository = otpRepository;
         _otpGenerator = otpGenerator;
         _unitOfWork = unitOfWork;
+        _isSmsSimulation = !configuration.GetValue<bool>("Twilio:Enabled");
     }
 
     public async Task<Result<OtpDeliveryResult>> Handle(ResendOtpCommand request, CancellationToken cancellationToken)
@@ -46,8 +50,11 @@ public sealed class ResendOtpCommandHandler : ICommandHandler<ResendOtpCommand, 
             return UserErrors.EmailNotVerified;
         if (request.Type == OtpType.VerifyPayment && user.IsPaymentVerified)
             return UserErrors.PaymentAlreadyVerified;
+        if (request.Type == OtpType.VerifyPhone && user.IsPhoneVerified)
+            return UserErrors.PhoneAlreadyVerified;
 
-        var isSimulation = request.Type is OtpType.VerifyEmail or OtpType.VerifyPayment;
+        var isSimulation = request.Type is OtpType.VerifyEmail or OtpType.VerifyPayment
+                           || (request.Type == OtpType.VerifyPhone && _isSmsSimulation);
 
         var otp = await _otpRepository.GetByEmailAndTypeAsync(
             emailOrError.Value,

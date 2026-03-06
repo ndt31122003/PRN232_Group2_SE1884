@@ -1,4 +1,5 @@
-﻿using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Domain.Identity.Entities;
 using PRN232_EbayClone.Domain.Users.Entities;
 using PRN232_EbayClone.Domain.Users.Services;
 
@@ -8,7 +9,7 @@ public sealed record RegisterUserCommand(
     string Email,
     string FullName,
     string Password
-) : ICommand;
+) : ICommand<LoginCommandResult>;
 
 public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
@@ -31,25 +32,32 @@ public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUse
     }
 }
 
-public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand>
+public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, LoginCommandResult>
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ITokenProvider _tokenProvider;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IEmailUniquenessChecker _emailUniquenessChecker;
     private readonly IUnitOfWork _unitOfWork;
+
     public RegisterUserCommandHandler(
         IUserRepository userRepository,
         IPasswordHasher passwordHasher,
+        ITokenProvider tokenProvider,
+        IRefreshTokenRepository refreshTokenRepository,
         IEmailUniquenessChecker emailUniquenessChecker,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _tokenProvider = tokenProvider;
+        _refreshTokenRepository = refreshTokenRepository;
         _emailUniquenessChecker = emailUniquenessChecker;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LoginCommandResult>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         var passwordHash = _passwordHasher.Hash(request.Password);
 
@@ -62,11 +70,16 @@ public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCom
         if (userOrError.IsFailure)
             return userOrError.Error;
 
-        _userRepository.Add(userOrError.Value);
+        var user = userOrError.Value;
+        _userRepository.Add(user);
+
+        var accessToken = _tokenProvider.GenerateAccessToken(user);
+        var refreshToken = RefreshToken.Create(user.Id, _tokenProvider.GenerateRefreshToken());
+        _refreshTokenRepository.Add(refreshToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        return new LoginCommandResult(accessToken, refreshToken.Token);
     }
 }
 
