@@ -61,3 +61,7 @@ yarn-error.log*
 
 
 *.log
+
+# Secrets - DO NOT commit real credentials
+appsettings.Development.json
+appsettings.Production.json
