@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: PRN232_EbayClone/PRN232_EbayClone.Api/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ConnectionStrings__Redis=redis:6379
+    depends_on:
+      - redis
+
+volumes:
+  redis_data:
