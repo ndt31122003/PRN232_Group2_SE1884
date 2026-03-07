@@ -10,6 +10,9 @@ namespace PRN232_EbayClone.Domain.Coupons.Entities;
 public sealed class Coupon : AggregateRoot<Guid>
 {
     private readonly List<CouponCondition> _conditions = [];
+    private readonly List<CouponExcludedCategory> _excludedCategories = [];
+    private readonly List<CouponExcludedItem> _excludedItems = [];
+    private readonly List<CouponTargetAudience> _targetAudiences = [];
 
     public Guid CouponTypeId { get; private set; }
     public CouponType CouponType { get; private set; } = null!;
@@ -30,6 +33,9 @@ public sealed class Coupon : AggregateRoot<Guid>
     public bool IsActive { get; private set; }
 
     public IReadOnlyCollection<CouponCondition> Conditions => _conditions.AsReadOnly();
+    public IReadOnlyCollection<CouponExcludedCategory> ExcludedCategories => _excludedCategories.AsReadOnly();
+    public IReadOnlyCollection<CouponExcludedItem> ExcludedItems => _excludedItems.AsReadOnly();
+    public IReadOnlyCollection<CouponTargetAudience> TargetAudiences => _targetAudiences.AsReadOnly();
 
     private Coupon(Guid id) : base(id)
     {
@@ -127,7 +133,7 @@ public sealed class Coupon : AggregateRoot<Guid>
         return Result.Success();
     }
 
-    public Result RemoveCondition(Guid conditionId)
+public Result RemoveCondition(Guid conditionId)
     {
         var existing = _conditions.FirstOrDefault(x => x.Id == conditionId);
         if (existing is null)
@@ -136,6 +142,85 @@ public sealed class Coupon : AggregateRoot<Guid>
         }
 
         _conditions.Remove(existing);
+        return Result.Success();
+    }
+
+    public Result AddExcludedCategory(CouponExcludedCategory category)
+    {
+        if (category.CouponId != Id)
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        if (_excludedCategories.Any(c => c.CategoryId == category.CategoryId))
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        _excludedCategories.Add(category);
+        return Result.Success();
+    }
+
+    public Result RemoveExcludedCategory(Guid categoryId)
+    {
+        var existing = _excludedCategories.FirstOrDefault(x => x.CategoryId == categoryId);
+        if (existing is null)
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        _excludedCategories.Remove(existing);
+        return Result.Success();
+    }
+
+    public Result AddExcludedItem(CouponExcludedItem item)
+    {
+        if (item.CouponId != Id)
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        if (_excludedItems.Any(i => i.ItemId == item.ItemId))
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        _excludedItems.Add(item);
+        return Result.Success();
+    }
+
+    public Result RemoveExcludedItem(Guid itemId)
+    {
+        var existing = _excludedItems.FirstOrDefault(x => x.ItemId == itemId);
+        if (existing is null)
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        _excludedItems.Remove(existing);
+        return Result.Success();
+    }
+
+    public Result AddTargetAudience(CouponTargetAudience audience)
+    {
+        if (audience.CouponId != Id)
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        _targetAudiences.Add(audience);
+        return Result.Success();
+    }
+
+    public Result RemoveTargetAudience(Guid audienceId)
+    {
+        var existing = _targetAudiences.FirstOrDefault(x => x.Id == audienceId);
+        if (existing is null)
+        {
+            return CouponErrors.InvalidCondition;
+        }
+
+        _targetAudiences.Remove(existing);
         return Result.Success();
     }
 

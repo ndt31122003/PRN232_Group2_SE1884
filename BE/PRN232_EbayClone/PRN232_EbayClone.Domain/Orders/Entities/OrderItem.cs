@@ -7,6 +7,7 @@ public class OrderItem(Guid id) : AggregateRoot<Guid>(id)
 {
     public Guid ListingId { get; private set; }
     public Guid? VariationId { get; private set; }
+    public Guid? CategoryId { get; private set; }
     public string Title { get; private set; } = null!;
     public string ImageUrl { get; private set; } = null!;
 
@@ -16,7 +17,8 @@ public class OrderItem(Guid id) : AggregateRoot<Guid>(id)
     public Money TotalPrice { get; private set; } = null!;
     public static OrderItem Create(
         Guid listingId,
-        Guid variationId,
+        Guid? variationId,
+        Guid? categoryId,
         string imageUrl,
         string title,
         string sku,
@@ -31,6 +33,7 @@ public class OrderItem(Guid id) : AggregateRoot<Guid>(id)
         {
             ListingId = listingId,
             VariationId = variationId == Guid.Empty ? null : variationId,
+            CategoryId = categoryId,
             Title = title,
             ImageUrl = imageUrl,
             Sku = sku,

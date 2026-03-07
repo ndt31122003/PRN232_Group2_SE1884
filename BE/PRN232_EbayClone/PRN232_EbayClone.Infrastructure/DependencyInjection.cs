@@ -98,8 +98,9 @@ public static class DependencyInjection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPerformanceRepository, PerformanceRepository>();
-        services.AddScoped<ICouponRepository, CouponRepository>();
+services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<ICouponTypeRepository, CouponTypeRepository>();
+        services.AddScoped<IVoucherRepository, VoucherRepository>();
         services.AddScoped<ISaleEventRepository, SaleEventRepository>();
         services.AddScoped<IShippingLabelRepository, ShippingLabelRepository>();
         services.AddScoped<ICancellationRequestRepository, CancellationRequestRepository>();

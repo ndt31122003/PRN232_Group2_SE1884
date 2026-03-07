@@ -18,6 +18,14 @@ public sealed class CouponType : AggregateRoot<Guid>
         CreatedAt = DateTime.UtcNow;
     }
 
+    public CouponType(Guid id, string name, string? description, bool isActive) : base(id)
+    {
+        Name = name;
+        Description = description;
+        IsActive = isActive;
+        CreatedAt = DateTime.UtcNow;
+    }
+
     public static Result<CouponType> Create(string name, string? description)
     {
         if (string.IsNullOrWhiteSpace(name))
