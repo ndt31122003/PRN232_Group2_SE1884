@@ -1,44 +1,21 @@
 ﻿using System;
-using PRN232_EbayClone.Domain.Shared.Abstractions;
-using PRN232_EbayClone.Domain.Shared.ValueObjects;
+using System.Collections.Generic;
 
-namespace PRN232_EbayClone.Domain.Orders.Entities;
-public class OrderItem(Guid id) : AggregateRoot<Guid>(id)
+namespace PRN232_EbayClone.Infrastructure.Persistence.Scaffolded;
+
+public partial class Orderitem
 {
-    public Guid ListingId { get; private set; }
-    public Guid? VariationId { get; private set; }
-    public string Title { get; private set; } = null!;
-    public string ImageUrl { get; private set; } = null!;
+    public Guid Id { get; set; }
 
-    public string Sku { get; private set; } = null!;
-    public int Quantity { get; private set; }
-    public Money UnitPrice { get; private set; } = null!;
-    public Money TotalPrice { get; private set; } = null!;
-    public static OrderItem Create(
-        Guid listingId,
-        Guid variationId,
-        string imageUrl,
-        string title,
-        string sku,
-        int quantity,
-        Money unitPrice)
-    {
-        if (quantity <= 0)
-            throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
-        if (unitPrice.Amount <= 0)
-            throw new ArgumentException("Unit price must be greater than zero.", nameof(unitPrice));
-        var orderItem = new OrderItem(Guid.NewGuid())
-        {
-            ListingId = listingId,
-            VariationId = variationId == Guid.Empty ? null : variationId,
-            Title = title,
-            ImageUrl = imageUrl,
-            Sku = sku,
-            Quantity = quantity,
-            UnitPrice = unitPrice,
-            TotalPrice = Money.Create(unitPrice.Amount * quantity, unitPrice.Currency).Value
-        };
-        return orderItem;
-    }
+    public Guid? Orderid { get; set; }
 
+    public Guid? Productid { get; set; }
+
+    public int? Quantity { get; set; }
+
+    public decimal? Unitprice { get; set; }
+
+    public virtual Ordertable? Order { get; set; }
+
+    public virtual Product? Product { get; set; }
 }
