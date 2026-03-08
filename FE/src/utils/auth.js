@@ -86,6 +86,7 @@ export const extractUserFromToken = (token) => {
   const isEmailVerified = payload["is_email_verified"] === "true";
   const isPhoneVerified = payload["is_phone_verified"] === "true";
   const isBusinessVerified = payload["is_business_verified"] === "true";
+  const isSellerVerified = payload["is_seller_verified"] === "true";
 
   return {
     id: id ?? null,
@@ -94,6 +95,7 @@ export const extractUserFromToken = (token) => {
     isEmailVerified,
     isPhoneVerified,
     isBusinessVerified,
+    isSellerVerified,
   };
 };
 
@@ -191,4 +193,9 @@ export const getStoredUser = () => {
   }
 
   return user;
+};
+
+export const isSellerVerified = () => {
+  const user = getStoredUser();
+  return Boolean(user?.isSellerVerified);
 };

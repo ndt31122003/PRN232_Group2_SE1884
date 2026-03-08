@@ -29,6 +29,8 @@ public sealed class User : AggregateRoot<UserId>
     public BusinessAddress? BusinessAddress { get; private set; }
     public bool IsBusinessVerified { get; private set; } = false;
 
+    public bool IsSellerVerified => IsEmailVerified && IsPhoneVerified && IsBusinessVerified;
+
     //Seller
     public SellerPerformanceLevel PerformanceLevel { get; private set; } = SellerPerformanceLevel.BelowStandard;
     public SellingLimitPolicy LimitPolicy => SellingLimitPolicy.For(PerformanceLevel);
@@ -112,10 +114,8 @@ public sealed class User : AggregateRoot<UserId>
 
     public Result AddListing(Listing listing)
     {
-        if(!IsEmailVerified)
-            return UserErrors.EmailNotVerified;
-        if(!IsPaymentVerified)
-            return UserErrors.PaymentNotVerified;
+        if (!IsSellerVerified)
+            return UserErrors.SellerNotVerified;
 
         if (!CanPostNewListing(listing))
             return Error.Failure(

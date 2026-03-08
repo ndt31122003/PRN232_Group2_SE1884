@@ -136,10 +136,7 @@ const ListingForm = () => {
       return true;
     }
     const stored = getStoredUser();
-    return Boolean(
-      stored?.isEmailVerified
-      && stored?.isPaymentVerified
-    );
+    return Boolean(stored?.isSellerVerified);
   });
 
   useEffect(() => {
@@ -149,10 +146,7 @@ const ListingForm = () => {
 
     const handleUserInfoUpdated = () => {
       const updated = getStoredUser();
-      setCanManageListing(Boolean(
-        updated?.isEmailVerified
-        && updated?.isPaymentVerified
-      ));
+      setCanManageListing(Boolean(updated?.isSellerVerified));
     };
 
     if (typeof window !== "undefined") {
@@ -176,12 +170,15 @@ const ListingForm = () => {
     if (!snapshot?.isEmailVerified) {
       requirements.push("xác minh email");
     }
-    if (!snapshot?.isPaymentVerified) {
-      requirements.push("xác minh thanh toán");
+    if (!snapshot?.isPhoneVerified) {
+      requirements.push("xác minh số điện thoại");
+    }
+    if (!snapshot?.isBusinessVerified) {
+      requirements.push("xác minh doanh nghiệp");
     }
     const desc = requirements.length > 0
-      ? `Vui lòng ${requirements.join(" và ")} trước khi tạo tin đăng.`
-      : "Truy cập Account settings để hoàn tất xác minh.";
+      ? `Vui lòng ${requirements.join(", ")} trước khi tạo tin đăng.`
+      : "Truy cập trang đăng ký để hoàn tất xác minh.";
 
     Notice({
       msg: "Chưa đủ điều kiện để tạo tin đăng.",
@@ -189,7 +186,7 @@ const ListingForm = () => {
       isSuccess: false
     });
 
-    navigate("/account/settings", { replace: true });
+    navigate("/register", { replace: true });
   }, [canManageListing, isCreatingNewListing, navigate]);
 
   const [files, setFiles] = useState([]);

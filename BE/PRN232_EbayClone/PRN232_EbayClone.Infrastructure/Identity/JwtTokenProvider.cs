@@ -29,7 +29,8 @@ public sealed class JwtTokenProvider : ITokenProvider
             new(ClaimTypes.Email, user.Email),
             new("is_email_verified", user.IsEmailVerified.ToString().ToLowerInvariant()),
             new("is_phone_verified", user.IsPhoneVerified.ToString().ToLowerInvariant()),
-            new("is_business_verified", user.IsBusinessVerified.ToString().ToLowerInvariant())
+            new("is_business_verified", user.IsBusinessVerified.ToString().ToLowerInvariant()),
+            new("is_seller_verified", user.IsSellerVerified.ToString().ToLowerInvariant())
         };
 
         if (user.Roles is not null && user.Roles.Any())
