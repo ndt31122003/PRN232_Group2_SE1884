@@ -1,84 +1,23 @@
-using PRN232_EbayClone.Domain.Disputes.Enums;
-using PRN232_EbayClone.Domain.Disputes.Errors;
-using PRN232_EbayClone.Domain.Listings.Entities;
-using PRN232_EbayClone.Domain.Shared.Abstractions;
-using PRN232_EbayClone.Domain.Shared.Results;
+﻿using System;
+using System.Collections.Generic;
 
-namespace PRN232_EbayClone.Domain.Disputes.Entities;
+namespace PRN232_EbayClone.Infrastructure.Persistence.Scaffolded;
 
-public class Dispute : AggregateRoot<Guid>
+public partial class Dispute
 {
-    public Guid ListingId { get; private set; }
-    public string RaisedById { get; private set; } = null!;
-    public string Reason { get; private set; } = null!;
-    public string Status { get; private set; } = null!;
+    public int Id { get; set; }
 
-    // Navigation properties
-    public Listing? Listing { get; private set; }
+    public int? Orderid { get; set; }
 
-    private Dispute(Guid id) : base(id) { }
+    public int? Raisedby { get; set; }
 
-    public static Result<Dispute> Create(
-        Guid listingId,
-        string raisedById,
-        string reason)
-    {
-        if (string.IsNullOrWhiteSpace(raisedById))
-        {
-            return Error.Validation("Dispute.RaisedByIdRequired", "Raised by ID là bắt buộc");
-        }
+    public string? Description { get; set; }
 
-        if (string.IsNullOrWhiteSpace(reason))
-        {
-            return DisputeErrors.ReasonRequired;
-        }
+    public string? Status { get; set; }
 
-        var dispute = new Dispute(Guid.NewGuid())
-        {
-            ListingId = listingId,
-            RaisedById = raisedById,
-            Reason = reason,
-            Status = DisputeStatus.Open.ToString()
-        };
+    public string? Resolution { get; set; }
 
-        return Result.Success(dispute);
-    }
+    public virtual Ordertable? Order { get; set; }
 
-    public Result UpdateStatus(string newStatus)
-    {
-        if (!Enum.TryParse<DisputeStatus>(newStatus, ignoreCase: true, out var status))
-        {
-            return Error.Validation("Dispute.InvalidStatus", $"Trạng thái không hợp lệ: {newStatus}");
-        }
-
-        if (status == DisputeStatus.Closed || status == DisputeStatus.Resolved)
-        {
-            // Can only update to closed/resolved from other statuses
-            if (Status == DisputeStatus.Closed.ToString() || Status == DisputeStatus.Resolved.ToString())
-            {
-                return DisputeErrors.CannotUpdate;
-            }
-        }
-
-        Status = newStatus;
-        return Result.Success();
-    }
-
-    public Result UpdateReason(string reason)
-    {
-        if (string.IsNullOrWhiteSpace(reason))
-        {
-            return DisputeErrors.ReasonRequired;
-        }
-
-        if (Status == DisputeStatus.Closed.ToString() || Status == DisputeStatus.Resolved.ToString())
-        {
-            return DisputeErrors.CannotUpdate;
-        }
-
-        Reason = reason;
-        return Result.Success();
-    }
-
-    public bool IsClosed => Status == DisputeStatus.Closed.ToString() || Status == DisputeStatus.Resolved.ToString();
+    public virtual User1? RaisedbyNavigation { get; set; }
 }
