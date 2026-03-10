@@ -3,44 +3,67 @@
 ## Yêu cầu
 - Docker
 - Docker Compose
+- .NET 8 SDK (để chạy migration locally)
 
 ## Cách 1: Sử dụng Docker Compose (Khuyến nghị)
 
+### Build và chạy container
 ```bash
 cd BE
-docker-compose up -d
+docker compose build
+docker compose up -d
 ```
 
-Đợi container khởi động xong, sau đó chạy migration:
-
+### Chạy Migration (lần đầu hoặc khi có thay đổi database)
 ```bash
-docker-compose exec api dotnet ef database update --project /app/PRN232_EbayClone.Infrastructure/PRN232_EbayClone.Infrastructure.csproj --startup-project /app/PRN232_EbayClone.Api/PRN232_EbayClone.Api.csproj --no-build
+cd BE/PRN232_EbayClone/PRN232_EbayClone.Infrastructure
+dotnet ef database update --connection "Host=aws-1-ap-northeast-1.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.cdvfbycudyhkqowylnhk;Password=EmThinhShizuka"
 ```
 
-## Cách 2: Chạy thủ công
-
-### 1. Chạy Redis và PostgreSQL
+Hoặc nếu chạy migration từ trong container:
 ```bash
-docker run -d --name redis -p 6379:6379 redis:alpine
-docker run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ebayclone -p 5432:5432 postgres:15-alpine
+docker compose exec api dotnet ef database update --project /app/PRN232_EbayClone.Infrastructure/PRN232_EbayClone.Infrastructure.csproj --startup-project /app/PRN232_EbayClone.Api/PRN232_EbayClone.Api.csproj --no-build
 ```
 
-### 2. Build và chạy API
+## EF Core Migration Commands
+
+### Tạo Migration mới
 ```bash
-cd BE
-docker build -t ebayclone-api -f PRN232_EbayClone/PRN232_EbayClone.Api/Dockerfile .
-docker run -d -p 8080:8080 -p 8081:8081 --name ebayclone-api --link postgres:postgres --link redis:redis ebayclone-api
+cd BE/PRN232_EbayClone/PRN232_EbayClone.Infrastructure
+dotnet ef migrations add <MigrationName>
 ```
 
-### 3. Chạy Migration
+### Xem danh sách Migration
 ```bash
-docker exec ebayclone-api dotnet ef database update --project /app/PRN232_EbayClone.Infrastructure/PRN232_EbayClone.Infrastructure.csproj --startup-project /app/PRN232_EbayClone.Api/PRN232_EbayClone.Api.csproj
+dotnet ef migrations list
 ```
 
-## API
+### Revert Migration (xóa migration cuối cùng)
+```bash
+dotnet ef migrations remove
+```
+
+### Tạo lại toàn bộ Migration (xóa hết và tạo lại)
+```bash
+# Xóa các file migration trong folder Migrations (giữ lại ApplicationDbContextModelSnapshot.cs nếu cần)
+dotnet ef migrations add InitialCreate
+```
+
+### Update database lên migration mới nhất
+```bash
+dotnet ef database update
+```
+
+### Update database đến một migration cụ thể
+```bash
+dotnet ef database update <MigrationName>
+```
+
+## API Endpoints
 
 - Swagger: http://localhost:8080/swagger
 - API: http://localhost:8080
+- Health Check: http://localhost:8080/
 
 ## Đăng ký tài khoản
 
@@ -70,5 +93,5 @@ curl -X POST http://localhost:8080/api/identity/login \
 ## Xóa container
 
 ```bash
-docker rm -f ebayclone-api
+docker compose down
 ```
