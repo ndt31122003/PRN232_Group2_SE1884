@@ -58,6 +58,26 @@ public class StoreConfiguration : IEntityTypeConfiguration<Store>
             .HasColumnName("is_active")
             .IsRequired();
 
+        builder.Property(s => s.ThemeColor)
+            .HasColumnName("theme_color")
+            .HasMaxLength(50);
+
+        builder.Property(s => s.LayoutConfig)
+            .HasColumnName("layout_config")
+            .HasColumnType("text");
+
+        builder.Property(s => s.ContactEmail)
+            .HasColumnName("contact_email")
+            .HasMaxLength(255);
+
+        builder.Property(s => s.ContactPhone)
+            .HasColumnName("contact_phone")
+            .HasMaxLength(50);
+
+        builder.Property(s => s.SocialLinks)
+            .HasColumnName("social_links")
+            .HasColumnType("text");
+
         builder.HasMany(s => s.Subscriptions)
             .WithOne()
             .HasForeignKey("StoreId")

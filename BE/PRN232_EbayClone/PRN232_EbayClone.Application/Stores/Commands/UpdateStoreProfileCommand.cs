@@ -10,7 +10,11 @@ public sealed record UpdateStoreProfileCommand(
     string Name,
     string? Description = null,
     string? LogoUrl = null,
-    string? BannerUrl = null
+    string? BannerUrl = null,
+    string? ThemeColor = null,
+    string? ContactEmail = null,
+    string? ContactPhone = null,
+    string? SocialLinks = null
 ) : ICommand;
 
 public sealed class UpdateStoreProfileCommandValidator : AbstractValidator<UpdateStoreProfileCommand>
@@ -35,6 +39,19 @@ public sealed class UpdateStoreProfileCommandValidator : AbstractValidator<Updat
         RuleFor(x => x.BannerUrl)
             .MaximumLength(500).WithMessage("URL banner không được vượt quá 500 ký tự")
             .When(x => !string.IsNullOrEmpty(x.BannerUrl));
+
+        RuleFor(x => x.ThemeColor)
+            .MaximumLength(50).WithMessage("Mã màu không được vượt quá 50 ký tự")
+            .When(x => !string.IsNullOrEmpty(x.ThemeColor));
+
+        RuleFor(x => x.ContactEmail)
+            .MaximumLength(255).WithMessage("Email liên hệ không được vượt quá 255 ký tự")
+            .EmailAddress().WithMessage("Email liên hệ không hợp lệ")
+            .When(x => !string.IsNullOrEmpty(x.ContactEmail));
+
+        RuleFor(x => x.ContactPhone)
+            .MaximumLength(50).WithMessage("Số điện thoại liên hệ không được vượt quá 50 ký tự")
+            .When(x => !string.IsNullOrEmpty(x.ContactPhone));
     }
 }
 
@@ -74,7 +91,11 @@ public sealed class UpdateStoreProfileCommandHandler : ICommandHandler<UpdateSto
             request.Name,
             request.Description,
             request.LogoUrl,
-            request.BannerUrl);
+            request.BannerUrl,
+            request.ThemeColor,
+            request.ContactEmail,
+            request.ContactPhone,
+            request.SocialLinks);
 
         if (updateResult.IsFailure)
             return updateResult.Error;

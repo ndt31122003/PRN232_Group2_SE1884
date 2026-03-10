@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PRN232_EbayClone.Domain.Users.Entities;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
@@ -77,6 +77,33 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
 
         builder.Ignore(s => s.LimitPolicy);
+
+        builder.Property(u => u.PhoneNumber)
+            .HasColumnName("phone_number")
+            .HasMaxLength(20)
+            .IsRequired(false);
+
+        builder.Property(u => u.IsPhoneVerified)
+            .HasColumnName("is_phone_verified")
+            .IsRequired();
+
+        builder.Property(u => u.BusinessName)
+            .HasColumnName("business_name")
+            .HasMaxLength(200)
+            .IsRequired(false);
+
+        builder.Property(u => u.IsBusinessVerified)
+            .HasColumnName("is_business_verified")
+            .IsRequired();
+
+        builder.OwnsOne(u => u.BusinessAddress, ba =>
+        {
+            ba.Property(a => a.Street).HasColumnName("business_street").HasMaxLength(300);
+            ba.Property(a => a.City).HasColumnName("business_city").HasMaxLength(100);
+            ba.Property(a => a.State).HasColumnName("business_state").HasMaxLength(100);
+            ba.Property(a => a.ZipCode).HasColumnName("business_zip_code").HasMaxLength(20);
+            ba.Property(a => a.Country).HasColumnName("business_country").HasMaxLength(100);
+        });
 
         builder.HasData(DemoSeedData.Users);
     }

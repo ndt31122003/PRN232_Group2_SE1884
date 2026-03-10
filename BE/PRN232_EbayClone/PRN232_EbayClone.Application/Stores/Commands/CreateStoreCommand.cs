@@ -67,9 +67,8 @@ public sealed class CreateStoreCommandHandler : ICommandHandler<CreateStoreComma
         if (user is null)
             return UserErrors.NotFound;
 
-        // Check if seller is verified (optional validation)
-        // if (!user.IsPaymentVerified)
-        //     return StoreErrors.SellerNotVerified;
+        if (!user.IsSellerVerified)
+            return UserErrors.SellerNotVerified;
 
         // Check if slug already exists
         var tempSlug = GenerateSlug(request.Name);

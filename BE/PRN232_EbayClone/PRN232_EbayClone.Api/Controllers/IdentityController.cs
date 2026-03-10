@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRN232_EbayClone.Application.Identity.Commands;
+using PRN232_EbayClone.Application.Identity.Queries;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 
@@ -123,4 +125,24 @@ public class IdentityController(ISender sender) : ApiController(sender)
     [HttpPost("resend-otp")]
     public Task<IActionResult> ResendOtp(ResendOtpCommand command, CancellationToken cancellationToken)
         => SendAsync(command, cancellationToken);
+
+    [Authorize]
+    [HttpPost("set-phone")]
+    public Task<IActionResult> SetPhoneNumber(SetPhoneNumberCommand command, CancellationToken cancellationToken)
+        => SendAsync(command, cancellationToken);
+
+    [Authorize]
+    [HttpPost("verify-phone")]
+    public Task<IActionResult> VerifyPhone(VerifyPhoneCommand command, CancellationToken cancellationToken)
+        => SendAsync(command, cancellationToken);
+
+    [Authorize]
+    [HttpPost("submit-business")]
+    public Task<IActionResult> SubmitBusiness(SubmitBusinessVerificationCommand command, CancellationToken cancellationToken)
+        => SendAsync(command, cancellationToken);
+
+    [Authorize]
+    [HttpGet("registration-status")]
+    public Task<IActionResult> GetRegistrationStatus(CancellationToken cancellationToken)
+        => SendAsync(new GetRegistrationStatusQuery(), cancellationToken);
 }

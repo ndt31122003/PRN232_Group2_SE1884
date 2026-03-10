@@ -18,6 +18,12 @@ public sealed class Store : AggregateRoot<StoreId>
     public StoreType StoreType { get; private set; }
     public bool IsActive { get; private set; }
 
+    public string? ThemeColor { get; private set; }
+    public string? LayoutConfig { get; private set; }
+    public string? ContactEmail { get; private set; }
+    public string? ContactPhone { get; private set; }
+    public string? SocialLinks { get; private set; }
+
     private readonly List<StoreSubscription> _subscriptions = [];
     public IReadOnlyCollection<StoreSubscription> Subscriptions => _subscriptions.AsReadOnly();
 
@@ -50,7 +56,15 @@ public sealed class Store : AggregateRoot<StoreId>
         return store;
     }
 
-    public Result UpdateProfile(string name, string? description, string? logoUrl, string? bannerUrl)
+    public Result UpdateProfile(
+        string name,
+        string? description,
+        string? logoUrl,
+        string? bannerUrl,
+        string? themeColor = null,
+        string? contactEmail = null,
+        string? contactPhone = null,
+        string? socialLinks = null)
     {
         if (string.IsNullOrWhiteSpace(name))
             return StoreErrors.NameRequired;
@@ -63,6 +77,10 @@ public sealed class Store : AggregateRoot<StoreId>
         Description = description;
         LogoUrl = logoUrl;
         BannerUrl = bannerUrl;
+        ThemeColor = themeColor;
+        ContactEmail = contactEmail;
+        ContactPhone = contactPhone;
+        SocialLinks = socialLinks;
 
         return Result.Success();
     }

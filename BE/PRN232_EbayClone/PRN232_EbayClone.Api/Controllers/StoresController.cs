@@ -29,7 +29,11 @@ public sealed class StoresController(ISender sender) : ApiController(sender)
             request.Name,
             request.Description,
             request.LogoUrl,
-            request.BannerUrl);
+            request.BannerUrl,
+            request.ThemeColor,
+            request.ContactEmail,
+            request.ContactPhone,
+            request.SocialLinks);
         return SendAsync(command, cancellationToken);
     }
 }
@@ -38,5 +42,9 @@ public sealed record UpdateStoreProfileRequest(
     string Name,
     string? Description = null,
     string? LogoUrl = null,
-    string? BannerUrl = null
+    string? BannerUrl = null,
+    string? ThemeColor = null,
+    string? ContactEmail = null,
+    string? ContactPhone = null,
+    string? SocialLinks = null
 );

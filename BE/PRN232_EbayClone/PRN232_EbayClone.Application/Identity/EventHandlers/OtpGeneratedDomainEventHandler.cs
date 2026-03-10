@@ -1,4 +1,5 @@
-﻿using PRN232_EbayClone.Application.Abstractions.Mail;
+using PRN232_EbayClone.Application.Abstractions.Mail;
+using PRN232_EbayClone.Application.Abstractions.Sms;
 using PRN232_EbayClone.Domain.Identity.Enums;
 using PRN232_EbayClone.Domain.Identity.Events;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
@@ -8,22 +9,35 @@ namespace PRN232_EbayClone.Application.Identity.EventHandlers;
 public sealed class OtpGeneratedDomainEventHandler : INotificationHandler<OtpGeneratedDomainEvent>
 {
     private readonly IEmailSender _emailSender;
+    private readonly ISmsSender _smsSender;
     private readonly ITemplateRenderer _templateRenderer;
     private readonly IUserRepository _userRepository;
 
     public OtpGeneratedDomainEventHandler(
         ITemplateRenderer templateRenderer,
         IEmailSender emailSender,
+        ISmsSender smsSender,
         IUserRepository userRepository)
     {
         _templateRenderer = templateRenderer;
         _emailSender = emailSender;
+        _smsSender = smsSender;
         _userRepository = userRepository;
     }
 
     public async Task Handle(OtpGeneratedDomainEvent notification, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByEmailAsync(new Email(notification.Email), cancellationToken);
+
+        if (notification.Type == OtpType.VerifyPhone)
+        {
+            if (user?.PhoneNumber is not null)
+            {
+                var smsMessage = $"Your verification code is {notification.Code}. It expires in {notification.ExpiresInMinutes} minutes.";
+                await _smsSender.SendSmsAsync(user.PhoneNumber, smsMessage, cancellationToken);
+            }
+            return;
+        }
 
         string mailSubject = notification.Type switch
         {

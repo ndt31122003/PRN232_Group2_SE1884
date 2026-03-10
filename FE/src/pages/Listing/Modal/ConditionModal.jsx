@@ -1,11 +1,5 @@
 import React, { useEffect } from "react";
 
-import { ReactComponent as CheckedIcon } from "@ebay/skin/dist/svg/icon/icon-radio-checked-18.svg";
-import { ReactComponent as UncheckedIcon } from "@ebay/skin/dist/svg/icon/icon-radio-unchecked-18.svg";
-
-import { EbayRadio } from '@ebay/ui-core-react/ebay-radio';
-import { EbayLabel } from '@ebay/ui-core-react/ebay-field';
-
 const ConditionModal = ({ isOpen, onClose, conditions = [], selectedConditionId, setSelectedConditionId }) => {
 
 
@@ -84,27 +78,22 @@ const ConditionModal = ({ isOpen, onClose, conditions = [], selectedConditionId,
                 </div>
 
                 <div style={{ padding: "28px", overflowY: "auto", flex: "1 1 auto" }}>
-                    <div style={{ display: "none" }}>
-                        <CheckedIcon id="icon-radio-checked-18" style={{ width: 18, height: 18 }} />
-                    </div>
-                    <div style={{ display: "none" }}>
-                        <UncheckedIcon id="icon-radio-unchecked-18" style={{ width: 18, height: 18 }} />
-                    </div>
                     {conditions.length === 0 && (
                         <p style={{ color: "#707070" }}>This category does not define condition options.</p>
                     )}
                     {conditions.map((condition) => (
                         <div key={condition.id} style={{ marginBottom: "24px" }}>
-                            <EbayRadio
-                                name="condition"
-                                value={condition.id}
-                                checked={selectedConditionId === condition.id}
-                                onChange={(e) => {
-                                    setSelectedConditionId(e.target.value);
-                                }}
-                            >
-                                <EbayLabel style={{ marginLeft: 8 }}>{condition.name}</EbayLabel>
-                            </EbayRadio>
+                            <label style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
+                                <input
+                                    type="radio"
+                                    name="condition"
+                                    value={condition.id}
+                                    checked={selectedConditionId === condition.id}
+                                    onChange={(e) => setSelectedConditionId(e.target.value)}
+                                    style={{ width: 18, height: 18, accentColor: "#0654ba" }}
+                                />
+                                <span style={{ marginLeft: 8, fontWeight: 500 }}>{condition.name}</span>
+                            </label>
                             <p
                                 style={{
                                     color: "#707070",

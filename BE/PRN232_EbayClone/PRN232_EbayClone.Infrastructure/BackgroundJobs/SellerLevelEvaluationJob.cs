@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,29 +33,35 @@ public sealed class SellerLevelEvaluationJob : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("🚀 Seller Level Evaluation Job started. Will check daily at {Time} UTC.", _evaluationTime);
+        _logger.LogInformation("Seller Level Evaluation Job started. Will check daily at {Time} UTC.", _evaluationTime);
 
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            try
+            while (!stoppingToken.IsCancellationRequested)
             {
-                await WaitForNextScheduledTime(stoppingToken);
+                try
+                {
+                    await WaitForNextScheduledTime(stoppingToken);
 
-                if (stoppingToken.IsCancellationRequested)
-                    break;
+                    if (stoppingToken.IsCancellationRequested)
+                        break;
 
-                await PerformEvaluationAsync(stoppingToken);
+                    await PerformEvaluationAsync(stoppingToken);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _logger.LogError(ex, "Error in Seller Level Evaluation Job");
+                }
+
+                await Task.Delay(_checkInterval, stoppingToken);
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                _logger.LogError(ex, "❌ Error in Seller Level Evaluation Job");
-            }
-
-            // Wait 24 hours before next check
-            await Task.Delay(_checkInterval, stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // Graceful shutdown
         }
 
-        _logger.LogInformation("🛑 Seller Level Evaluation Job stopped.");
+        _logger.LogInformation("Seller Level Evaluation Job stopped.");
     }
 
     private async Task WaitForNextScheduledTime(CancellationToken cancellationToken)

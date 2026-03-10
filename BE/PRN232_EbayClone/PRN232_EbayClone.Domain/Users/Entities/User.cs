@@ -1,4 +1,4 @@
-﻿using PRN232_EbayClone.Domain.Listings.Entities;
+using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
 using PRN232_EbayClone.Domain.Roles.Entities;
 using PRN232_EbayClone.Domain.Shared.Abstractions;
@@ -22,6 +22,14 @@ public sealed class User : AggregateRoot<UserId>
     public IReadOnlyList<Role> Roles => _roles.AsReadOnly();
     public bool IsEmailVerified { get; private set; } = false;
     public bool IsPaymentVerified { get; private set; } = false;
+
+    public string? PhoneNumber { get; private set; }
+    public bool IsPhoneVerified { get; private set; } = false;
+    public string? BusinessName { get; private set; }
+    public BusinessAddress? BusinessAddress { get; private set; }
+    public bool IsBusinessVerified { get; private set; } = false;
+
+    public bool IsSellerVerified => IsEmailVerified && IsPhoneVerified && IsBusinessVerified;
 
     //Seller
     public SellerPerformanceLevel PerformanceLevel { get; private set; } = SellerPerformanceLevel.BelowStandard;
@@ -86,15 +94,28 @@ public sealed class User : AggregateRoot<UserId>
     public void VerifyEmail() => IsEmailVerified = true;
     public void VerifyPayment() => IsPaymentVerified = true;
     public void UpdatePassword(string newHashedPassword) => PasswordHash = newHashedPassword;
+
+    public void SetPhoneNumber(string phoneNumber)
+    {
+        PhoneNumber = phoneNumber;
+        IsPhoneVerified = false;
+    }
+
+    public void VerifyPhone() => IsPhoneVerified = true;
+
+    public void SetBusinessInfo(string businessName, BusinessAddress address)
+    {
+        BusinessName = businessName;
+        BusinessAddress = address;
+        IsBusinessVerified = true;
+    }
     public bool CanPostNewListing(Listing listing)
         => LimitPolicy.CanList(_activeListings.Count, _activeTotalValue + listing.GetEstimatedValue());
 
     public Result AddListing(Listing listing)
     {
-        if(!IsEmailVerified)
-            return UserErrors.EmailNotVerified;
-        if(!IsPaymentVerified)
-            return UserErrors.PaymentNotVerified;
+        if (!IsSellerVerified)
+            return UserErrors.SellerNotVerified;
 
         if (!CanPostNewListing(listing))
             return Error.Failure(

@@ -18,6 +18,10 @@ public sealed record StoreDetailsDto(
     string? BannerUrl,
     StoreType StoreType,
     bool IsActive,
+    string? ThemeColor,
+    string? ContactEmail,
+    string? ContactPhone,
+    string? SocialLinks,
     SubscriptionDetailsDto ActiveSubscription
 );
 
@@ -96,6 +100,10 @@ public sealed class GetStoreByIdQueryHandler : IQueryHandler<GetStoreByIdQuery, 
             store.BannerUrl,
             store.StoreType,
             store.IsActive,
+            store.ThemeColor,
+            store.ContactEmail,
+            store.ContactPhone,
+            store.SocialLinks,
             subscriptionDto);
 
         return storeDto;

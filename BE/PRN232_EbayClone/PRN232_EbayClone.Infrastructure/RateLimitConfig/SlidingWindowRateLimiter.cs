@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using PRN232_EbayClone.Api.Infrastructure.RateLimitConfig;
 using StackExchange.Redis;
 
@@ -30,15 +31,25 @@ public class SlidingWindowRateLimiter
             end
             return 0
             ";
-    private readonly IDatabase _db;
+    private readonly IDatabase? _db;
     private readonly IConfiguration _config;
     private readonly RequestDelegate _next;
+    private readonly bool _redisAvailable;
 
-    public SlidingWindowRateLimiter(RequestDelegate next, IConnectionMultiplexer muxer, IConfiguration config)
+    public SlidingWindowRateLimiter(RequestDelegate next, IConfiguration config, IServiceProvider serviceProvider)
     {
-        _db = muxer.GetDatabase();
-        _config = config;
         _next = next;
+        _config = config;
+        try
+        {
+            var muxer = serviceProvider.GetService<IConnectionMultiplexer>();
+            _db = muxer?.GetDatabase();
+            _redisAvailable = _db != null;
+        }
+        catch
+        {
+            _redisAvailable = false;
+        }
     }
 
     private static string GetUserKey(HttpContext context)
@@ -77,6 +88,12 @@ public class SlidingWindowRateLimiter
 
     public async Task InvokeAsync(HttpContext httpContext)
     {
+        if (!_redisAvailable)
+        {
+            await _next(httpContext);
+            return;
+        }
+
         var apiKey = GetUserKey(httpContext);
         if (string.IsNullOrEmpty(apiKey))
         {

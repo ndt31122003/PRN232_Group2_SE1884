@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PRN232_EbayClone.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using PRN232_EbayClone.Infrastructure.Persistence;
 namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260306132214_AddSellerVerificationFields")]
+    partial class AddSellerVerificationFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3189,150 +3192,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.ToTable("coupon_condition", (string)null);
                 });
 
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponExcludedCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
-
-                    b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_excluded_categories");
-
-                    b.HasIndex("CouponId")
-                        .HasDatabaseName("ix_coupon_excluded_categories_coupon_id");
-
-                    b.ToTable("coupon_excluded_categories", (string)null);
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponExcludedItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<Guid>("ItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("item_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_excluded_items");
-
-                    b.HasIndex("CouponId")
-                        .HasDatabaseName("ix_coupon_excluded_items_coupon_id");
-
-                    b.ToTable("coupon_excluded_items", (string)null);
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponTargetAudience", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<Guid?>("LocationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("location_id");
-
-                    b.Property<int?>("MinAccountAgeDays")
-                        .HasColumnType("integer")
-                        .HasColumnName("min_account_age_days");
-
-                    b.Property<decimal?>("MinTotalSpent")
-                        .HasColumnType("numeric")
-                        .HasColumnName("min_total_spent");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.Property<int>("UserType")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_type");
-
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_target_audiences");
-
-                    b.HasIndex("CouponId")
-                        .HasDatabaseName("ix_coupon_target_audiences_coupon_id");
-
-                    b.ToTable("coupon_target_audiences", (string)null);
-                });
-
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponType", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4706,10 +4565,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -6957,16 +6812,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("banner_url");
 
-                    b.Property<string>("ContactEmail")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("contact_email");
-
-                    b.Property<string>("ContactPhone")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("contact_phone");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -6987,10 +6832,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
-                    b.Property<string>("LayoutConfig")
-                        .HasColumnType("text")
-                        .HasColumnName("layout_config");
-
                     b.Property<string>("LogoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
@@ -7008,18 +6849,9 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("slug");
 
-                    b.Property<string>("SocialLinks")
-                        .HasColumnType("text")
-                        .HasColumnName("social_links");
-
                     b.Property<int>("StoreType")
                         .HasColumnType("integer")
                         .HasColumnName("store_type");
-
-                    b.Property<string>("ThemeColor")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("theme_color");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -7237,141 +7069,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             Username = "demo.seller3@example.com",
                             _activeTotalValue = 16022.00m
                         });
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Vouchers.Entities.Voucher", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("AssignedUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("assigned_user_id");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("code");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("currency");
-
-                    b.Property<decimal>("CurrentBalance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("current_balance");
-
-                    b.Property<DateTime?>("ExpiryDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expiry_date");
-
-                    b.Property<decimal>("InitialValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("initial_value");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<bool>("IsTransferable")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_transferable");
-
-                    b.Property<DateTime>("IssueDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("issue_date");
-
-                    b.Property<Guid?>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_vouchers");
-
-                    b.ToTable("vouchers", (string)null);
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Vouchers.Entities.VoucherTransaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<decimal>("AmountUsed")
-                        .HasColumnType("numeric")
-                        .HasColumnName("amount_used");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("text")
-                        .HasColumnName("notes");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("transaction_date");
-
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("integer")
-                        .HasColumnName("transaction_type");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.Property<Guid>("VoucherId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("voucher_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_voucher_transactions");
-
-                    b.HasIndex("VoucherId")
-                        .HasDatabaseName("ix_voucher_transactions_voucher_id");
-
-                    b.ToTable("voucher_transactions", (string)null);
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Infrastructure.Outbox.OutboxMessage", b =>
@@ -12908,42 +12605,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_coupon_condition_coupons_coupon_id");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponExcludedCategory", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.Coupons.Entities.Coupon", "Coupon")
-                        .WithMany("ExcludedCategories")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_excluded_categories_coupons_coupon_id");
-
-                    b.Navigation("Coupon");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponExcludedItem", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.Coupons.Entities.Coupon", "Coupon")
-                        .WithMany("ExcludedItems")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_excluded_items_coupons_coupon_id");
-
-                    b.Navigation("Coupon");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponTargetAudience", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.Coupons.Entities.Coupon", "Coupon")
-                        .WithMany("TargetAudiences")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_target_audiences_coupons_coupon_id");
-
-                    b.Navigation("Coupon");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Disputes.Entities.Dispute", b =>
@@ -19124,18 +18785,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Navigation("BusinessAddress");
                 });
 
-            modelBuilder.Entity("PRN232_EbayClone.Domain.Vouchers.Entities.VoucherTransaction", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.Vouchers.Entities.Voucher", "Voucher")
-                        .WithMany()
-                        .HasForeignKey("VoucherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_voucher_transactions_vouchers_voucher_id");
-
-                    b.Navigation("Voucher");
-                });
-
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.HasOne("PRN232_EbayClone.Domain.Roles.Entities.Role", null)
@@ -22820,12 +22469,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.Coupon", b =>
                 {
                     b.Navigation("Conditions");
-
-                    b.Navigation("ExcludedCategories");
-
-                    b.Navigation("ExcludedItems");
-
-                    b.Navigation("TargetAudiences");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.Order", b =>

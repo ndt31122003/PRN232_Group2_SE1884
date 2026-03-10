@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using PRN232_EbayClone.Domain.Shared.Abstractions;
 using PRN232_EbayClone.Infrastructure.Persistence;
@@ -7,6 +7,7 @@ using Quartz;
 
 namespace PRN232_EbayClone.Infrastructure.Outbox;
 
+[DisallowConcurrentExecution]
 public sealed class ProcessOutboxMessagesJob : IJob
 {
     private const int MaxRetryCount = 3;
@@ -41,6 +42,9 @@ public sealed class ProcessOutboxMessagesJob : IJob
                 if (type is null)
                 {
                     _logger.LogWarning("Unknown event type {EventType} for OutboxMessage {OutboxMessageId}", outboxMessage.Type, outboxMessage.Id);
+                    outboxMessage.ProcessedOn = DateTime.UtcNow;
+                    outboxMessage.Error = $"Unknown event type: {outboxMessage.Type}";
+                    await _dbContext.SaveChangesAsync(context.CancellationToken);
                     continue;
                 }
 
@@ -55,6 +59,9 @@ public sealed class ProcessOutboxMessagesJob : IJob
                 if (domainEvent is null)
                 {
                     _logger.LogWarning("Could not deserialize outbox message with ID {OutboxMessageId}", outboxMessage.Id);
+                    outboxMessage.ProcessedOn = DateTime.UtcNow;
+                    outboxMessage.Error = "Failed to deserialize";
+                    await _dbContext.SaveChangesAsync(context.CancellationToken);
                     continue;
                 }
 
@@ -66,10 +73,10 @@ public sealed class ProcessOutboxMessagesJob : IJob
             {
                 _logger.LogError(ex, "Error publishing outbox message with ID {OutboxMessageId}", outboxMessage.Id);
                 outboxMessage.RetryCount++;
-                outboxMessage.Error = $"{ex.Message}. {ex.StackTrace}";
+                outboxMessage.Error = $"{ex.Message}";
             }
-        }
 
-        await _dbContext.SaveChangesAsync(context.CancellationToken);
+            await _dbContext.SaveChangesAsync(context.CancellationToken);
+        }
     }
 }

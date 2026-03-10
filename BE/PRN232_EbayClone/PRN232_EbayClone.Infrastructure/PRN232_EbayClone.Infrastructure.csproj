@@ -41,6 +41,7 @@
 		<PackageReference Include="Quartz.Serialization.Json" Version="3.15.0" />
 		<PackageReference Include="SkiaSharp" Version="3.119.1" />
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.1" />
+		<PackageReference Include="Twilio" Version="7.14.3" />
 		<PackageReference Include="ZXing.Net" Version="0.16.11" />
 		<PackageReference Include="StackExchange.Redis" Version="2.9.25" />
 	</ItemGroup>
