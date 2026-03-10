@@ -12,8 +12,8 @@ using PRN232_EbayClone.Infrastructure.Persistence;
 namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260307105552_AddStoreExtensibility")]
-    partial class AddStoreExtensibility
+    [Migration("20260308190334_AddStoreExtensibility2")]
+    partial class AddStoreExtensibility2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

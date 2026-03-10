@@ -1,11 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+using PRN232_EbayClone.Domain.Shared.Abstractions;
+using PRN232_EbayClone.Domain.Shared.Results;
+using PRN232_EbayClone.Domain.Stores.Enums;
+using PRN232_EbayClone.Domain.Stores.Errors;
+using PRN232_EbayClone.Domain.Stores.ValueObjects;
+using PRN232_EbayClone.Domain.Users.ValueObjects;
 
-namespace PRN232_EbayClone.Infrastructure.Persistence.Scaffolded;
+namespace PRN232_EbayClone.Domain.Stores.Entities;
 
-public partial class Store
+public sealed class Store : AggregateRoot<StoreId>
 {
-    public Guid Id { get; set; }
+    public UserId UserId { get; private set; }
+    public string Name { get; private set; } = null!;
+    public string Slug { get; private set; } = null!;
+    public string? Description { get; private set; }
+    public string? LogoUrl { get; private set; }
+    public string? BannerUrl { get; private set; }
+    public StoreType StoreType { get; private set; }
+    public bool IsActive { get; private set; }
 
     public string? ThemeColor { get; private set; }
     public string? LayoutConfig { get; private set; }
@@ -16,11 +27,19 @@ public partial class Store
     private readonly List<StoreSubscription> _subscriptions = [];
     public IReadOnlyCollection<StoreSubscription> Subscriptions => _subscriptions.AsReadOnly();
 
-    public string? Storename { get; set; }
+    private Store(StoreId id) : base(id) { }
 
-    public string? Description { get; set; }
+    public static Result<Store> Create(
+        UserId userId,
+        string name,
+        StoreType storeType,
+        string? description = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return StoreErrors.NameRequired;
 
-    public string? Bannerimageurl { get; set; }
+        if (name.Length > 255)
+            return StoreErrors.NameTooLong;
 
         var slug = GenerateSlug(name);
 
@@ -97,3 +116,4 @@ public partial class Store
             .ToLowerInvariant();
     }
 }
+
