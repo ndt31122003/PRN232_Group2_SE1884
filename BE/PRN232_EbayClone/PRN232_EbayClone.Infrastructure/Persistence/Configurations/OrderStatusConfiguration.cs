@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRN232_EbayClone.Domain.Orders.Entities;
 using PRN232_EbayClone.Infrastructure.Persistence.Seeds;
 
@@ -45,13 +46,19 @@ public class OrderStatusTransitionConfiguration : IEntityTypeConfiguration<Order
                      .HasForeignKey("ToStatusId")
                      .IsRequired();
 
+              var stringListComparer = new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<string>>(
+                  (c1, c2) => c1!.SequenceEqual(c2!),
+                  c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                  c => c.ToList());
+
               builder.Property(t => t.AllowedRoles)
-                     .HasColumnName("allowed_roles")
+                     
                      .HasConversion(
                           v => string.Join(',', v),
                           v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
                      )
-                     .IsRequired();
+                     .IsRequired()
+                     .Metadata.SetValueComparer(stringListComparer);
 
               builder.HasData(OrderStatusSeed.Transitions);
        }
@@ -65,7 +72,7 @@ public class OrderStatusHistoryConfiguration : IEntityTypeConfiguration<OrderSta
               builder.HasKey(h => h.Id);
 
               builder.Property(h => h.Id)
-                     .HasColumnName("id")
+                     
                      .ValueGeneratedOnAdd()
                      .HasDefaultValueSql("gen_random_uuid()");
 

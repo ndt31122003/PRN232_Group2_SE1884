@@ -7,6 +7,7 @@ namespace PRN232_EbayClone.Domain.Coupons.Entities;
 public sealed class CouponCondition : Entity<Guid>
 {
     public Guid CouponId { get; private set; }
+    public Coupon? Coupon { get; private set; }
     public int? BuyQuantity { get; private set; }
     public int? GetQuantity { get; private set; }
     public decimal? GetDiscountPercent { get; private set; }

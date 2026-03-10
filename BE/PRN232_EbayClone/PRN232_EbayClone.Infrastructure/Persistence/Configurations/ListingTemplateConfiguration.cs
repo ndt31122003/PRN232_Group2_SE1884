@@ -27,23 +27,23 @@ public class ListingTemplateConfiguration : IEntityTypeConfiguration<ListingTemp
 
         builder.Property(t => t.PayloadJson)
             .IsRequired()
-            .HasColumnName("payload_json")
+            
             .HasColumnType("jsonb");
 
         builder.Property(t => t.CreatedAt)
-            .HasColumnName("created_at");
+            ;
 
         builder.Property(t => t.CreatedBy)
-            .HasColumnName("created_by");
+            ;
 
         builder.Property(t => t.UpdatedAt)
-            .HasColumnName("updated_at");
+            ;
 
         builder.Property(t => t.UpdatedBy)
-            .HasColumnName("updated_by");
+            ;
 
         builder.Property(t => t.IsDeleted)
-            .HasColumnName("is_deleted");
+            ;
 
         builder.HasIndex(t => t.Name)
             .HasDatabaseName("ix_listing_template_name");

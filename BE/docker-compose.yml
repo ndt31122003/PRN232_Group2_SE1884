@@ -16,7 +16,9 @@ services:
       - "8080:8080"
       - "8081:8081"
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Redis=redis:6379
+      - ConnectionStrings__DefaultConnection=Host=aws-1-ap-northeast-1.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.cdvfbycudyhkqowylnhk;Password=EmThinhShizuka
     depends_on:
       - redis
 

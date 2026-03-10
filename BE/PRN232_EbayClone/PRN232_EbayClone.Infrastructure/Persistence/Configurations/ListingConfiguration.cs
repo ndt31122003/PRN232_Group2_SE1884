@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.Enums;
 using PRN232_EbayClone.Infrastructure.Persistence.Seeds;
@@ -15,9 +16,14 @@ public class ListingConfiguration : IEntityTypeConfiguration<Listing>
         builder.HasKey(l => l.Id);
 
         // TPH discriminator
-        builder.HasDiscriminator<ListingFormat>("listing_format")
+        builder.HasDiscriminator<ListingFormat>("ListingFormat")
             .HasValue<FixedPriceListing>(ListingFormat.FixedPrice)
             .HasValue<AuctionListing>(ListingFormat.Auction);
+
+        var stringListComparer = new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<IEnumerable<string>>(
+            (c1, c2) => c1!.SequenceEqual(c2!),
+            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+            c => c.ToList().AsReadOnly());
 
         // ItemSpecifics: lưu JSON
         builder.OwnsMany(l => l.ItemSpecifics, b =>
@@ -30,7 +36,8 @@ public class ListingConfiguration : IEntityTypeConfiguration<Listing>
                 .HasConversion(
                     v => string.Join(";", v),       // string[] -> string
                     v => v.Split(";", StringSplitOptions.RemoveEmptyEntries)) // string -> string[]
-                .HasColumnName("val");
+                
+                .Metadata.SetValueComparer(stringListComparer);
         });
 
         // ListingImages
@@ -61,7 +68,7 @@ public class ListingConfiguration : IEntityTypeConfiguration<Listing>
             })
             .HasDatabaseName("idx_listing_active_owner_sort")
             .IsDescending(false, true, true, false, false, false)
-            .HasFilter("status = 3");
+            .HasFilter("\"Status\" = 3");
 
         builder.HasIndex(l => l.Title)
             .HasDatabaseName("idx_listing_title_trgm")

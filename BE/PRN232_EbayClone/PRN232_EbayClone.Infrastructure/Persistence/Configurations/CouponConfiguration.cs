@@ -16,21 +16,21 @@ public sealed class CouponConfiguration : IEntityTypeConfiguration<Coupon>
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Id)
-            .HasColumnName("id");
+            ;
 
         builder.Property(c => c.CouponTypeId)
-            .HasColumnName("coupon_type_id");
+            ;
 
         builder.Property(c => c.CategoryId)
-            .HasColumnName("category_id");
+            ;
 
         builder.Property(c => c.Name)
-            .HasColumnName("name")
+            
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(c => c.Code)
-            .HasColumnName("code")
+            
             .HasMaxLength(50)
             .IsRequired();
 
@@ -39,7 +39,7 @@ public sealed class CouponConfiguration : IEntityTypeConfiguration<Coupon>
             .IsUnique();
 
         builder.Property(c => c.DiscountValue)
-            .HasColumnName("discount_value")
+            
             .HasColumnType("numeric(10,2)")
             .IsRequired();
 
@@ -54,64 +54,64 @@ public sealed class CouponConfiguration : IEntityTypeConfiguration<Coupon>
             value => value.HasValue ? new UserId(value.Value) : null);
 
         builder.Property(c => c.SellerId)
-            .HasColumnName("seller_id")
+            
             .HasConversion(sellerIdConverter)
             .IsRequired(false);
 
         builder.Property(c => c.DiscountUnit)
-            .HasColumnName("discount_unit")
+            
             .HasMaxLength(10)
             .HasConversion(discountUnitConverter)
             .IsRequired();
 
         builder.Property(c => c.MaxDiscount)
-            .HasColumnName("max_discount")
+            
             .HasColumnType("numeric(10,2)");
 
         builder.Property(c => c.StartDate)
-            .HasColumnName("start_date")
+            
             .IsRequired();
 
         builder.Property(c => c.EndDate)
-            .HasColumnName("end_date")
+            
             .IsRequired();
 
         builder.Property(c => c.UsageLimit)
-            .HasColumnName("usage_limit");
+            ;
 
         builder.Property(c => c.UsagePerUser)
-            .HasColumnName("usage_per_user");
+            ;
 
         builder.Property(c => c.MinimumOrderValue)
-            .HasColumnName("minimum_order_value")
+            
             .HasColumnType("numeric(10,2)");
 
         builder.Property(c => c.ApplicablePriceMin)
-            .HasColumnName("applicable_price_min")
+            
             .HasColumnType("numeric(10,2)");
 
         builder.Property(c => c.ApplicablePriceMax)
-            .HasColumnName("applicable_price_max")
+            
             .HasColumnType("numeric(10,2)");
 
         builder.Property(c => c.IsActive)
-            .HasColumnName("is_active")
+            
             .IsRequired();
 
         builder.Property(c => c.CreatedAt)
-            .HasColumnName("created_at");
+            ;
 
         builder.Property(c => c.CreatedBy)
-            .HasColumnName("created_by");
+            ;
 
         builder.Property(c => c.UpdatedAt)
-            .HasColumnName("updated_at");
+            ;
 
         builder.Property(c => c.UpdatedBy)
-            .HasColumnName("updated_by");
+            ;
 
         builder.Property(c => c.IsDeleted)
-            .HasColumnName("is_deleted")
+            
             .HasDefaultValue(false);
 
         builder.HasQueryFilter(c => !c.IsDeleted);
@@ -122,8 +122,27 @@ public sealed class CouponConfiguration : IEntityTypeConfiguration<Coupon>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(c => c.Conditions)
-            .WithOne()
+            .WithOne(cc => cc.Coupon)
             .HasForeignKey(cc => cc.CouponId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+
+        builder.HasMany(c => c.ExcludedCategories)
+            .WithOne(cc => cc.Coupon)
+            .HasForeignKey(cc => cc.CouponId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+
+        builder.HasMany(c => c.ExcludedItems)
+            .WithOne(cc => cc.Coupon)
+            .HasForeignKey(cc => cc.CouponId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+
+        builder.HasMany(c => c.TargetAudiences)
+            .WithOne(cc => cc.Coupon)
+            .HasForeignKey(cc => cc.CouponId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
     }
 }

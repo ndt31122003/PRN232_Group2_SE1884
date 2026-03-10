@@ -21,7 +21,7 @@ public sealed class OtpConfiguration : IEntityTypeConfiguration<Otp>
 
         builder
              .Property(u => u.Email)
-             .HasColumnName("email")
+             
              .HasConversion(
                  e => e.Value,
                  value => new Email(value));

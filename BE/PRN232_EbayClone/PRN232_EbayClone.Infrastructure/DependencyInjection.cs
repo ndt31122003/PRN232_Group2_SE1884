@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,10 +80,8 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.UseNpgsql(connectionString)
-                   .UseSnakeCaseNamingConvention()
                    .AddInterceptors(sp.GetServices<ISaveChangesInterceptor>())
-                   .EnableDetailedErrors()
-                   .EnableSensitiveDataLogging();
+                   .EnableDetailedErrors();
         });
         services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<IDbConnectionFactory>(_ => new NpgsqlConnectionFactory(connectionString));
@@ -222,6 +221,9 @@ services.AddScoped<ICouponRepository, CouponRepository>();
 
                 store.UseNewtonsoftJsonSerializer();
             });
+
+            configure.SetProperty("quartz.jobStore.tablePrefix", "qrtz_");
+            configure.SetProperty("quartz.jobStore.useProperties", "true");
 
             void AddSimpleJob<TJob>(string jobName, int intervalSeconds)
                 where TJob : IJob

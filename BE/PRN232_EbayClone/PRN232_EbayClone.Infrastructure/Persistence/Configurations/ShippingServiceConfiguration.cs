@@ -42,24 +42,24 @@ public class ShippingServiceConfiguration : IEntityTypeConfiguration<ShippingSer
             .HasMaxLength(256);
 
         builder.Property(s => s.DeliveryWindowLabel)
-            .HasColumnName("delivery_window_label")
+            
             .HasMaxLength(80)
             .IsRequired();
 
         builder.Property(s => s.PrinterRequired)
-            .HasColumnName("printer_required")
+            
             .HasDefaultValue(false);
 
         builder.Property(s => s.SupportsQrCode)
-            .HasColumnName("supports_qr_code")
+            
             .HasDefaultValue(false);
 
         builder.Property(s => s.MinEstimatedDeliveryDays)
-            .HasColumnName("min_estimated_delivery_days")
+            
             .IsRequired();
 
         builder.Property(s => s.MaxEstimatedDeliveryDays)
-            .HasColumnName("max_estimated_delivery_days")
+            
             .IsRequired();
 
         builder.OwnsOne(s => s.BaseCost, money =>

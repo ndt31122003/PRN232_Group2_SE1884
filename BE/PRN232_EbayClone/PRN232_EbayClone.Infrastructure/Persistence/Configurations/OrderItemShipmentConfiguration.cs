@@ -14,41 +14,41 @@ public sealed class OrderItemShipmentConfiguration : IEntityTypeConfiguration<Or
             .HasName("pk_order_item_shipments");
 
         builder.Property(shipment => shipment.Id)
-            .HasColumnName("id")
+            
             .HasDefaultValueSql("gen_random_uuid()")
             .ValueGeneratedOnAdd();
 
         builder.Property(shipment => shipment.OrderId)
-            .HasColumnName("order_id")
+            
             .IsRequired();
 
         builder.Property(shipment => shipment.OrderItemId)
-            .HasColumnName("order_item_id")
+            
             .IsRequired();
 
         builder.Property(shipment => shipment.ShippingLabelId)
-            .HasColumnName("shipping_label_id");
+            ;
 
         builder.Property(shipment => shipment.TrackingNumber)
-            .HasColumnName("tracking_number")
+            
             .HasMaxLength(120)
             .IsRequired();
 
         builder.Property(shipment => shipment.Carrier)
-            .HasColumnName("carrier")
+            
             .HasMaxLength(120)
             .IsRequired();
 
         builder.Property(shipment => shipment.ShippedAt)
-            .HasColumnName("shipped_at")
+            
             .IsRequired();
 
         builder.Property(shipment => shipment.CreatedAt)
-            .HasColumnName("created_at")
+            
             .IsRequired();
 
         builder.Property(shipment => shipment.UpdatedAt)
-            .HasColumnName("updated_at");
+            ;
 
         builder.HasIndex(shipment => shipment.OrderId)
             .HasDatabaseName("ix_order_item_shipments_order_id");

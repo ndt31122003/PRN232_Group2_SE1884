@@ -16,7 +16,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 
         builder
             .Property(u => u.UserId)
-            .HasColumnName("user_id")
+            
             .HasConversion(
                 id => id.Value,
                 value => new UserId(value));

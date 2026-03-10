@@ -12,25 +12,25 @@ public sealed class DisputeConfiguration : IEntityTypeConfiguration<Dispute>
         builder.HasKey(d => d.Id);
 
         builder.Property(d => d.Id)
-            .HasColumnName("id")
+            
             .ValueGeneratedNever();
 
         builder.Property(d => d.ListingId)
-            .HasColumnName("listing_id")
+            
             .IsRequired();
 
         builder.Property(d => d.RaisedById)
-            .HasColumnName("raised_by_id")
+            
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(d => d.Reason)
-            .HasColumnName("reason")
+            
             .HasMaxLength(2000)
             .IsRequired();
 
         builder.Property(d => d.Status)
-            .HasColumnName("status")
+            
             .HasMaxLength(50)
             .IsRequired();
 

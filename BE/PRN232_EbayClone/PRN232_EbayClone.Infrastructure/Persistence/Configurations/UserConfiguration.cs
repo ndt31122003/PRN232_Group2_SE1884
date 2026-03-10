@@ -41,7 +41,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder
             .Property(u => u.IsPaymentVerified)
-            .HasColumnName("is_payment_verified")
+            
             .IsRequired();
 
         builder.Property(s => s.PerformanceLevel)
@@ -50,7 +50,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                 v => SellerPerformanceLevel.From(v))
             .IsRequired()
             .HasMaxLength(32)
-            .HasColumnName("performance_level");
+            ;
 
         builder.Metadata
             .FindNavigation(nameof(User.ActiveListings))!
@@ -60,19 +60,19 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         {
             nav.WithOwner().HasForeignKey("seller_id");
             nav.Property<UserId>("seller_id")
-                .HasColumnName("seller_id")
+                
                 .HasConversion(
                     id => id.Value,
                     value => new UserId(value));
             nav.Property(l => l.Value)
-                .HasColumnName("listing_id");
+                ;
             nav.HasKey(l => l.Value);
 
             nav.HasData(DemoSeedData.ActiveListings);
         });
 
         builder.Property<decimal>("_activeTotalValue")
-            .HasColumnName("active_total_value")
+            
             .HasPrecision(18, 2)
             .IsRequired();
 

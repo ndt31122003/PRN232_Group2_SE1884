@@ -17,21 +17,21 @@ public class ReturnPolicyConfiguration : IEntityTypeConfiguration<ReturnPolicy>
             .HasConversion(
                 id => id.Value,
                 value => new StoreId(value))
-            .HasColumnName("store_id")
+            
             .IsRequired();
 
         builder.Property(p => p.AcceptReturns)
-            .HasColumnName("accept_returns")
+            
             .IsRequired();
 
         builder.Property(p => p.ReturnPeriodDays)
-            .HasColumnName("return_period_days");
+            ;
 
         builder.Property(p => p.RefundMethod)
-            .HasColumnName("refund_method");
+            ;
 
         builder.Property(p => p.ReturnShippingPaidBy)
-            .HasColumnName("return_shipping_paid_by");
+            ;
 
         builder.HasIndex(p => p.StoreId)
             .HasDatabaseName("idx_return_policy_store_id")

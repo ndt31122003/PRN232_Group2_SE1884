@@ -1,5 +1,9 @@
 # Chạy Backend bằng Docker
 
+## Yêu cầu
+- Docker
+- Docker Compose
+
 ## Cách 1: Sử dụng Docker Compose (Khuyến nghị)
 
 ```bash
@@ -7,18 +11,30 @@ cd BE
 docker-compose up -d
 ```
 
+Đợi container khởi động xong, sau đó chạy migration:
+
+```bash
+docker-compose exec api dotnet ef database update --project /app/PRN232_EbayClone.Infrastructure/PRN232_EbayClone.Infrastructure.csproj --startup-project /app/PRN232_EbayClone.Api/PRN232_EbayClone.Api.csproj --no-build
+```
+
 ## Cách 2: Chạy thủ công
 
-### 1. Chạy Redis
+### 1. Chạy Redis và PostgreSQL
 ```bash
 docker run -d --name redis -p 6379:6379 redis:alpine
+docker run -d --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ebayclone -p 5432:5432 postgres:15-alpine
 ```
 
 ### 2. Build và chạy API
 ```bash
 cd BE
 docker build -t ebayclone-api -f PRN232_EbayClone/PRN232_EbayClone.Api/Dockerfile .
-docker run -d -p 8080:8080 -p 8081:8081 --name ebayclone-api ebayclone-api
+docker run -d -p 8080:8080 -p 8081:8081 --name ebayclone-api --link postgres:postgres --link redis:redis ebayclone-api
+```
+
+### 3. Chạy Migration
+```bash
+docker exec ebayclone-api dotnet ef database update --project /app/PRN232_EbayClone.Infrastructure/PRN232_EbayClone.Infrastructure.csproj --startup-project /app/PRN232_EbayClone.Api/PRN232_EbayClone.Api.csproj
 ```
 
 ## API

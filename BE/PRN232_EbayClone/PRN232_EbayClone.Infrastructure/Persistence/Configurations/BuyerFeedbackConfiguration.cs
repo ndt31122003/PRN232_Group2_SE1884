@@ -13,43 +13,43 @@ public sealed class BuyerFeedbackConfiguration : IEntityTypeConfiguration<BuyerF
         builder.HasKey(feedback => feedback.Id);
 
         builder.Property(feedback => feedback.Id)
-            .HasColumnName("id");
+            ;
 
         builder.Property(feedback => feedback.OrderId)
-            .HasColumnName("order_id")
+            
             .IsRequired();
 
         builder.Property(feedback => feedback.SellerId)
-            .HasColumnName("seller_id")
+            
             .IsRequired();
 
         builder.Property(feedback => feedback.BuyerId)
-            .HasColumnName("buyer_id")
+            
             .IsRequired();
 
         builder.Property(feedback => feedback.Comment)
-            .HasColumnName("comment")
+            
             .HasMaxLength(BuyerFeedback.MaxCommentLength)
             .IsRequired();
 
         builder.Property(feedback => feedback.UsesStoredComment)
-            .HasColumnName("uses_stored_comment")
+            
             .IsRequired();
 
         builder.Property(feedback => feedback.StoredCommentKey)
-            .HasColumnName("stored_comment_key")
+            
             .HasMaxLength(100);
 
         builder.Property(feedback => feedback.CreatedAt)
-            .HasColumnName("created_at")
+            
             .IsRequired();
 
         builder.Property(feedback => feedback.FollowUpComment)
-            .HasColumnName("follow_up_comment")
+            
             .HasMaxLength(BuyerFeedback.MaxCommentLength);
 
         builder.Property(feedback => feedback.FollowUpCommentedAt)
-            .HasColumnName("follow_up_commented_at");
+            ;
 
         builder.HasIndex(feedback => feedback.OrderId)
             .IsUnique()

@@ -78,7 +78,10 @@ app.MapHealthChecks("/");
 
 app.UseExceptionHandler();
 
-app.UseHttpsRedirection();
+if (!builder.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseMiddleware<RequestLogContextMiddleware>();
 app.UseSerilogRequestLogging();
@@ -102,7 +105,11 @@ app.UseRouting();
 app.UseCors(CorsPolicyName);
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseSlidingWindowRateLimiter();
 

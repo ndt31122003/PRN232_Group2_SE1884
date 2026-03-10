@@ -15,7 +15,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
               builder.HasKey(o => o.Id);
 
               builder.Property(o => o.OrderNumber)
-                     .HasColumnName("order_number")
+                     
                      .HasMaxLength(50)
                      .IsRequired();
 
@@ -80,11 +80,12 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
               builder.Navigation(o => o.StatusHistory)
                      .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-              builder.HasOne(o => o.Buyer)
-                     .WithMany()
-                     .HasForeignKey(o => o.BuyerId);
+               builder.HasOne(o => o.Buyer)
+                      .WithMany()
+                      .HasForeignKey(o => o.BuyerId)
+                      .IsRequired(false);
 
-              builder.HasData(OrderSeedData.Orders);
+               builder.HasData(OrderSeedData.Orders);
 
               builder.Ignore(o => o.DomainEvents);
        }

@@ -11,10 +11,8 @@ public class Review : AggregateRoot<Guid>
     public Guid ListingId { get; private set; }
     public string ReviewerId { get; private set; } = null!;
     public string RecipientId { get; private set; } = null!;
-    public ReviewParticipantRole ReviewerRole { get; private set; }
-        = ReviewParticipantRole.Unknown;
-    public ReviewParticipantRole RecipientRole { get; private set; }
-        = ReviewParticipantRole.Unknown;
+    public ReviewParticipantRole ReviewerRole { get; private set; } = ReviewParticipantRole.Buyer;
+    public ReviewParticipantRole RecipientRole { get; private set; } = ReviewParticipantRole.Seller;
     public int Rating { get; private set; }
     public ReviewRatingType RatingType { get; private set; }
     public string? Comment { get; private set; }

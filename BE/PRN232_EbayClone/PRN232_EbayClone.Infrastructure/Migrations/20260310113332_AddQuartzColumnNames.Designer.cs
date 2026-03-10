@@ -9,11 +9,11 @@ using PRN232_EbayClone.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
+namespace PRN232_EbayClone.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260307062047_AddCategoryIdToOrderItem")]
-    partial class AddCategoryIdToOrderItem
+    [Migration("20260310113332_AddQuartzColumnNames")]
+    partial class AddQuartzColumnNames
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,48 +30,37 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_category");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ParentId")
-                        .HasDatabaseName("ix_category_parent_id");
+                    b.HasIndex("ParentId");
 
                     b.ToTable("category", (string)null);
 
@@ -752,18 +741,14 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Categories.Entities.CategoryCondition", b =>
                 {
                     b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ConditionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("condition_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("CategoryId", "ConditionId")
-                        .HasName("pk_category_condition");
+                    b.HasKey("CategoryId", "ConditionId");
 
-                    b.HasIndex("ConditionId")
-                        .HasDatabaseName("ix_category_condition_condition_id");
+                    b.HasIndex("ConditionId");
 
                     b.ToTable("category_condition", (string)null);
 
@@ -1694,36 +1679,28 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("AllowMultiple")
-                        .HasColumnType("boolean")
-                        .HasColumnName("allow_multiple");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsRequired")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_required");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<string>("_values")
                         .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("values");
+                        .HasColumnType("jsonb");
 
                     b.Property<Guid?>("category_id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_category_specific");
+                    b.HasKey("Id");
 
-                    b.HasIndex("category_id")
-                        .HasDatabaseName("ix_category_specific_category_id");
+                    b.HasIndex("category_id");
 
                     b.ToTable("category_specific", (string)null);
 
@@ -2922,41 +2899,32 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_condition");
+                    b.HasKey("Id");
 
                     b.ToTable("condition", (string)null);
 
@@ -3039,110 +3007,86 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<decimal?>("ApplicablePriceMax")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("applicable_price_max");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<decimal?>("ApplicablePriceMin")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("applicable_price_min");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("code");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<Guid>("CouponTypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_type_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("DiscountUnit")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("discount_unit");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<decimal>("DiscountValue")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("discount_value");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
+                        .HasDefaultValue(false);
 
                     b.Property<decimal?>("MaxDiscount")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("max_discount");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<decimal?>("MinimumOrderValue")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("minimum_order_value");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<Guid?>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<int?>("UsageLimit")
-                        .HasColumnType("integer")
-                        .HasColumnName("usage_limit");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("UsagePerUser")
-                        .HasColumnType("integer")
-                        .HasColumnName("usage_per_user");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_coupon");
+                    b.HasKey("Id");
 
                     b.HasIndex("Code")
                         .IsUnique()
                         .HasDatabaseName("ux_coupon_code");
 
-                    b.HasIndex("CouponTypeId")
-                        .HasDatabaseName("ix_coupon_coupon_type_id");
+                    b.HasIndex("CouponTypeId");
 
                     b.ToTable("coupon", (string)null);
                 });
@@ -3151,43 +3095,33 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("BuyQuantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("buy_quantity");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ConditionDescription")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("condition_description");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_id");
+                        .HasColumnType("uuid");
 
                     b.Property<decimal?>("GetDiscountPercent")
-                        .HasColumnType("numeric(5,2)")
-                        .HasColumnName("get_discount_percent");
+                        .HasColumnType("numeric(5,2)");
 
                     b.Property<int?>("GetQuantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("get_quantity");
+                        .HasColumnType("integer");
 
                     b.Property<decimal?>("SaveEveryAmount")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("save_every_amount");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<int?>("SaveEveryItems")
-                        .HasColumnType("integer")
-                        .HasColumnName("save_every_items");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_condition");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CouponId")
-                        .HasDatabaseName("ix_coupon_condition_coupon_id");
+                    b.HasIndex("CouponId");
 
                     b.ToTable("coupon_condition", (string)null);
                 });
@@ -3196,192 +3130,149 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_excluded_categories");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CouponId")
-                        .HasDatabaseName("ix_coupon_excluded_categories_coupon_id");
+                    b.HasIndex("CouponId");
 
-                    b.ToTable("coupon_excluded_categories", (string)null);
+                    b.ToTable("CouponExcludedCategories");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponExcludedItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("ItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("item_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_excluded_items");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CouponId")
-                        .HasDatabaseName("ix_coupon_excluded_items_coupon_id");
+                    b.HasIndex("CouponId");
 
-                    b.ToTable("coupon_excluded_items", (string)null);
+                    b.ToTable("CouponExcludedItems");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponTargetAudience", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("coupon_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("LocationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("location_id");
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("MinAccountAgeDays")
-                        .HasColumnType("integer")
-                        .HasColumnName("min_account_age_days");
+                        .HasColumnType("integer");
 
                     b.Property<decimal?>("MinTotalSpent")
-                        .HasColumnType("numeric")
-                        .HasColumnName("min_total_spent");
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<int>("UserType")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_type");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_target_audiences");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CouponId")
-                        .HasDatabaseName("ix_coupon_target_audiences_coupon_id");
+                    b.HasIndex("CouponId");
 
-                    b.ToTable("coupon_target_audiences", (string)null);
+                    b.ToTable("CouponTargetAudiences");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponType", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("description");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_deleted");
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_coupon_type");
+                    b.HasKey("Id");
 
                     b.ToTable("coupon_type", (string)null);
 
@@ -3490,62 +3381,48 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Disputes.Entities.Dispute", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("RaisedById")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("raised_by_id");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("reason");
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("status");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_dispute");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ListingId")
-                        .HasDatabaseName("ix_dispute_listing_id");
+                    b.HasIndex("ListingId");
 
-                    b.HasIndex("RaisedById")
-                        .HasDatabaseName("ix_dispute_raised_by_id");
+                    b.HasIndex("RaisedById");
 
-                    b.HasIndex("Status")
-                        .HasDatabaseName("ix_dispute_status");
+                    b.HasIndex("Status");
 
                     b.ToTable("dispute", (string)null);
                 });
@@ -3553,54 +3430,42 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.FileMetadata.Entities.FileMetadata", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("content_type");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_name");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("LinkedEntityId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("linked_entity_id");
+                        .HasColumnType("uuid");
 
                     b.Property<long>("Size")
-                        .HasColumnType("bigint")
-                        .HasColumnName("size");
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("url");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_file_metadata");
+                    b.HasKey("Id");
 
                     b.ToTable("file_metadata", (string)null);
                 });
@@ -3608,58 +3473,45 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Identity.Entities.Otp", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("code");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("email");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("ExpiresOnUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_on_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsUsed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_used");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_otp");
+                    b.HasKey("Id");
 
                     b.HasIndex("Email", "Code")
-                        .IsUnique()
-                        .HasDatabaseName("ix_otp_email_code");
+                        .IsUnique();
 
                     b.ToTable("otp", (string)null);
                 });
@@ -3668,48 +3520,37 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("ExpiresOnUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_on_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("token");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_refresh_token");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_refresh_token_user_id");
+                    b.HasIndex("UserId");
 
                     b.ToTable("refresh_token", (string)null);
                 });
@@ -3718,57 +3559,45 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("FormatLabel")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("format_label");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("PayloadJson")
                         .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("payload_json");
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("ThumbnailUrl")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("thumbnail_url");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_listing_template");
+                    b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .HasDatabaseName("ix_listing_template_name");
@@ -3818,91 +3647,70 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ConditionDescription")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("condition_description");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("ConditionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("condition_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("DraftExpiredAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("draft_expired_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Duration")
-                        .HasColumnType("integer")
-                        .HasColumnName("duration");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Format")
-                        .HasColumnType("integer")
-                        .HasColumnName("format");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ListingDescription")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("listing_description");
+                        .HasColumnType("text");
+
+                    b.Property<int>("ListingFormat")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ScheduledStartTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("scheduled_start_time");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Sku")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("sku");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("title");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.Property<int>("listing_format")
-                        .HasColumnType("integer")
-                        .HasColumnName("listing_format");
-
-                    b.HasKey("Id")
-                        .HasName("pk_listing");
+                    b.HasKey("Id");
 
                     b.HasIndex("Sku")
                         .HasDatabaseName("idx_listing_sku_trgm");
@@ -3922,11 +3730,11 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.HasIndex("CreatedBy", "StartDate", "CreatedAt", "Id", "CategoryId", "Format")
                         .IsDescending(false, true, true, false, false, false)
                         .HasDatabaseName("idx_listing_active_owner_sort")
-                        .HasFilter("status = 3");
+                        .HasFilter("\"Status\" = 3");
 
                     b.ToTable("listing", (string)null);
 
-                    b.HasDiscriminator<int>("listing_format");
+                    b.HasDiscriminator<int>("ListingFormat");
 
                     b.UseTphMappingStrategy();
                 });
@@ -3935,54 +3743,42 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("BuyerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("buyer_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("character varying(80)")
-                        .HasColumnName("comment");
+                        .HasColumnType("character varying(80)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FollowUpComment")
                         .HasMaxLength(80)
-                        .HasColumnType("character varying(80)")
-                        .HasColumnName("follow_up_comment");
+                        .HasColumnType("character varying(80)");
 
                     b.Property<DateTimeOffset?>("FollowUpCommentedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("follow_up_commented_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("StoredCommentKey")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("stored_comment_key");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("UsesStoredComment")
-                        .HasColumnType("boolean")
-                        .HasColumnName("uses_stored_comment");
+                        .HasColumnType("boolean");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_buyer_feedback");
+                    b.HasKey("Id");
 
-                    b.HasIndex("BuyerId")
-                        .HasDatabaseName("ix_order_buyer_feedback_buyer_id");
+                    b.HasIndex("BuyerId");
 
                     b.HasIndex("OrderId")
                         .IsUnique()
@@ -3995,85 +3791,65 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("AutoClosedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("auto_closed_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("BuyerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("buyer_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("BuyerNote")
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("buyer_note");
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("completed_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<int>("InitiatedBy")
-                        .HasColumnType("integer")
-                        .HasColumnName("initiated_by");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Reason")
-                        .HasColumnType("integer")
-                        .HasColumnName("reason");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("RequestedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("requested_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("SellerNote")
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("seller_note");
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<DateTime?>("SellerRespondedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("seller_responded_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("SellerResponseDeadlineUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("seller_response_deadline_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_cancellation_requests");
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .HasDatabaseName("idx_cancellation_requests_order");
@@ -4185,99 +3961,75 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("ArchivedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("archived_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("BuyerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("buyer_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("CancelledAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("cancelled_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CouponCode")
-                        .HasColumnType("text")
-                        .HasColumnName("coupon_code");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("DeliveredAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("delivered_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("FulfillmentType")
-                        .HasColumnType("integer")
-                        .HasColumnName("fulfillment_type");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("OrderNumber")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("order_number");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("OrderedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("ordered_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("paid_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("PromotionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("promotion_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("ShippedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("shipped_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("ShippingStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("shipping_status");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("StatusId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("status_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_orders");
+                    b.HasKey("Id");
 
-                    b.HasIndex("BuyerId")
-                        .HasDatabaseName("ix_orders_buyer_id");
+                    b.HasIndex("BuyerId");
 
                     b.HasIndex("OrderNumber")
-                        .IsUnique()
-                        .HasDatabaseName("ix_orders_order_number");
+                        .IsUnique();
 
-                    b.HasIndex("StatusId")
-                        .HasDatabaseName("ix_orders_status_id");
+                    b.HasIndex("StatusId");
 
                     b.ToTable("orders", (string)null);
 
@@ -4707,75 +4459,59 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("image_url");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("quantity");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Sku")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("sku");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("title");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("VariationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("variation_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_items");
+                    b.HasKey("Id");
 
                     b.HasIndex("ListingId")
                         .HasDatabaseName("idx_order_items_listing_id");
 
-                    b.HasIndex("OrderId")
-                        .HasDatabaseName("ix_order_items_order_id");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("order_items", (string)null);
 
@@ -5297,48 +5033,38 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Carrier")
                         .IsRequired()
                         .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("carrier");
+                        .HasColumnType("character varying(120)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("OrderItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_item_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("ShippedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("shipped_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("ShippingLabelId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("shipping_label_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("TrackingNumber")
                         .IsRequired()
                         .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("tracking_number");
+                        .HasColumnType("character varying(120)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id")
                         .HasName("pk_order_item_shipments");
@@ -5359,43 +5085,35 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("code");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("color");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("SortOrder")
-                        .HasColumnType("integer")
-                        .HasColumnName("sort_order");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_statuses");
+                    b.HasKey("Id");
 
                     b.HasIndex("Code")
-                        .IsUnique()
-                        .HasDatabaseName("ix_order_statuses_code");
+                        .IsUnique();
 
                     b.ToTable("order_statuses", (string)null);
 
@@ -5515,36 +5233,27 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("ChangedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("changed_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("FromStatusId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("from_status_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ToStatusId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("to_status_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_status_histories");
+                    b.HasKey("Id");
 
-                    b.HasIndex("FromStatusId")
-                        .HasDatabaseName("ix_order_status_histories_from_status_id");
+                    b.HasIndex("FromStatusId");
 
-                    b.HasIndex("OrderId")
-                        .HasDatabaseName("ix_order_status_histories_order_id");
+                    b.HasIndex("OrderId");
 
-                    b.HasIndex("ToStatusId")
-                        .HasDatabaseName("ix_order_status_histories_to_status_id");
+                    b.HasIndex("ToStatusId");
 
                     b.ToTable("order_status_histories", (string)null);
                 });
@@ -5553,30 +5262,23 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("AllowedRoles")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("allowed_roles");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("FromStatusId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("from_status_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ToStatusId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("to_status_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_status_transitions");
+                    b.HasKey("Id");
 
-                    b.HasIndex("FromStatusId")
-                        .HasDatabaseName("ix_order_status_transitions_from_status_id");
+                    b.HasIndex("FromStatusId");
 
-                    b.HasIndex("ToStatusId")
-                        .HasDatabaseName("ix_order_status_transitions_to_status_id");
+                    b.HasIndex("ToStatusId");
 
                     b.ToTable("order_status_transitions", (string)null);
 
@@ -5755,103 +5457,79 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("BuyerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("buyer_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("BuyerNote")
                         .HasMaxLength(1500)
-                        .HasColumnType("character varying(1500)")
-                        .HasColumnName("buyer_note");
+                        .HasColumnType("character varying(1500)");
 
                     b.Property<DateTime?>("BuyerReturnDueAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("buyer_return_due_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("BuyerShippedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("buyer_shipped_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ClosedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("closed_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("DeliveredAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("delivered_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("PreferredResolution")
-                        .HasColumnType("integer")
-                        .HasColumnName("preferred_resolution");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Reason")
-                        .HasColumnType("integer")
-                        .HasColumnName("reason");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("RefundIssuedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("refund_issued_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("RequestedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("requested_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ReturnCarrier")
                         .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("return_carrier");
+                        .HasColumnType("character varying(120)");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("SellerNote")
                         .HasMaxLength(1500)
-                        .HasColumnType("character varying(1500)")
-                        .HasColumnName("seller_note");
+                        .HasColumnType("character varying(1500)");
 
                     b.Property<DateTime?>("SellerRespondedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("seller_responded_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
+                        .HasColumnType("integer");
 
                     b.Property<string>("TrackingNumber")
                         .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("tracking_number");
+                        .HasColumnType("character varying(120)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_return_requests");
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .HasDatabaseName("idx_return_requests_order");
@@ -5982,106 +5660,85 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Carrier")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("carrier");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTimeOffset?>("EstimatedDelivery")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("estimated_delivery");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("HeightIn")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("height_in");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsVoided")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_voided");
+                        .HasDefaultValue(false);
 
                     b.Property<string>("LabelDocumentId")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("label_document_id");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("LabelFileName")
                         .IsRequired()
                         .HasMaxLength(260)
-                        .HasColumnType("character varying(260)")
-                        .HasColumnName("label_file_name");
+                        .HasColumnType("character varying(260)");
 
                     b.Property<string>("LabelUrl")
                         .IsRequired()
                         .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)")
-                        .HasColumnName("label_url");
+                        .HasColumnType("character varying(1024)");
 
                     b.Property<decimal>("LengthIn")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("length_in");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("PackageType")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("character varying(80)")
-                        .HasColumnName("package_type");
+                        .HasColumnType("character varying(80)");
 
                     b.Property<DateTimeOffset>("PurchasedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("purchased_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ServiceCode")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("service_code");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("service_name");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<Guid>("ShippingServiceId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("shipping_service_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("TrackingNumber")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("tracking_number");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("VoidReason")
                         .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("void_reason");
+                        .HasColumnType("character varying(250)");
 
                     b.Property<DateTimeOffset?>("VoidedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("voided_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("WeightOz")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("weight_oz");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("WidthIn")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("width_in");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_order_shipping_labels");
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderId")
                         .HasDatabaseName("ix_order_shipping_labels_order_id");
@@ -6093,103 +5750,83 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Carrier")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("carrier");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("CoverageDescription")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("coverage_description");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("DeliveryWindowLabel")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("character varying(80)")
-                        .HasColumnName("delivery_window_label");
+                        .HasColumnType("character varying(80)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("MaxEstimatedDeliveryDays")
-                        .HasColumnType("integer")
-                        .HasColumnName("max_estimated_delivery_days");
+                        .HasColumnType("integer");
 
                     b.Property<int>("MinEstimatedDeliveryDays")
-                        .HasColumnType("integer")
-                        .HasColumnName("min_estimated_delivery_days");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("notes");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<bool>("PrinterRequired")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("printer_required");
+                        .HasDefaultValue(false);
 
                     b.Property<string>("SavingsDescription")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("savings_description");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("ServiceCode")
                         .IsRequired()
                         .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("service_code");
+                        .HasColumnType("character varying(120)");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("service_name");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(60)
-                        .HasColumnType("character varying(60)")
-                        .HasColumnName("slug");
+                        .HasColumnType("character varying(60)");
 
                     b.Property<bool>("SupportsQrCode")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("supports_qr_code");
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_shipping_services");
+                    b.HasKey("Id");
 
                     b.HasIndex("Slug")
-                        .IsUnique()
-                        .HasDatabaseName("ix_shipping_services_slug");
+                        .IsUnique();
 
                     b.ToTable("shipping_services", (string)null);
 
@@ -6305,51 +5942,39 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("AcceptReturns")
-                        .HasColumnType("boolean")
-                        .HasColumnName("accept_returns");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("RefundMethod")
-                        .HasColumnType("integer")
-                        .HasColumnName("refund_method");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("ReturnPeriodDays")
-                        .HasColumnType("integer")
-                        .HasColumnName("return_period_days");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("ReturnShippingPaidBy")
-                        .HasColumnType("integer")
-                        .HasColumnName("return_shipping_paid_by");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("StoreId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("store_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_return_policy");
+                    b.HasKey("Id");
 
                     b.HasIndex("StoreId")
                         .IsUnique()
@@ -6362,55 +5987,43 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Carrier")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("carrier");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<int>("HandlingTimeDays")
-                        .HasColumnType("integer")
-                        .HasColumnName("handling_time_days");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_default");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("service_name");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<Guid>("StoreId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("store_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_shipping_policy");
+                    b.HasKey("Id");
 
                     b.HasIndex("StoreId")
                         .HasDatabaseName("idx_shipping_policy_store_id");
@@ -6418,80 +6031,410 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.ToTable("shipping_policy", (string)null);
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzBlobTrigger", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("TriggerName")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_name");
+
+                    b.Property<string>("TriggerGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_group");
+
+                    b.Property<byte[]>("BlobData")
+                        .HasColumnType("bytea")
+                        .HasColumnName("blob_data");
+
+                    b.HasKey("SchedName", "TriggerName", "TriggerGroup");
+
+                    b.ToTable("qrtz_blob_triggers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzCalendar", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("CalendarName")
+                        .HasColumnType("text")
+                        .HasColumnName("calendar_name");
+
+                    b.Property<byte[]>("Calendar")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("calendar");
+
+                    b.HasKey("SchedName", "CalendarName");
+
+                    b.ToTable("qrtz_calendars", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzCronTrigger", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("TriggerName")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_name");
+
+                    b.Property<string>("TriggerGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_group");
+
+                    b.Property<string>("CronExpression")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("cron_expression");
+
+                    b.Property<string>("TimeZoneId")
+                        .HasColumnType("text")
+                        .HasColumnName("time_zone_id");
+
+                    b.HasKey("SchedName", "TriggerName", "TriggerGroup");
+
+                    b.ToTable("qrtz_cron_triggers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzFiredTrigger", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("EntryId")
+                        .HasColumnType("text")
+                        .HasColumnName("entry_id");
+
+                    b.Property<long>("FiredTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("fired_time");
+
+                    b.Property<string>("InstanceName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("instance_name");
+
+                    b.Property<string>("IsNonconcurrent")
+                        .HasColumnType("text")
+                        .HasColumnName("is_nonconcurrent");
+
+                    b.Property<string>("JobGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("job_group");
+
+                    b.Property<string>("JobName")
+                        .HasColumnType("text")
+                        .HasColumnName("job_name");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<string>("RequestsRecovery")
+                        .HasColumnType("text")
+                        .HasColumnName("requests_recovery");
+
+                    b.Property<long>("SchedTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sched_time");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("state");
+
+                    b.Property<string>("TriggerGroup")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_group");
+
+                    b.Property<string>("TriggerName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_name");
+
+                    b.HasKey("SchedName", "EntryId");
+
+                    b.ToTable("qrtz_fired_triggers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzJobDetail", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("JobName")
+                        .HasColumnType("text")
+                        .HasColumnName("job_name");
+
+                    b.Property<string>("JobGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("job_group");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("IsDurable")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("is_durable");
+
+                    b.Property<string>("IsNonconcurrent")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("is_nonconcurrent");
+
+                    b.Property<string>("IsUpdateData")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("is_update_data");
+
+                    b.Property<string>("JobClassName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("job_class_name");
+
+                    b.Property<byte[]>("JobData")
+                        .HasColumnType("bytea")
+                        .HasColumnName("job_data");
+
+                    b.Property<string>("RequestsRecovery")
+                        .HasColumnType("text")
+                        .HasColumnName("requests_recovery");
+
+                    b.HasKey("SchedName", "JobName", "JobGroup");
+
+                    b.ToTable("qrtz_job_details", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzLock", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("LockName")
+                        .HasColumnType("text")
+                        .HasColumnName("lock_name");
+
+                    b.HasKey("SchedName", "LockName");
+
+                    b.ToTable("qrtz_locks", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzPausedTriggerGrp", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("TriggerGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_group");
+
+                    b.HasKey("SchedName", "TriggerGroup");
+
+                    b.ToTable("qrtz_paused_trigger_grps", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzSchedulerState", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("InstanceName")
+                        .HasColumnType("text")
+                        .HasColumnName("instance_name");
+
+                    b.Property<long>("CheckinInterval")
+                        .HasColumnType("bigint")
+                        .HasColumnName("checkin_interval");
+
+                    b.Property<long>("LastCheckinTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("last_checkin_time");
+
+                    b.HasKey("SchedName", "InstanceName");
+
+                    b.ToTable("qrtz_scheduler_state", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzSimpleTrigger", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("TriggerName")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_name");
+
+                    b.Property<string>("TriggerGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_group");
+
+                    b.Property<long>("RepeatCount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("repeat_count");
+
+                    b.Property<long>("RepeatInterval")
+                        .HasColumnType("bigint")
+                        .HasColumnName("repeat_interval");
+
+                    b.Property<long>("TimesTriggered")
+                        .HasColumnType("bigint")
+                        .HasColumnName("times_triggered");
+
+                    b.HasKey("SchedName", "TriggerName", "TriggerGroup");
+
+                    b.ToTable("qrtz_simple_triggers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzTrigger", b =>
+                {
+                    b.Property<string>("SchedName")
+                        .HasColumnType("text")
+                        .HasColumnName("sched_name");
+
+                    b.Property<string>("TriggerName")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_name");
+
+                    b.Property<string>("TriggerGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_group");
+
+                    b.Property<string>("CalendarName")
+                        .HasColumnType("text")
+                        .HasColumnName("calendar_name");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<long?>("EndTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("end_time");
+
+                    b.Property<byte[]>("JobData")
+                        .HasColumnType("bytea")
+                        .HasColumnName("job_data");
+
+                    b.Property<string>("JobGroup")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("job_group");
+
+                    b.Property<string>("JobName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("job_name");
+
+                    b.Property<short?>("MisfireInstr")
+                        .HasColumnType("smallint")
+                        .HasColumnName("misfire_instr");
+
+                    b.Property<long?>("NextFireTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("next_fire_time");
+
+                    b.Property<long?>("PrevFireTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("prev_fire_time");
+
+                    b.Property<int?>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<long>("StartTime")
+                        .HasColumnType("bigint")
+                        .HasColumnName("start_time");
+
+                    b.Property<string>("TriggerState")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_state");
+
+                    b.Property<string>("TriggerType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("trigger_type");
+
+                    b.HasKey("SchedName", "TriggerName", "TriggerGroup");
+
+                    b.HasIndex("SchedName", "JobName", "JobGroup");
+
+                    b.ToTable("qrtz_triggers", (string)null);
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Reports.Entities.ReportDownload", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("CompletedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("completed_at_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("FileUrl")
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
-                        .HasColumnName("file_url");
+                        .HasColumnType("character varying(512)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ReferenceCode")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("reference_code");
+                        .HasColumnType("character varying(32)");
 
                     b.Property<DateTime>("RequestedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("requested_at_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("source");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("status");
+                        .HasColumnType("character varying(32)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("type");
+                        .HasColumnType("character varying(128)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_report_downloads");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId", "ReferenceCode")
-                        .IsUnique()
-                        .HasDatabaseName("ix_report_downloads_user_id_reference_code");
+                        .IsUnique();
 
                     b.ToTable("report_downloads", (string)null);
                 });
@@ -6500,83 +6443,65 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("DeliveryEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("delivery_email");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<DateTime?>("EndDateUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Frequency")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("frequency");
+                        .HasColumnType("character varying(32)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastRunAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_run_at_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("NextRunAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("next_run_at_utc");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("source");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("type");
+                        .HasColumnType("character varying(128)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_report_schedules");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId", "Source", "Type", "IsActive")
-                        .HasDatabaseName("ix_report_schedules_user_id_source_type_is_active");
+                    b.HasIndex("UserId", "Source", "Type", "IsActive");
 
                     b.ToTable("report_schedules", (string)null);
                 });
@@ -6584,105 +6509,83 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Reviews.Entities.Review", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Comment")
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("comment");
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Rating")
-                        .HasColumnType("integer")
-                        .HasColumnName("rating");
+                        .HasColumnType("integer");
 
                     b.Property<string>("RecipientId")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("recipient_id");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("RecipientRole")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
-                        .HasDefaultValue("Seller")
-                        .HasColumnName("recipient_role");
+                        .HasDefaultValue("Seller");
 
                     b.Property<DateTime?>("RepliedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("replied_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Reply")
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("reply");
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<string>("ReviewerId")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("reviewer_id");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ReviewerRole")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
-                        .HasDefaultValue("Buyer")
-                        .HasColumnName("reviewer_role");
+                        .HasDefaultValue("Buyer");
 
                     b.Property<DateTime?>("RevisionRequestedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("revision_requested_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RevisionStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasDefaultValue("None")
-                        .HasColumnName("revision_status");
+                        .HasDefaultValue("None");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_review");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ListingId")
-                        .HasDatabaseName("ix_review_listing_id");
+                    b.HasIndex("ListingId");
 
-                    b.HasIndex("RecipientId")
-                        .HasDatabaseName("ix_review_recipient_id");
+                    b.HasIndex("RecipientId");
 
-                    b.HasIndex("RecipientRole")
-                        .HasDatabaseName("ix_review_recipient_role");
+                    b.HasIndex("RecipientRole");
 
-                    b.HasIndex("ReviewerId")
-                        .HasDatabaseName("ix_review_reviewer_id");
+                    b.HasIndex("ReviewerId");
 
                     b.ToTable("review", (string)null);
                 });
@@ -6690,42 +6593,33 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Roles.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_role");
+                    b.HasKey("Id");
 
                     b.ToTable("role", (string)null);
                 });
@@ -6734,82 +6628,64 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("BlockPriceIncreaseRevisions")
-                        .HasColumnType("boolean")
-                        .HasColumnName("block_price_increase_revisions");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("description");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal?>("HighlightPercentage")
-                        .HasColumnType("numeric(5,2)")
-                        .HasColumnName("highlight_percentage");
+                        .HasColumnType("numeric(5,2)");
 
                     b.Property<bool>("IncludeSkippedItems")
-                        .HasColumnType("boolean")
-                        .HasColumnName("include_skipped_items");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Mode")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("mode");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(90)
-                        .HasColumnType("character varying(90)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying(90)");
 
                     b.Property<bool>("OfferFreeShipping")
-                        .HasColumnType("boolean")
-                        .HasColumnName("offer_free_shipping");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("status");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event");
+                    b.HasKey("Id");
 
                     b.ToTable("sale_event", (string)null);
                 });
@@ -6818,37 +6694,29 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("DiscountType")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("discount_type");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<decimal>("DiscountValue")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("discount_value");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<string>("Label")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("label");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("Priority")
-                        .HasColumnType("integer")
-                        .HasColumnName("priority");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("SaleEventId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sale_event_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event_discount_tier");
+                    b.HasKey("Id");
 
-                    b.HasIndex("SaleEventId")
-                        .HasDatabaseName("ix_sale_event_discount_tier_sale_event_id");
+                    b.HasIndex("SaleEventId");
 
                     b.ToTable("sale_event_discount_tier", (string)null);
                 });
@@ -6857,30 +6725,23 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("DiscountTierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("discount_tier_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SaleEventId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sale_event_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event_listing");
+                    b.HasKey("Id");
 
-                    b.HasIndex("DiscountTierId")
-                        .HasDatabaseName("ix_sale_event_listing_discount_tier_id");
+                    b.HasIndex("DiscountTierId");
 
                     b.HasIndex("SaleEventId", "ListingId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_sale_event_listing_sale_event_id_listing_id");
+                        .IsUnique();
 
                     b.ToTable("sale_event_listing", (string)null);
                 });
@@ -6889,58 +6750,46 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("BuyersCanSeeVatNumber")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("buyers_can_see_vat_number");
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("ListingsStayActiveWhenOutOfStock")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("listings_stay_active_when_out_of_stock");
+                        .HasDefaultValue(false);
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("ShowExactQuantityAvailable")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("show_exact_quantity_available");
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("VatNumber")
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("vat_number");
+                        .HasColumnType("character varying(200)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_seller_preference");
+                    b.HasKey("Id");
 
                     b.HasIndex("SellerId")
                         .IsUnique()
@@ -6952,69 +6801,54 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Stores.Entities.Store", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("BannerUrl")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("banner_url");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("LogoUrl")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("logo_url");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("name");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("slug");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<int>("StoreType")
-                        .HasColumnType("integer")
-                        .HasColumnName("store_type");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_store");
+                    b.HasKey("Id");
 
                     b.HasIndex("Slug")
                         .IsUnique()
@@ -7030,39 +6864,30 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("FinalValueFeePercentage")
-                        .HasColumnType("numeric(5,2)")
-                        .HasColumnName("final_value_fee_percentage");
+                        .HasColumnType("numeric(5,2)");
 
                     b.Property<int>("ListingLimit")
-                        .HasColumnType("integer")
-                        .HasColumnName("listing_limit");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("StoreId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("store_id");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("SubscriptionType")
-                        .HasColumnType("integer")
-                        .HasColumnName("subscription_type");
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id")
-                        .HasName("pk_store_subscription");
+                    b.HasKey("Id");
 
                     b.HasIndex("StoreId")
                         .HasDatabaseName("idx_store_subscription_store_id");
@@ -7076,74 +6901,58 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Users.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("email");
+                        .HasColumnType("text");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("full_name");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsEmailVerified")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_email_verified");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsPaymentVerified")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_payment_verified");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("password_hash");
+                        .HasColumnType("text");
 
                     b.Property<string>("PerformanceLevel")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("performance_level");
+                        .HasColumnType("character varying(32)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("username");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("_activeTotalValue")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("active_total_value");
+                        .HasColumnType("numeric(18,2)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_user");
+                    b.HasKey("Id");
 
                     b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_email");
+                        .IsUnique();
 
                     b.ToTable("user", (string)null);
 
@@ -7199,172 +7008,133 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("AssignedUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("assigned_user_id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("code");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<string>("Currency")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("currency");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("CurrentBalance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("current_balance");
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime?>("ExpiryDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expiry_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("InitialValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("initial_value");
+                        .HasColumnType("numeric");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsTransferable")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_transferable");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("IssueDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("issue_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_vouchers");
+                    b.HasKey("Id");
 
-                    b.ToTable("vouchers", (string)null);
+                    b.ToTable("Vouchers");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Vouchers.Entities.VoucherTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("AmountUsed")
-                        .HasColumnType("numeric")
-                        .HasColumnName("amount_used");
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("text")
-                        .HasColumnName("notes");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("order_id");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("transaction_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TransactionType")
-                        .HasColumnType("integer")
-                        .HasColumnName("transaction_type");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("VoucherId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("voucher_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("Id")
-                        .HasName("pk_voucher_transactions");
+                    b.HasKey("Id");
 
-                    b.HasIndex("VoucherId")
-                        .HasDatabaseName("ix_voucher_transactions_voucher_id");
+                    b.HasIndex("VoucherId");
 
-                    b.ToTable("voucher_transactions", (string)null);
+                    b.ToTable("VoucherTransactions");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Infrastructure.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("content");
+                        .HasColumnType("text");
 
                     b.Property<string>("Error")
-                        .HasColumnType("text")
-                        .HasColumnName("error");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("OccurredOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("occurred_on");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ProcessedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("processed_on");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("RetryCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("retry_count");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("type");
+                        .HasColumnType("text");
 
-                    b.HasKey("Id")
-                        .HasName("pk_outbox_message");
+                    b.HasKey("Id");
 
                     b.ToTable("outbox_message", (string)null);
                 });
@@ -7372,20 +7142,16 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("roles_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uuid");
 
-                    b.HasKey("RolesId", "UserId")
-                        .HasName("pk_role_user");
+                    b.HasKey("RolesId", "UserId");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_role_user_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("role_user", (string)null);
+                    b.ToTable("RoleUser");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.AuctionListing", b =>
@@ -7400,8 +7166,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.HasBaseType("PRN232_EbayClone.Domain.Listings.Entities.Listing");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
+                        .HasColumnType("integer");
 
                     b.HasDiscriminator().HasValue(2);
 
@@ -12813,8 +12578,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.HasOne("PRN232_EbayClone.Domain.Categories.Entities.Category", null)
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_category_category_parent_id");
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Categories.Entities.CategoryCondition", b =>
@@ -12823,15 +12587,13 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("CategoryConditions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_category_condition_categories_category_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Conditions.Entities.Condition", "Condition")
                         .WithMany()
                         .HasForeignKey("ConditionId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_category_condition_condition_condition_id");
+                        .IsRequired();
 
                     b.Navigation("Condition");
                 });
@@ -12840,8 +12602,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("PRN232_EbayClone.Domain.Categories.Entities.Category", null)
                         .WithMany("CategorySpecifics")
-                        .HasForeignKey("category_id")
-                        .HasConstraintName("fk_category_specific_category_category_id");
+                        .HasForeignKey("category_id");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.Coupon", b =>
@@ -12850,20 +12611,20 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("CouponTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_coupon_types_coupon_type_id");
+                        .IsRequired();
 
                     b.Navigation("CouponType");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponCondition", b =>
                 {
-                    b.HasOne("PRN232_EbayClone.Domain.Coupons.Entities.Coupon", null)
+                    b.HasOne("PRN232_EbayClone.Domain.Coupons.Entities.Coupon", "Coupon")
                         .WithMany("Conditions")
                         .HasForeignKey("CouponId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_condition_coupons_coupon_id");
+                        .IsRequired();
+
+                    b.Navigation("Coupon");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Coupons.Entities.CouponExcludedCategory", b =>
@@ -12872,8 +12633,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("ExcludedCategories")
                         .HasForeignKey("CouponId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_excluded_categories_coupons_coupon_id");
+                        .IsRequired();
 
                     b.Navigation("Coupon");
                 });
@@ -12884,8 +12644,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("ExcludedItems")
                         .HasForeignKey("CouponId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_excluded_items_coupons_coupon_id");
+                        .IsRequired();
 
                     b.Navigation("Coupon");
                 });
@@ -12896,8 +12655,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("TargetAudiences")
                         .HasForeignKey("CouponId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_coupon_target_audiences_coupons_coupon_id");
+                        .IsRequired();
 
                     b.Navigation("Coupon");
                 });
@@ -12908,8 +12666,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_dispute_listings_listing_id");
+                        .IsRequired();
 
                     b.Navigation("Listing");
                 });
@@ -12920,8 +12677,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_refresh_token_user_user_id");
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -12931,67 +12687,55 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsMany("PRN232_EbayClone.Domain.Listings.ValueObjects.ItemSpecific", "ItemSpecifics", b1 =>
                         {
                             b1.Property<Guid>("listing_id")
-                                .HasColumnType("uuid")
-                                .HasColumnName("listing_id");
+                                .HasColumnType("uuid");
 
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
-                                .HasColumnName("id");
+                                .HasColumnType("integer");
 
                             NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
-                                .HasColumnName("name");
+                                .HasColumnType("character varying(100)");
 
                             b1.Property<string>("Values")
                                 .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("val");
+                                .HasColumnType("text");
 
-                            b1.HasKey("listing_id", "Id")
-                                .HasName("pk_listing_item_specific");
+                            b1.HasKey("listing_id", "Id");
 
                             b1.ToTable("listing_item_specific", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("listing_id")
-                                .HasConstraintName("fk_listing_item_specific_listing_listing_id");
+                                .HasForeignKey("listing_id");
                         });
 
                     b.OwnsMany("PRN232_EbayClone.Domain.Listings.ValueObjects.ListingImage", "Images", b1 =>
                         {
                             b1.Property<Guid>("listing_id")
-                                .HasColumnType("uuid")
-                                .HasColumnName("listing_id");
+                                .HasColumnType("uuid");
 
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
-                                .HasColumnName("id");
+                                .HasColumnType("integer");
 
                             NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<bool>("IsPrimary")
-                                .HasColumnType("boolean")
-                                .HasColumnName("is_primary");
+                                .HasColumnType("boolean");
 
                             b1.Property<string>("Url")
                                 .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("url");
+                                .HasColumnType("text");
 
-                            b1.HasKey("listing_id", "Id")
-                                .HasName("pk_listing_image");
+                            b1.HasKey("listing_id", "Id");
 
                             b1.ToTable("listing_image", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("listing_id")
-                                .HasConstraintName("fk_listing_image_listing_listing_id");
+                                .HasForeignKey("listing_id");
 
                             b1.HasData(
                                 new
@@ -15107,15 +14851,13 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("BuyerId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_buyer_feedback_user_buyer_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Orders.Entities.Order", null)
                         .WithOne("SellerFeedback")
                         .HasForeignKey("PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_buyer_feedback_orders_order_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.CancellationRequest", b =>
@@ -15124,32 +14866,27 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("CancellationRequests")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_cancellation_requests_orders_order_id");
+                        .IsRequired();
 
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "OrderTotalSnapshot", b1 =>
                         {
                             b1.Property<Guid>("CancellationRequestId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("order_total_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("order_total_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("CancellationRequestId");
 
                             b1.ToTable("order_cancellation_requests");
 
                             b1.WithOwner()
-                                .HasForeignKey("CancellationRequestId")
-                                .HasConstraintName("fk_order_cancellation_requests_order_cancellation_requests_id");
+                                .HasForeignKey("CancellationRequestId");
 
                             b1.HasData(
                                 new
@@ -15187,26 +14924,22 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "RefundAmount", b1 =>
                         {
                             b1.Property<Guid>("CancellationRequestId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("refund_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("refund_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("CancellationRequestId");
 
                             b1.ToTable("order_cancellation_requests");
 
                             b1.WithOwner()
-                                .HasForeignKey("CancellationRequestId")
-                                .HasConstraintName("fk_order_cancellation_requests_order_cancellation_requests_id");
+                                .HasForeignKey("CancellationRequestId");
 
                             b1.HasData(
                                 new
@@ -15235,23 +14968,18 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("PRN232_EbayClone.Domain.Users.Entities.User", "Buyer")
                         .WithMany()
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_orders_user_buyer_id");
+                        .HasForeignKey("BuyerId");
 
                     b.HasOne("PRN232_EbayClone.Domain.Orders.Entities.OrderStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_orders_order_statuses_status_id");
+                        .IsRequired();
 
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "DiscountAmount", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric")
@@ -15268,8 +14996,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("orders");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderId")
-                                .HasConstraintName("fk_orders_orders_id");
+                                .HasForeignKey("OrderId");
 
                             b1.HasData(
                                 new
@@ -15421,8 +15148,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "PlatformFee", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric")
@@ -15439,8 +15165,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("orders");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderId")
-                                .HasConstraintName("fk_orders_orders_id");
+                                .HasForeignKey("OrderId");
 
                             b1.HasData(
                                 new
@@ -15592,8 +15317,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "ShippingCost", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric")
@@ -15610,8 +15334,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("orders");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderId")
-                                .HasConstraintName("fk_orders_orders_id");
+                                .HasForeignKey("OrderId");
 
                             b1.HasData(
                                 new
@@ -15763,8 +15486,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "SubTotal", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric")
@@ -15781,8 +15503,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("orders");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderId")
-                                .HasConstraintName("fk_orders_orders_id");
+                                .HasForeignKey("OrderId");
 
                             b1.HasData(
                                 new
@@ -15934,8 +15655,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "TaxAmount", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric")
@@ -15952,8 +15672,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("orders");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderId")
-                                .HasConstraintName("fk_orders_orders_id");
+                                .HasForeignKey("OrderId");
 
                             b1.HasData(
                                 new
@@ -16105,8 +15824,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "Total", b1 =>
                         {
                             b1.Property<Guid>("OrderId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric")
@@ -16123,8 +15841,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("orders");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderId")
-                                .HasConstraintName("fk_orders_orders_id");
+                                .HasForeignKey("OrderId");
 
                             b1.HasData(
                                 new
@@ -16302,39 +16019,33 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_items_listing_listing_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Orders.Entities.Order", null)
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_items_orders_order_id");
+                        .IsRequired();
 
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "TotalPrice", b1 =>
                         {
                             b1.Property<Guid>("OrderItemId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("numeric")
-                                .HasColumnName("total_price_amount");
+                                .HasColumnType("numeric");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("total_price_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("OrderItemId");
 
                             b1.ToTable("order_items");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderItemId")
-                                .HasConstraintName("fk_order_items_order_items_id");
+                                .HasForeignKey("OrderItemId");
 
                             b1.HasData(
                                 new
@@ -16546,26 +16257,22 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "UnitPrice", b1 =>
                         {
                             b1.Property<Guid>("OrderItemId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("numeric")
-                                .HasColumnName("unit_price_amount");
+                                .HasColumnType("numeric");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("unit_price_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("OrderItemId");
 
                             b1.ToTable("order_items");
 
                             b1.WithOwner()
-                                .HasForeignKey("OrderItemId")
-                                .HasConstraintName("fk_order_items_order_items_id");
+                                .HasForeignKey("OrderItemId");
 
                             b1.HasData(
                                 new
@@ -16787,14 +16494,12 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("ItemShipments")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_item_shipments_orders_order_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Orders.Entities.ShippingLabel", null)
                         .WithMany()
                         .HasForeignKey("ShippingLabelId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("fk_order_item_shipments_shipping_labels_shipping_label_id");
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.OrderStatusHistory", b =>
@@ -16803,22 +16508,19 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("FromStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_status_histories_order_statuses_from_status_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Orders.Entities.Order", null)
                         .WithMany("StatusHistory")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_status_histories_orders_order_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Orders.Entities.OrderStatus", "ToStatus")
                         .WithMany()
                         .HasForeignKey("ToStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_status_histories_order_statuses_to_status_id");
+                        .IsRequired();
 
                     b.Navigation("FromStatus");
 
@@ -16831,15 +16533,13 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("AllowedTransitions")
                         .HasForeignKey("FromStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_status_transitions_order_statuses_from_status_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Orders.Entities.OrderStatus", "ToStatus")
                         .WithMany()
                         .HasForeignKey("ToStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_status_transitions_order_statuses_to_status_id");
+                        .IsRequired();
 
                     b.Navigation("FromStatus");
 
@@ -16852,32 +16552,27 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("ReturnRequests")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_return_requests_orders_order_id");
+                        .IsRequired();
 
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "OrderTotalSnapshot", b1 =>
                         {
                             b1.Property<Guid>("ReturnRequestId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("order_total_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("order_total_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("ReturnRequestId");
 
                             b1.ToTable("order_return_requests");
 
                             b1.WithOwner()
-                                .HasForeignKey("ReturnRequestId")
-                                .HasConstraintName("fk_order_return_requests_order_return_requests_id");
+                                .HasForeignKey("ReturnRequestId");
 
                             b1.HasData(
                                 new
@@ -16915,26 +16610,22 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "RefundAmount", b1 =>
                         {
                             b1.Property<Guid>("ReturnRequestId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("refund_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("refund_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("ReturnRequestId");
 
                             b1.ToTable("order_return_requests");
 
                             b1.WithOwner()
-                                .HasForeignKey("ReturnRequestId")
-                                .HasConstraintName("fk_order_return_requests_order_return_requests_id");
+                                .HasForeignKey("ReturnRequestId");
 
                             b1.HasData(
                                 new
@@ -16948,26 +16639,22 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "RestockingFee", b1 =>
                         {
                             b1.Property<Guid>("ReturnRequestId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("restocking_fee_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("restocking_fee_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("ReturnRequestId");
 
                             b1.ToTable("order_return_requests");
 
                             b1.WithOwner()
-                                .HasForeignKey("ReturnRequestId")
-                                .HasConstraintName("fk_order_return_requests_order_return_requests_id");
+                                .HasForeignKey("ReturnRequestId");
 
                             b1.HasData(
                                 new
@@ -16994,59 +16681,50 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_shipping_labels_orders_order_id");
+                        .IsRequired();
 
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "Cost", b1 =>
                         {
                             b1.Property<Guid>("ShippingLabelId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("cost_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("cost_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("ShippingLabelId");
 
                             b1.ToTable("order_shipping_labels");
 
                             b1.WithOwner()
-                                .HasForeignKey("ShippingLabelId")
-                                .HasConstraintName("fk_order_shipping_labels_order_shipping_labels_id");
+                                .HasForeignKey("ShippingLabelId");
                         });
 
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "Insurance", b1 =>
                         {
                             b1.Property<Guid>("ShippingLabelId")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("insurance_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("insurance_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("ShippingLabelId");
 
                             b1.ToTable("order_shipping_labels");
 
                             b1.WithOwner()
-                                .HasForeignKey("ShippingLabelId")
-                                .HasConstraintName("fk_order_shipping_labels_order_shipping_labels_id");
+                                .HasForeignKey("ShippingLabelId");
                         });
 
                     b.Navigation("Cost")
@@ -17061,26 +16739,22 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "BaseCost", b1 =>
                         {
                             b1.Property<Guid>("ShippingServiceId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("numeric")
-                                .HasColumnName("base_cost_amount");
+                                .HasColumnType("numeric");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("base_cost_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("ShippingServiceId");
 
                             b1.ToTable("shipping_services");
 
                             b1.WithOwner()
-                                .HasForeignKey("ShippingServiceId")
-                                .HasConstraintName("fk_shipping_services_shipping_services_id");
+                                .HasForeignKey("ShippingServiceId");
 
                             b1.HasData(
                                 new
@@ -17124,30 +16798,36 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "Cost", b1 =>
                         {
                             b1.Property<Guid>("ShippingPolicyId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("cost_amount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("cost_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("ShippingPolicyId");
 
                             b1.ToTable("shipping_policy");
 
                             b1.WithOwner()
-                                .HasForeignKey("ShippingPolicyId")
-                                .HasConstraintName("fk_shipping_policy_shipping_policy_id");
+                                .HasForeignKey("ShippingPolicyId");
                         });
 
                     b.Navigation("Cost")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Quartz.QrtzTrigger", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Quartz.QrtzJobDetail", null)
+                        .WithMany()
+                        .HasForeignKey("SchedName", "JobName", "JobGroup")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_QRTZ_TRIGGERS_JOB_DETAILS");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Reports.Entities.ReportDownload", b =>
@@ -17155,29 +16835,24 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Reports.ValueObjects.ReportDateRange", "DateRange", b1 =>
                         {
                             b1.Property<Guid>("ReportDownloadId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
-                            b1.Property<DateTime?>("EndUtc")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("range_end_utc");
+                            b1.Property<DateTime>("EndUtc")
+                                .HasColumnType("timestamp with time zone");
 
-                            b1.Property<DateTime?>("StartUtc")
-                                .HasColumnType("timestamp with time zone")
-                                .HasColumnName("range_start_utc");
+                            b1.Property<DateTime>("StartUtc")
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<string>("TimeZone")
                                 .HasMaxLength(64)
-                                .HasColumnType("character varying(64)")
-                                .HasColumnName("range_timezone");
+                                .HasColumnType("character varying(64)");
 
                             b1.HasKey("ReportDownloadId");
 
                             b1.ToTable("report_downloads");
 
                             b1.WithOwner()
-                                .HasForeignKey("ReportDownloadId")
-                                .HasConstraintName("fk_report_downloads_report_downloads_id");
+                                .HasForeignKey("ReportDownloadId");
                         });
 
                     b.Navigation("DateRange");
@@ -17189,8 +16864,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_review_listing_listing_id");
+                        .IsRequired();
 
                     b.Navigation("Listing");
                 });
@@ -17200,21 +16874,17 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsMany("PRN232_EbayClone.Domain.Roles.ValueObjects.RolePermission", "Permissions", b1 =>
                         {
                             b1.Property<Guid>("RoleId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("role_id");
+                                .HasColumnType("uuid");
 
                             b1.Property<string>("Permission")
-                                .HasColumnType("text")
-                                .HasColumnName("Permission");
+                                .HasColumnType("text");
 
-                            b1.HasKey("RoleId", "Permission")
-                                .HasName("pk_role_permissions");
+                            b1.HasKey("RoleId", "Permission");
 
                             b1.ToTable("role_permissions", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("RoleId")
-                                .HasConstraintName("fk_role_permissions_role_role_id");
+                                .HasForeignKey("RoleId");
                         });
 
                     b.Navigation("Permissions");
@@ -17226,8 +16896,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("DiscountTiers")
                         .HasForeignKey("SaleEventId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_discount_tier_sale_event_sale_event_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing", b =>
@@ -17236,15 +16905,13 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("Listings")
                         .HasForeignKey("DiscountTierId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_listing_sale_event_discount_tier_discount_tier_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", null)
                         .WithMany("Listings")
                         .HasForeignKey("SaleEventId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_listing_sale_event_sale_event_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.SellingPreferences.Entities.SellerPreference", b =>
@@ -17252,150 +16919,124 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.SellingPreferences.ValueObjects.BuyerManagementSettings", "BuyerManagement", b1 =>
                         {
                             b1.Property<Guid>("SellerPreferenceId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<bool>("ApplyFeedbackScoreThreshold")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(false)
-                                .HasColumnName("apply_feedback_score_threshold");
+                                .HasDefaultValue(false);
 
                             b1.Property<bool>("BlockMaxItemsInLastTenDays")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(false)
-                                .HasColumnName("block_max_items_last_ten_days");
+                                .HasDefaultValue(false);
 
                             b1.Property<bool>("BlockPrimaryAddressOutsideShippingLocation")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(true)
-                                .HasColumnName("block_primary_address_outside_shipping_location");
+                                .HasDefaultValue(true);
 
                             b1.Property<bool>("BlockUnpaidItemStrikes")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(false)
-                                .HasColumnName("block_unpaid_item_strikes");
+                                .HasDefaultValue(false);
 
                             b1.Property<int?>("FeedbackScoreThreshold")
-                                .HasColumnType("integer")
-                                .HasColumnName("feedback_score_threshold");
+                                .HasColumnType("integer");
 
                             b1.Property<int?>("MaxItemsInLastTenDays")
-                                .HasColumnType("integer")
-                                .HasColumnName("max_items_last_ten_days");
+                                .HasColumnType("integer");
 
                             b1.Property<bool>("PreventBlockedBuyersFromContacting")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(true)
-                                .HasColumnName("prevent_blocked_buyers_contacting");
+                                .HasDefaultValue(true);
 
                             b1.Property<bool>("RequirePaymentMethodBeforeBid")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(true)
-                                .HasColumnName("require_payment_method_before_bid");
+                                .HasDefaultValue(true);
 
                             b1.Property<bool>("RequirePaymentMethodBeforeOffer")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(true)
-                                .HasColumnName("require_payment_method_before_offer");
+                                .HasDefaultValue(true);
 
                             b1.Property<int>("UnpaidItemStrikesCount")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
-                                .HasDefaultValue(0)
-                                .HasColumnName("unpaid_item_strikes_count");
+                                .HasDefaultValue(0);
 
                             b1.Property<int>("UnpaidItemStrikesPeriodInMonths")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
-                                .HasDefaultValue(0)
-                                .HasColumnName("unpaid_item_strikes_period_months");
+                                .HasDefaultValue(0);
 
                             b1.Property<bool>("UpdateBlockSettingsForActiveListings")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(false)
-                                .HasColumnName("update_block_settings_active_listings");
+                                .HasDefaultValue(false);
 
                             b1.HasKey("SellerPreferenceId");
 
                             b1.ToTable("seller_preference");
 
                             b1.WithOwner()
-                                .HasForeignKey("SellerPreferenceId")
-                                .HasConstraintName("fk_seller_preference_seller_preference_id");
+                                .HasForeignKey("SellerPreferenceId");
                         });
 
                     b.OwnsOne("PRN232_EbayClone.Domain.SellingPreferences.ValueObjects.InvoicePreference", "InvoicePreference", b1 =>
                         {
                             b1.Property<Guid>("SellerPreferenceId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<bool>("ApplyCreditsAutomatically")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(true)
-                                .HasColumnName("invoice_apply_credits_automatically");
+                                .HasDefaultValue(true);
 
                             b1.Property<int>("Format")
-                                .HasColumnType("integer")
-                                .HasColumnName("invoice_format");
+                                .HasColumnType("integer");
 
                             b1.Property<bool>("SendEmailCopy")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("boolean")
-                                .HasDefaultValue(true)
-                                .HasColumnName("invoice_send_email_copy");
+                                .HasDefaultValue(true);
 
                             b1.HasKey("SellerPreferenceId");
 
                             b1.ToTable("seller_preference");
 
                             b1.WithOwner()
-                                .HasForeignKey("SellerPreferenceId")
-                                .HasConstraintName("fk_seller_preference_seller_preference_id");
+                                .HasForeignKey("SellerPreferenceId");
                         });
 
                     b.OwnsMany("PRN232_EbayClone.Domain.SellingPreferences.ValueObjects.BlockedBuyer", "BlockedBuyers", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<DateTime>("CreatedAtUtc")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at_utc")
                                 .HasDefaultValueSql("now() at time zone 'utc'");
 
                             b1.Property<string>("Identifier")
                                 .IsRequired()
                                 .HasMaxLength(200)
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("identifier");
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<string>("NormalizedIdentifier")
                                 .IsRequired()
                                 .HasMaxLength(200)
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("normalized_identifier");
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<Guid>("seller_preference_id")
-                                .HasColumnType("uuid")
-                                .HasColumnName("seller_preference_id");
+                                .HasColumnType("uuid");
 
-                            b1.HasKey("Id")
-                                .HasName("pk_seller_blocked_buyer");
+                            b1.HasKey("Id");
 
-                            b1.HasIndex("seller_preference_id")
-                                .HasDatabaseName("ix_seller_blocked_buyer_seller_preference_id");
+                            b1.HasIndex("seller_preference_id");
 
                             b1.HasIndex("NormalizedIdentifier", "seller_preference_id")
                                 .IsUnique()
@@ -17404,43 +17045,35 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("seller_blocked_buyer", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("seller_preference_id")
-                                .HasConstraintName("fk_seller_blocked_buyer_seller_preference_seller_preference_id");
+                                .HasForeignKey("seller_preference_id");
                         });
 
                     b.OwnsMany("PRN232_EbayClone.Domain.SellingPreferences.ValueObjects.ExemptBuyer", "ExemptBuyers", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<DateTime>("CreatedAtUtc")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("timestamp with time zone")
-                                .HasColumnName("created_at_utc")
                                 .HasDefaultValueSql("now() at time zone 'utc'");
 
                             b1.Property<string>("Identifier")
                                 .IsRequired()
                                 .HasMaxLength(200)
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("identifier");
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<string>("NormalizedIdentifier")
                                 .IsRequired()
                                 .HasMaxLength(200)
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("normalized_identifier");
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<Guid>("seller_preference_id")
-                                .HasColumnType("uuid")
-                                .HasColumnName("seller_preference_id");
+                                .HasColumnType("uuid");
 
-                            b1.HasKey("Id")
-                                .HasName("pk_seller_exempt_buyer");
+                            b1.HasKey("Id");
 
-                            b1.HasIndex("seller_preference_id")
-                                .HasDatabaseName("ix_seller_exempt_buyer_seller_preference_id");
+                            b1.HasIndex("seller_preference_id");
 
                             b1.HasIndex("NormalizedIdentifier", "seller_preference_id")
                                 .IsUnique()
@@ -17449,8 +17082,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("seller_exempt_buyer", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("seller_preference_id")
-                                .HasConstraintName("fk_seller_exempt_buyer_seller_preference_seller_preference_id");
+                                .HasForeignKey("seller_preference_id");
                         });
 
                     b.Navigation("BlockedBuyers");
@@ -17470,32 +17102,27 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany("Subscriptions")
                         .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_store_subscription_store_store_id");
+                        .IsRequired();
 
                     b.OwnsOne("PRN232_EbayClone.Domain.Shared.ValueObjects.Money", "MonthlyFee", b1 =>
                         {
                             b1.Property<Guid>("StoreSubscriptionId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("numeric(18,2)")
-                                .HasColumnName("monthly_fee");
+                                .HasColumnType("numeric(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
-                                .HasColumnName("monthly_fee_currency");
+                                .HasColumnType("character varying(3)");
 
                             b1.HasKey("StoreSubscriptionId");
 
                             b1.ToTable("store_subscription");
 
                             b1.WithOwner()
-                                .HasForeignKey("StoreSubscriptionId")
-                                .HasConstraintName("fk_store_subscription_store_subscription_id");
+                                .HasForeignKey("StoreSubscriptionId");
                         });
 
                     b.Navigation("MonthlyFee")
@@ -17508,24 +17135,19 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         {
                             b1.Property<Guid>("Value")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid")
-                                .HasColumnName("listing_id");
+                                .HasColumnType("uuid");
 
                             b1.Property<Guid>("seller_id")
-                                .HasColumnType("uuid")
-                                .HasColumnName("seller_id");
+                                .HasColumnType("uuid");
 
-                            b1.HasKey("Value")
-                                .HasName("pk_listing_id");
+                            b1.HasKey("Value");
 
-                            b1.HasIndex("seller_id")
-                                .HasDatabaseName("ix_listing_id_seller_id");
+                            b1.HasIndex("seller_id");
 
-                            b1.ToTable("listing_id", (string)null);
+                            b1.ToTable("ListingId");
 
                             b1.WithOwner()
-                                .HasForeignKey("seller_id")
-                                .HasConstraintName("fk_listing_id_user_seller_id");
+                                .HasForeignKey("seller_id");
 
                             b1.HasData(
                                 new
@@ -19039,8 +18661,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("VoucherId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_voucher_transactions_vouchers_voucher_id");
+                        .IsRequired();
 
                     b.Navigation("Voucher");
                 });
@@ -19051,15 +18672,13 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_user_role_roles_id");
+                        .IsRequired();
 
                     b.HasOne("PRN232_EbayClone.Domain.Users.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_user_user_user_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.AuctionListing", b =>
@@ -19067,32 +18686,26 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Listings.ValueObjects.AuctionPricing", "Pricing", b1 =>
                         {
                             b1.Property<Guid>("AuctionListingId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal?>("BuyItNowPrice")
-                                .HasColumnType("numeric")
-                                .HasColumnName("pricing_buy_it_now_price");
+                                .HasColumnType("numeric");
 
                             b1.Property<int>("Quantity")
-                                .HasColumnType("integer")
-                                .HasColumnName("pricing_quantity");
+                                .HasColumnType("integer");
 
                             b1.Property<decimal?>("ReservePrice")
-                                .HasColumnType("numeric")
-                                .HasColumnName("pricing_reserve_price");
+                                .HasColumnType("numeric");
 
                             b1.Property<decimal>("StartPrice")
-                                .HasColumnType("numeric")
-                                .HasColumnName("pricing_start_price");
+                                .HasColumnType("numeric");
 
                             b1.HasKey("AuctionListingId");
 
                             b1.ToTable("listing");
 
                             b1.WithOwner()
-                                .HasForeignKey("AuctionListingId")
-                                .HasConstraintName("fk_auction_listings_auction_listings_id");
+                                .HasForeignKey("AuctionListingId");
                         });
 
                     b.Navigation("Pricing")
@@ -19104,24 +18717,24 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Listings.ValueObjects.FixedPricePricing", "Pricing", b1 =>
                         {
                             b1.Property<Guid>("FixedPriceListingId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Price")
-                                .HasColumnType("numeric")
-                                .HasColumnName("pricing_price");
+                                .HasColumnType("numeric");
 
                             b1.Property<int>("Quantity")
-                                .HasColumnType("integer")
-                                .HasColumnName("pricing_quantity");
+                                .HasColumnType("integer");
 
                             b1.HasKey("FixedPriceListingId");
 
-                            b1.ToTable("listing");
+                            b1.ToTable("listing", t =>
+                                {
+                                    t.Property("Quantity")
+                                        .HasColumnName("FixedPricePricing_Pricing_Quantity");
+                                });
 
                             b1.WithOwner()
-                                .HasForeignKey("FixedPriceListingId")
-                                .HasConstraintName("fk_fixed_price_listings_fixed_price_listings_id");
+                                .HasForeignKey("FixedPriceListingId");
 
                             b1.HasData(
                                 new
@@ -20929,28 +20542,23 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.OwnsOne("PRN232_EbayClone.Domain.Listings.ValueObjects.OfferSettings", "OfferSettings", b1 =>
                         {
                             b1.Property<Guid>("FixedPriceListingId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
+                                .HasColumnType("uuid");
 
                             b1.Property<bool>("AllowOffers")
-                                .HasColumnType("boolean")
-                                .HasColumnName("offer_settings_allow_offers");
+                                .HasColumnType("boolean");
 
                             b1.Property<decimal?>("AutoAcceptOffer")
-                                .HasColumnType("numeric")
-                                .HasColumnName("offer_settings_auto_accept_offer");
+                                .HasColumnType("numeric");
 
                             b1.Property<decimal?>("MinimumOffer")
-                                .HasColumnType("numeric")
-                                .HasColumnName("offer_settings_minimum_offer");
+                                .HasColumnType("numeric");
 
                             b1.HasKey("FixedPriceListingId");
 
                             b1.ToTable("listing");
 
                             b1.WithOwner()
-                                .HasForeignKey("FixedPriceListingId")
-                                .HasConstraintName("fk_fixed_price_listings_fixed_price_listings_id");
+                                .HasForeignKey("FixedPriceListingId");
 
                             b1.HasData(
                                 new
@@ -22663,40 +22271,32 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
-                                .HasColumnName("id");
+                                .HasColumnType("integer");
 
                             NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<string>("Images")
                                 .IsRequired()
-                                .HasColumnType("jsonb")
-                                .HasColumnName("images");
+                                .HasColumnType("jsonb");
 
                             b1.Property<Guid>("ListingId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("listing_id");
+                                .HasColumnType("uuid");
 
                             b1.Property<decimal>("Price")
-                                .HasColumnType("numeric")
-                                .HasColumnName("price");
+                                .HasColumnType("numeric");
 
                             b1.Property<int>("Quantity")
-                                .HasColumnType("integer")
-                                .HasColumnName("quantity");
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Sku")
                                 .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("sku");
+                                .HasColumnType("text");
 
                             b1.Property<string>("VariationSpecifics")
                                 .IsRequired()
-                                .HasColumnType("jsonb")
-                                .HasColumnName("specifics");
+                                .HasColumnType("jsonb");
 
-                            b1.HasKey("Id")
-                                .HasName("pk_variation");
+                            b1.HasKey("Id");
 
                             b1.HasIndex("ListingId")
                                 .HasDatabaseName("idx_variation_listing_id");
@@ -22704,8 +22304,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             b1.ToTable("variation", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("ListingId")
-                                .HasConstraintName("fk_variation_fixed_price_listings_listing_id");
+                                .HasForeignKey("ListingId");
                         });
 
                     b.Navigation("OfferSettings")

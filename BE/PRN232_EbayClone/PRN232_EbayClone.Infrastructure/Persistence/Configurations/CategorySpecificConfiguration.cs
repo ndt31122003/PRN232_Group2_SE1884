@@ -28,11 +28,11 @@ public sealed class CategorySpecificConfiguration : IEntityTypeConfiguration<Cat
 
         builder
             .Property(cs => cs.IsRequired)
-            .HasColumnName("is_required");
+            ;
 
         builder
             .Property(cs => cs.AllowMultiple)
-            .HasColumnName("allow_multiple");
+            ;
 
         var comparer = new ValueComparer<HashSet<string>>(
             (left, right) => CompareValues(left, right),
@@ -41,7 +41,7 @@ public sealed class CategorySpecificConfiguration : IEntityTypeConfiguration<Cat
 
         builder
             .Property<HashSet<string>>("_values")
-            .HasColumnName("values")
+            
             .HasColumnType("jsonb")
             .HasConversion(
                 values => JsonSerializer.Serialize(values ?? new HashSet<string>(StringComparer.Ordinal), SerializerOptions),

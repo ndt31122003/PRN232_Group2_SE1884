@@ -18,37 +18,37 @@ public class ShippingPolicyConfiguration : IEntityTypeConfiguration<ShippingPoli
             .HasConversion(
                 id => id.Value,
                 value => new StoreId(value))
-            .HasColumnName("store_id")
+            
             .IsRequired();
 
         builder.Property(p => p.Carrier)
-            .HasColumnName("carrier")
+            
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(p => p.ServiceName)
-            .HasColumnName("service_name")
+            
             .HasMaxLength(100)
             .IsRequired();
 
         builder.OwnsOne(p => p.Cost, money =>
         {
             money.Property(m => m.Amount)
-                .HasColumnName("cost_amount")
+                
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
             money.Property(m => m.Currency)
-                .HasColumnName("cost_currency")
+                
                 .HasMaxLength(3)
                 .IsRequired();
         });
 
         builder.Property(p => p.HandlingTimeDays)
-            .HasColumnName("handling_time_days")
+            
             .IsRequired();
 
         builder.Property(p => p.IsDefault)
-            .HasColumnName("is_default")
+            
             .IsRequired();
 
         builder.HasIndex(p => p.StoreId)

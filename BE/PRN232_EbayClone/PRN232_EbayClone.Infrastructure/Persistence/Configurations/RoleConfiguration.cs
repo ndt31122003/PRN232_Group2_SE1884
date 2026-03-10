@@ -36,7 +36,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
 
             rp.Property(p => p.Permission)
               .HasConversion(new EnumToStringConverter<Permission>())
-              .HasColumnName("Permission")
+              
               .IsRequired();
 
             rp.HasKey("RoleId", "Permission");

@@ -13,35 +13,35 @@ public sealed class CouponTypeConfiguration : IEntityTypeConfiguration<CouponTyp
         builder.HasKey(ct => ct.Id);
 
         builder.Property(ct => ct.Id)
-            .HasColumnName("id");
+            ;
 
         builder.Property(ct => ct.Name)
-            .HasColumnName("name")
+            
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(ct => ct.Description)
-            .HasColumnName("description")
+            
             .HasMaxLength(255);
 
         builder.Property(ct => ct.IsActive)
-            .HasColumnName("is_active")
+            
             .IsRequired();
 
         builder.Property(ct => ct.CreatedAt)
-            .HasColumnName("created_at");
+            ;
 
         builder.Property(ct => ct.CreatedBy)
-            .HasColumnName("created_by");
+            ;
 
         builder.Property(ct => ct.UpdatedAt)
-            .HasColumnName("updated_at");
+            ;
 
         builder.Property(ct => ct.UpdatedBy)
-            .HasColumnName("updated_by");
+            ;
 
         builder.Property(ct => ct.IsDeleted)
-            .HasColumnName("is_deleted")
+            
             .HasDefaultValue(false);
 
         builder.HasQueryFilter(ct => !ct.IsDeleted);

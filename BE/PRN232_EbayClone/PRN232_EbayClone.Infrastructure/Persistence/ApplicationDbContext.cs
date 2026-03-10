@@ -16,6 +16,7 @@ using PRN232_EbayClone.Domain.Coupons.Entities;
 using PRN232_EbayClone.Domain.Vouchers.Entities;
 using PRN232_EbayClone.Domain.Reviews.Entities;
 using PRN232_EbayClone.Domain.Disputes.Entities;
+using PRN232_EbayClone.Domain.Quartz;
 using PRN232_EbayClone.Infrastructure.Outbox;
 using System.Reflection;
 
@@ -68,12 +69,150 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<Dispute> Disputes => Set<Dispute>();
     public DbSet<SellerPreference> SellerPreferences => Set<SellerPreference>();
 
-
+    public DbSet<QrtzJobDetail> QrtzJobDetails => Set<QrtzJobDetail>();
+    public DbSet<QrtzTrigger> QrtzTriggers => Set<QrtzTrigger>();
+    public DbSet<QrtzSimpleTrigger> QrtzSimpleTriggers => Set<QrtzSimpleTrigger>();
+    public DbSet<QrtzCronTrigger> QrtzCronTriggers => Set<QrtzCronTrigger>();
+    public DbSet<QrtzBlobTrigger> QrtzBlobTriggers => Set<QrtzBlobTrigger>();
+    public DbSet<QrtzCalendar> QrtzCalendars => Set<QrtzCalendar>();
+    public DbSet<QrtzPausedTriggerGrp> QrtzPausedTriggerGrps => Set<QrtzPausedTriggerGrp>();
+    public DbSet<QrtzFiredTrigger> QrtzFiredTriggers => Set<QrtzFiredTrigger>();
+    public DbSet<QrtzSchedulerState> QrtzSchedulerStates => Set<QrtzSchedulerState>();
+    public DbSet<QrtzLock> QrtzLocks => Set<QrtzLock>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
         builder.HasPostgresExtension("pg_trgm");
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        builder.Entity<QrtzJobDetail>(e =>
+        {
+            e.ToTable("qrtz_job_details");
+            e.HasKey(x => new { x.SchedName, x.JobName, x.JobGroup });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.JobName).HasColumnName("job_name");
+            e.Property(x => x.JobGroup).HasColumnName("job_group");
+            e.Property(x => x.Description).HasColumnName("description");
+            e.Property(x => x.JobClassName).HasColumnName("job_class_name");
+            e.Property(x => x.IsDurable).HasColumnName("is_durable");
+            e.Property(x => x.IsNonconcurrent).HasColumnName("is_nonconcurrent");
+            e.Property(x => x.IsUpdateData).HasColumnName("is_update_data");
+            e.Property(x => x.RequestsRecovery).HasColumnName("requests_recovery");
+            e.Property(x => x.JobData).HasColumnName("job_data");
+        });
+
+        builder.Entity<QrtzTrigger>(e =>
+        {
+            e.ToTable("qrtz_triggers");
+            e.HasKey(x => new { x.SchedName, x.TriggerName, x.TriggerGroup });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.TriggerName).HasColumnName("trigger_name");
+            e.Property(x => x.TriggerGroup).HasColumnName("trigger_group");
+            e.Property(x => x.JobName).HasColumnName("job_name");
+            e.Property(x => x.JobGroup).HasColumnName("job_group");
+            e.Property(x => x.Description).HasColumnName("description");
+            e.Property(x => x.NextFireTime).HasColumnName("next_fire_time");
+            e.Property(x => x.PrevFireTime).HasColumnName("prev_fire_time");
+            e.Property(x => x.Priority).HasColumnName("priority");
+            e.Property(x => x.TriggerState).HasColumnName("trigger_state");
+            e.Property(x => x.TriggerType).HasColumnName("trigger_type");
+            e.Property(x => x.StartTime).HasColumnName("start_time");
+            e.Property(x => x.EndTime).HasColumnName("end_time");
+            e.Property(x => x.CalendarName).HasColumnName("calendar_name");
+            e.Property(x => x.MisfireInstr).HasColumnName("misfire_instr");
+            e.Property(x => x.JobData).HasColumnName("job_data");
+            e.HasOne<QrtzJobDetail>()
+                .WithMany()
+                .HasForeignKey(x => new { x.SchedName, x.JobName, x.JobGroup })
+                .HasConstraintName("FK_QRTZ_TRIGGERS_JOB_DETAILS");
+        });
+
+        builder.Entity<QrtzSimpleTrigger>(e =>
+        {
+            e.ToTable("qrtz_simple_triggers");
+            e.HasKey(x => new { x.SchedName, x.TriggerName, x.TriggerGroup });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.TriggerName).HasColumnName("trigger_name");
+            e.Property(x => x.TriggerGroup).HasColumnName("trigger_group");
+            e.Property(x => x.RepeatCount).HasColumnName("repeat_count");
+            e.Property(x => x.RepeatInterval).HasColumnName("repeat_interval");
+            e.Property(x => x.TimesTriggered).HasColumnName("times_triggered");
+        });
+
+        builder.Entity<QrtzCronTrigger>(e =>
+        {
+            e.ToTable("qrtz_cron_triggers");
+            e.HasKey(x => new { x.SchedName, x.TriggerName, x.TriggerGroup });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.TriggerName).HasColumnName("trigger_name");
+            e.Property(x => x.TriggerGroup).HasColumnName("trigger_group");
+            e.Property(x => x.CronExpression).HasColumnName("cron_expression");
+            e.Property(x => x.TimeZoneId).HasColumnName("time_zone_id");
+        });
+
+        builder.Entity<QrtzBlobTrigger>(e =>
+        {
+            e.ToTable("qrtz_blob_triggers");
+            e.HasKey(x => new { x.SchedName, x.TriggerName, x.TriggerGroup });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.TriggerName).HasColumnName("trigger_name");
+            e.Property(x => x.TriggerGroup).HasColumnName("trigger_group");
+            e.Property(x => x.BlobData).HasColumnName("blob_data");
+        });
+
+        builder.Entity<QrtzCalendar>(e =>
+        {
+            e.ToTable("qrtz_calendars");
+            e.HasKey(x => new { x.SchedName, x.CalendarName });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.CalendarName).HasColumnName("calendar_name");
+            e.Property(x => x.Calendar).HasColumnName("calendar");
+        });
+
+        builder.Entity<QrtzPausedTriggerGrp>(e =>
+        {
+            e.ToTable("qrtz_paused_trigger_grps");
+            e.HasKey(x => new { x.SchedName, x.TriggerGroup });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.TriggerGroup).HasColumnName("trigger_group");
+        });
+
+        builder.Entity<QrtzFiredTrigger>(e =>
+        {
+            e.ToTable("qrtz_fired_triggers");
+            e.HasKey(x => new { x.SchedName, x.EntryId });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.EntryId).HasColumnName("entry_id");
+            e.Property(x => x.TriggerName).HasColumnName("trigger_name");
+            e.Property(x => x.TriggerGroup).HasColumnName("trigger_group");
+            e.Property(x => x.InstanceName).HasColumnName("instance_name");
+            e.Property(x => x.FiredTime).HasColumnName("fired_time");
+            e.Property(x => x.SchedTime).HasColumnName("sched_time");
+            e.Property(x => x.Priority).HasColumnName("priority");
+            e.Property(x => x.State).HasColumnName("state");
+            e.Property(x => x.JobName).HasColumnName("job_name");
+            e.Property(x => x.JobGroup).HasColumnName("job_group");
+            e.Property(x => x.IsNonconcurrent).HasColumnName("is_nonconcurrent");
+            e.Property(x => x.RequestsRecovery).HasColumnName("requests_recovery");
+        });
+
+        builder.Entity<QrtzSchedulerState>(e =>
+        {
+            e.ToTable("qrtz_scheduler_state");
+            e.HasKey(x => new { x.SchedName, x.InstanceName });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.InstanceName).HasColumnName("instance_name");
+            e.Property(x => x.LastCheckinTime).HasColumnName("last_checkin_time");
+            e.Property(x => x.CheckinInterval).HasColumnName("checkin_interval");
+        });
+
+        builder.Entity<QrtzLock>(e =>
+        {
+            e.ToTable("qrtz_locks");
+            e.HasKey(x => new { x.SchedName, x.LockName });
+            e.Property(x => x.SchedName).HasColumnName("sched_name");
+            e.Property(x => x.LockName).HasColumnName("lock_name");
+        });
     }
 }
