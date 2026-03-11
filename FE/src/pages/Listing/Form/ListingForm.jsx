@@ -5,21 +5,7 @@ import "./ListingForm.css";
 
 import ebayLogo from "../../../assets/images/ebay_logo.png";
 
-import { EbayButton } from "@ebay/ui-core-react/ebay-button";
-import { EbayFilePreviewCard } from "@ebay/ui-core-react/ebay-file-preview-card";
-import { ReactComponent as AddImageIcon } from "@ebay/skin/dist/svg/icon/icon-add-image-24.svg";
-import { ReactComponent as CalendarIcon } from "@ebay/skin/dist/svg/icon/icon-calendar-24.svg";
-import { ReactComponent as RemoveIcon } from "@ebay/skin/dist/svg/icon/icon-delete-16.svg";
-import { ReactComponent as EditIcon } from "@ebay/skin/dist/svg/icon/icon-pencil-16.svg";
-import { ReactComponent as InfoFilledIcon } from "@ebay/skin/dist/svg/icon/icon-information-filled-16.svg";
-import { ReactComponent as MenuIcon } from "@ebay/skin/dist/svg/icon/icon-menu-16.svg";
-
-import { EbayTextbox, EbayTextboxPrefixText } from '@ebay/ui-core-react/ebay-textbox';
-import { EbayLabel, EbayField, EbayFieldDescription } from '@ebay/ui-core-react/ebay-field';
-import { EbaySwitch } from '@ebay/ui-core-react/ebay-switch';
-import { EbaySelect, EbaySelectOption } from '@ebay/ui-core-react/ebay-select';
-import { EbayFakeLink } from '@ebay/ui-core-react/ebay-fake-link';
-import { EbaySectionNoticeCTA, EbayNoticeContent, EbaySectionNotice } from '@ebay/ui-core-react/ebay-section-notice';
+import { HiPhoto, HiXMark, HiCalendar, HiTrash, HiPencil, HiInformationCircle, HiBars3 } from 'react-icons/hi2';
 
 import CategoryModal from "../Modal/CategoryModal"
 import ConditionModal from "../Modal/ConditionModal"
@@ -150,10 +136,7 @@ const ListingForm = () => {
       return true;
     }
     const stored = getStoredUser();
-    return Boolean(
-      stored?.isEmailVerified
-      && stored?.isPaymentVerified
-    );
+    return Boolean(stored?.isSellerVerified);
   });
 
   useEffect(() => {
@@ -163,10 +146,7 @@ const ListingForm = () => {
 
     const handleUserInfoUpdated = () => {
       const updated = getStoredUser();
-      setCanManageListing(Boolean(
-        updated?.isEmailVerified
-        && updated?.isPaymentVerified
-      ));
+      setCanManageListing(Boolean(updated?.isSellerVerified));
     };
 
     if (typeof window !== "undefined") {
@@ -190,12 +170,15 @@ const ListingForm = () => {
     if (!snapshot?.isEmailVerified) {
       requirements.push("xác minh email");
     }
-    if (!snapshot?.isPaymentVerified) {
-      requirements.push("xác minh thanh toán");
+    if (!snapshot?.isPhoneVerified) {
+      requirements.push("xác minh số điện thoại");
+    }
+    if (!snapshot?.isBusinessVerified) {
+      requirements.push("xác minh doanh nghiệp");
     }
     const desc = requirements.length > 0
-      ? `Vui lòng ${requirements.join(" và ")} trước khi tạo tin đăng.`
-      : "Truy cập Account settings để hoàn tất xác minh.";
+      ? `Vui lòng ${requirements.join(", ")} trước khi tạo tin đăng.`
+      : "Truy cập trang đăng ký để hoàn tất xác minh.";
 
     Notice({
       msg: "Chưa đủ điều kiện để tạo tin đăng.",
@@ -203,7 +186,7 @@ const ListingForm = () => {
       isSuccess: false
     });
 
-    navigate("/account/settings", { replace: true });
+    navigate("/register", { replace: true });
   }, [canManageListing, isCreatingNewListing, navigate]);
 
   const [files, setFiles] = useState([]);
@@ -2497,7 +2480,7 @@ const ListingForm = () => {
             style={{ display: "none" }}
             onChange={handleFilesSelected}
           />
-          <div style={{ display: "none" }}><RemoveIcon id="icon-delete-16" style={{ width: 24, height: 24 }} /></div>
+          <div style={{ display: "none" }}><HiTrash style={{ width: 24, height: 24 }} /></div>
           {/* Layout: ảnh main bên trái, grid nhỏ bên phải */}
           <div style={{ display: "flex", gap: "16px" }}>
             {/* Ô lớn hiển thị ảnh đầu tiên hoặc khung upload */}
@@ -2515,24 +2498,25 @@ const ListingForm = () => {
               }}
             >
               {files[0] ? (
-                <EbayFilePreviewCard
-                  a11yCancelUploadText="Cancel upload"
-                  deleteText="Delete"
-                  file={files[0]}
-                  onDelete={() => handleDelete(files[0].id)}
-                />
+                <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', width: '100%', height: '100%' }}>
+                  <img src={files[0].src || files[0].preview} alt={files[0].name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button type="button" onClick={() => handleDelete(files[0].id)} style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <HiXMark style={{ width: 12, height: 12 }} />
+                  </button>
+                </div>
               ) : (
                 <>
-                  <AddImageIcon style={{ width: 24, height: 24 }} />
+                  <HiPhoto style={{ width: 24, height: 24 }} />
 
                   <p style={{ fontSize: "20px" }}>Drag and drop files</p>
-                  <EbayButton
+                  <button
+                    type="button"
                     style={{ marginTop: "12px" }}
-                    priority="tertiary"
-                    onClick={handleButtonClick} // ✅ chỉ button này mới mở dialog
+                    className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    onClick={handleButtonClick}
                   >
                     Upload from computer
-                  </EbayButton>
+                  </button>
                 </>
               )}
             </div>
@@ -2550,13 +2534,12 @@ const ListingForm = () => {
             >
               {/* render ảnh còn lại */}
               {files.slice(1).map((file) => (
-                <EbayFilePreviewCard
-                  key={file.id}
-                  a11yCancelUploadText="Cancel upload"
-                  deleteText="Delete"
-                  file={file}
-                  onDelete={() => handleDelete(file.id)}
-                />
+                <div key={file.id} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', width: '100%', height: '100%' }}>
+                  <img src={file.src || file.preview} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button type="button" onClick={() => handleDelete(file.id)} style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <HiXMark style={{ width: 12, height: 12 }} />
+                  </button>
+                </div>
               ))}
 
               {/* Ô Add */}
@@ -2574,7 +2557,7 @@ const ListingForm = () => {
                     fontSize: "14px",
                   }}
                 >
-                  <AddImageIcon style={{ width: 24, height: 24 }} />
+                  <HiPhoto style={{ width: 24, height: 24 }} />
                   <span>Add</span>
                 </div>
               )}
@@ -2606,26 +2589,29 @@ const ListingForm = () => {
           <h3>TITLE</h3>
 
 
-          <EbayField layout="block">
-            <EbayLabel stacked>Item title</EbayLabel>
-            <EbayTextbox
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Item title</label>
+            <input
+              type="text"
               name="itemTitle"
               value={title}
-              onInputChange={(event, { value }) => setTitle(value)}
-              fluid
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
               style={{ height: "45px" }}
             />
-          </EbayField>
+          </div>
 
-          <EbayField layout="block">
-            <EbayLabel stacked>Custom label (SKU)</EbayLabel>
-            <EbayTextbox
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Custom label (SKU)</label>
+            <input
+              type="text"
               name="itemSKU"
               value={sku}
-              onInputChange={(event, { value }) => setSku(value)}
+              onChange={(e) => setSku(e.target.value)}
+              className="rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
               style={{ width: "400px" }}
             />
-          </EbayField>
+          </div>
 
         </div>
 
@@ -2644,22 +2630,24 @@ const ListingForm = () => {
           <div>
             <h3 style={{ marginBottom: "8px" }}>ITEM CATEGORY</h3>
             {!selectedCategoryId && (
-              <EbaySectionNotice status="information">
-                <EbayNoticeContent>
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <p className="text-sm text-gray-700">
                   Select a category to enable tailored item specifics and pricing guidance.
-                </EbayNoticeContent>
-              </EbaySectionNotice>
+                </p>
+              </div>
             )}
             {selectedCategoryId && primaryCategoryLabel && (
               statusPermissions.allowCategoryEdit ? (
-                <EbayFakeLink
+                <button
+                  type="button"
                   style={{ margin: 0, fontWeight: "500" }}
+                  className="text-sm text-blue-600 hover:underline bg-transparent border-none cursor-pointer p-0"
                   onClick={() => setCategoryModalOpen(true)}
                 >
                   <p style={{ margin: 0 }}>
                     {primaryCategoryLabel}
                   </p>
-                </EbayFakeLink>
+                </button>
               ) : (
                 <p style={{ margin: 0, fontWeight: 500 }}>{primaryCategoryLabel}</p>
               )
@@ -2677,15 +2665,15 @@ const ListingForm = () => {
           {/* Bên phải */}
           {statusPermissions.allowCategoryEdit ? (
             <p style={{ margin: 0 }}>
-              <EbayButton
+              <button
+                type="button"
                 onClick={() => setCategoryModalOpen(true)}
-                borderless
-                priority="tertiary"
+                className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", border: "none" }}
               >
-                <EditIcon style={{ width: "16px", height: "16px", marginRight: "4px" }} />
+                <HiPencil style={{ width: "16px", height: "16px", marginRight: "4px" }} />
                 <p>Edit</p>
-              </EbayButton>
+              </button>
             </p>
           ) : (
             <p style={{ margin: 0, color: "#6f7780", fontSize: "13px" }}>
@@ -2723,11 +2711,11 @@ const ListingForm = () => {
         <div style={{ marginBottom: "48px" }}>
           <h3>ITEM SPECIFICS</h3>
           {!selectedCategoryId && (
-            <EbaySectionNotice status="information">
-              <EbayNoticeContent>
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <p className="text-sm text-gray-700">
                 Pick a category first to see the required and optional item specifics.
-              </EbayNoticeContent>
-            </EbaySectionNotice>
+              </p>
+            </div>
           )}
           {selectedCategoryId && (
             <>
@@ -2784,7 +2772,7 @@ const ListingForm = () => {
 
         <hr />
         <div style={{ display: "none" }}>
-          <InfoFilledIcon id="icon-information-filled-16" style={{ width: "16px", height: "16px" }} />
+          <HiInformationCircle style={{ width: "16px", height: "16px" }} />
         </div>
         <div
           style={{
@@ -2800,11 +2788,11 @@ const ListingForm = () => {
             <h3 style={{ marginBottom: "8px" }}>VARIATIONS</h3>
 
             {!selectedCategoryId && (
-              <EbaySectionNotice status="information">
-                <EbayNoticeContent>
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <p className="text-sm text-gray-700">
                   Choose a category first to configure variations for this listing.
-                </EbayNoticeContent>
-              </EbaySectionNotice>
+                </p>
+              </div>
             )}
 
             {selectedCategoryId && priceFormat === "2" && !variationSummary && (
@@ -2918,16 +2906,14 @@ const ListingForm = () => {
 
             {selectedCategoryId && priceFormat !== "2" && (
               <>
-                <EbaySectionNotice status="information">
-                  <EbayNoticeContent>
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                  <p className="text-sm text-gray-700">
                     Variations are unavailable for this listing. Eligibility is limited to qualifying item categories, Buy It Now pricing formats, and other criteria.
-                  </EbayNoticeContent>
-                  <EbaySectionNoticeCTA>
-                    <EbayFakeLink onClick={() => { }}>
-                      Learn more
-                    </EbayFakeLink>
-                  </EbaySectionNoticeCTA>
-                </EbaySectionNotice>
+                  </p>
+                  <button type="button" onClick={() => { }} className="text-sm text-blue-600 hover:underline bg-transparent border-none cursor-pointer p-0">
+                    Learn more
+                  </button>
+                </div>
 
 
               </>
@@ -2944,9 +2930,9 @@ const ListingForm = () => {
                 gap: "12px"
               }}
             >
-              <EbayButton
-                borderless
-                priority="tertiary"
+              <button
+                type="button"
+                className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
                 onClick={() =>
                   navigate("/variation-form", {
@@ -2960,19 +2946,19 @@ const ListingForm = () => {
                   })
                 }
               >
-                <EditIcon style={{ width: "16px", height: "16px", marginRight: "4px" }} />
+                <HiPencil style={{ width: "16px", height: "16px", marginRight: "4px" }} />
                 <p>Edit</p>
-              </EbayButton>
+              </button>
 
               {variationData && (
-                <EbayButton
-                  borderless
-                  priority="tertiary"
+                <button
+                  type="button"
+                  className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                   style={{ cursor: "pointer" }}
                   onClick={handleClearVariations}
                 >
                   Clear variations
-                </EbayButton>
+                </button>
               )}
             </div>
           )}
@@ -2983,29 +2969,31 @@ const ListingForm = () => {
         <div style={{ marginBottom: "48px" }}>
           <h3>CONDITION</h3>
           {!selectedConditionId && (
-            <EbaySectionNotice status="information">
-              <EbayNoticeContent>
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <p className="text-sm text-gray-700">
                 Provide a condition for your item
-              </EbayNoticeContent>
-            </EbaySectionNotice>
+              </p>
+            </div>
           )}
 
           <h3 style={{ margin: 0, fontWeight: "normal" }}>Item condition</h3>
           {!selectedConditionId && conditions.length > 0 && (
-            <MenuIcon
+            <HiBars3
               onClick={() => setConditionModalOpen(true)}
               style={{ cursor: "pointer", width: "16px", height: "16px" }} />
           )}
 
           {selectedConditionId && (
-            <EbayFakeLink
+            <button
+              type="button"
+              className="text-sm text-blue-600 hover:underline bg-transparent border-none cursor-pointer p-0"
             >
               <h3
                 onClick={() => setConditionModalOpen(true)}
                 style={{ margin: 0, fontWeight: "normal" }}>
                 {conditions.find(c => c.id === selectedConditionId)?.name}
               </h3>
-            </EbayFakeLink>
+            </button>
           )}
 
           <ConditionModal
@@ -3020,17 +3008,16 @@ const ListingForm = () => {
             <p style={{ color: "#777" }}>This category does not publish condition guidelines.</p>
           )}
 
-          <EbayField layout="block">
-            <EbayLabel stacked><h4 style={{ margin: 0, fontWeight: "normal" }}>Condition description</h4></EbayLabel>
-            <EbayTextbox
-              fluid
-              multiline
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700"><h4 style={{ margin: 0, fontWeight: "normal" }}>Condition description</h4></label>
+            <textarea
               name="itemCondition"
               value={conditionDescription}
-              onInputChange={(event, { value }) => setConditionDescription(value)}
+              onChange={(e) => setConditionDescription(e.target.value)}
+              className="w-full rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
               style={{ minHeight: "50px" }}
             />
-          </EbayField>
+          </div>
         </div>
 
         <hr />
@@ -3038,13 +3025,12 @@ const ListingForm = () => {
         <div style={{ marginBottom: "48px" }}>
           <h3>DESCRIPTION</h3>
 
-          <EbayTextbox
-            multiline
+          <textarea
             name="itemDescription"
-            fluid
             value={listingDescription}
-            onInputChange={(event, { value }) => setListingDescription(value)}
+            onChange={(e) => setListingDescription(e.target.value)}
             placeholder="Write a detailed description of your item"
+            className="w-full rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
           />
         </div>
 
@@ -3053,10 +3039,10 @@ const ListingForm = () => {
         <div style={{ marginBottom: "48px" }}>
           <h3>PRICING</h3>
           <div className="date__select_listing">
-            <EbayField layout="block">
-              <EbayLabel stacked>Format</EbayLabel>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Format</label>
               {statusPermissions.allowFormatSelection ? (
-                <EbaySelect
+                <select
                   name="itemFormat"
                   value={priceFormat}
                   disabled={hasVariations}
@@ -3066,14 +3052,15 @@ const ListingForm = () => {
                     }
                     setPriceFormat(event.target.value);
                   }}
+                  className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                   style={{ width: "400px" }}
                 >
                   {priceFormats.map((option) => (
-                    <EbaySelectOption key={option.value} value={option.value}>
+                    <option key={option.value} value={option.value}>
                       {option.text}
-                    </EbaySelectOption>
+                    </option>
                   ))}
-                </EbaySelect>
+                </select>
               ) : (
                 <div style={{
                   border: "1px solid #c7c7c7",
@@ -3090,118 +3077,134 @@ const ListingForm = () => {
                   {priceFormats.find((option) => option.value === priceFormat)?.text ?? "Unknown format"}
                 </div>
               )}
-            </EbayField>
+            </div>
           </div>
 
           {priceFormat === "1" && (
             <div className="date__select_listing">
-              <EbayField layout="block">
-                <EbayLabel stacked>Auction duration</EbayLabel>
-                <EbaySelect
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Auction duration</label>
+                <select
                   name="itemAuctionDuration"
                   value={auctionDuration}
                   onChange={(event) => setAuctionDuration(event.target.value)}
+                  className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                   style={{ width: "400px" }}
                 >
                   {auctionDurations.map((option) => (
-                    <EbaySelectOption key={option.value} value={option.value}>
+                    <option key={option.value} value={option.value}>
                       {option.text}
-                    </EbaySelectOption>
+                    </option>
                   ))}
-                </EbaySelect>
-              </EbayField>
+                </select>
+              </div>
 
               <div style={{ display: "flex", gap: "32px", alignItems: "flex-start" }}>
                 {/* Starting bid */}
                 <div>
-                  <EbayLabel stacked>Starting bid</EbayLabel>
-                  <EbayTextbox
-                    name="itemStartingBid"
-                    value={startingBid}
-                    onInputChange={(event, { value }) => {
-                      if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
-                        setStartingBid(value);
-                      }
-                    }}
-                    style={{ width: "150px" }}
-                  >
-                    <EbayTextboxPrefixText id="prefix">$</EbayTextboxPrefixText>
-                  </EbayTextbox>
-                  <EbayFieldDescription>&nbsp;</EbayFieldDescription>
+                  <label className="text-sm font-medium text-gray-700">Starting bid</label>
+                  <div className="relative flex items-center" style={{ width: "150px" }}>
+                    <span className="absolute left-3 text-sm text-gray-500">$</span>
+                    <input
+                      type="text"
+                      name="itemStartingBid"
+                      value={startingBid}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
+                          setStartingBid(value);
+                        }
+                      }}
+                      className="w-full rounded border border-gray-300 py-2 pl-7 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">&nbsp;</p>
                 </div>
 
                 {/* Buy It Now (optional) */}
                 <div>
-                  <EbayLabel stacked>Buy It Now (optional)</EbayLabel>
-                  <EbayTextbox
-                    name="itemBuyItNow"
-                    value={buyItNowPrice}
-                    onInputChange={(event, { value }) => {
-                      if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
-                        setBuyItNowPrice(value);
-                      }
-                    }}
-                    style={{ width: "150px" }}
-                  >
-                    <EbayTextboxPrefixText id="prefix">$</EbayTextboxPrefixText>
-                  </EbayTextbox>
-                  <EbayFieldDescription style={{ width: "150px" }}>
+                  <label className="text-sm font-medium text-gray-700">Buy It Now (optional)</label>
+                  <div className="relative flex items-center" style={{ width: "150px" }}>
+                    <span className="absolute left-3 text-sm text-gray-500">$</span>
+                    <input
+                      type="text"
+                      name="itemBuyItNow"
+                      value={buyItNowPrice}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
+                          setBuyItNowPrice(value);
+                        }
+                      }}
+                      className="w-full rounded border border-gray-300 py-2 pl-7 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500" style={{ width: "150px" }}>
                     Minimum: 30% more than starting bid
-                  </EbayFieldDescription>
+                  </p>
                 </div>
               </div>
 
-              <EbayField layout="block">
-                <EbayLabel stacked>Reserve price (optional)</EbayLabel>
-                <EbayTextbox
-                  name="itemReservePrice"
-                  value={reservePrice}
-                  onInputChange={(event, { value }) => {
-                    if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
-                      setReservePrice(value);
-                    }
-                  }}
-                  style={{ width: "150px" }}
-                >
-                  <EbayTextboxPrefixText id="prefix">$</EbayTextboxPrefixText>
-                </EbayTextbox>
-              </EbayField>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Reserve price (optional)</label>
+                <div className="relative flex items-center" style={{ width: "150px" }}>
+                  <span className="absolute left-3 text-sm text-gray-500">$</span>
+                  <input
+                    type="text"
+                    name="itemReservePrice"
+                    value={reservePrice}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
+                        setReservePrice(value);
+                      }
+                    }}
+                    className="w-full rounded border border-gray-300 py-2 pl-7 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
             </div>
           )}
 
           {/* Nếu Buy It Now */}
           {priceFormat === "2" && !hasVariations && (
-            <EbayField layout="block">
-              <EbayLabel stacked>Item price</EbayLabel>
-              <EbayTextbox
-                name="itemPrice"
-                value={fixedPrice}
-                onInputChange={(event, { value }) => {
-                  if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
-                    setFixedPrice(value);
-                  }
-                }}
-                style={{ width: "150px" }}
-              >
-                <EbayTextboxPrefixText id="prefix">$</EbayTextboxPrefixText>
-              </EbayTextbox>
-            </EbayField>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Item price</label>
+              <div className="relative flex items-center" style={{ width: "150px" }}>
+                <span className="absolute left-3 text-sm text-gray-500">$</span>
+                <input
+                  type="text"
+                  name="itemPrice"
+                  value={fixedPrice}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
+                      setFixedPrice(value);
+                    }
+                  }}
+                  className="w-full rounded border border-gray-300 py-2 pl-7 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
           )}
 
           {!hasVariations && (
-            <EbayField layout="block">
-              <EbayLabel stacked>Quantity</EbayLabel>
-              <EbayTextbox
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Quantity</label>
+              <input
+                type="text"
                 name="itemQuantity"
                 value={quantity}
-                onInputChange={(e, { value }) => {
+                onChange={(e) => {
+                  const value = e.target.value;
                   if (/^(?:[1-9]\d*|)$/.test(value)) {
                     setQuantity(value);
                   }
                 }}
+                className="rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
                 style={{ width: "184px" }}
               />
-            </EbayField>
+            </div>
           )}
 
 
@@ -3227,42 +3230,51 @@ const ListingForm = () => {
                   Interested buyers can send an offer for this item. You can accept, counter, or decline.
                 </p>
               </div>
-              <EbaySwitch checked={allowOfferEnabled} onChange={toggleAllowOfferEnabled} />
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked={allowOfferEnabled} onChange={toggleAllowOfferEnabled} className="sr-only peer" />
+                <div className="w-9 h-5 bg-gray-200 peer-checked:bg-blue-600 rounded-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
             </div>
 
             {allowOfferEnabled && (
               <div style={{ display: "flex", alignItems: "flex-end", gap: "12px" }}>
-                <EbayField layout="block">
-                  <EbayLabel stacked>Minimum offer</EbayLabel>
-                  <EbayTextbox
-                    name="itemMinimumOffer"
-                    value={minimumOffer}
-                    onInputChange={(event, { value }) => {
-                      if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
-                        setMinimumOffer(value);
-                      }
-                    }}
-                    style={{ width: "150px" }}
-                  >
-                    <EbayTextboxPrefixText id="prefix">$</EbayTextboxPrefixText>
-                  </EbayTextbox>
-                </EbayField>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Minimum offer</label>
+                  <div className="relative flex items-center" style={{ width: "150px" }}>
+                    <span className="absolute left-3 text-sm text-gray-500">$</span>
+                    <input
+                      type="text"
+                      name="itemMinimumOffer"
+                      value={minimumOffer}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
+                          setMinimumOffer(value);
+                        }
+                      }}
+                      className="w-full rounded border border-gray-300 py-2 pl-7 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
 
-                <EbayField layout="block">
-                  <EbayLabel stacked>Auto accept</EbayLabel>
-                  <EbayTextbox
-                    name="itemAutoAcceptOffer"
-                    value={autoAcceptOffer}
-                    onInputChange={(event, { value }) => {
-                      if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
-                        setAutoAcceptOffer(value);
-                      }
-                    }}
-                    style={{ width: "150px" }}
-                  >
-                    <EbayTextboxPrefixText id="prefix">$</EbayTextboxPrefixText>
-                  </EbayTextbox>
-                </EbayField>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Auto accept</label>
+                  <div className="relative flex items-center" style={{ width: "150px" }}>
+                    <span className="absolute left-3 text-sm text-gray-500">$</span>
+                    <input
+                      type="text"
+                      name="itemAutoAcceptOffer"
+                      value={autoAcceptOffer}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^(?:\d+)?(?:\.\d{0,2})?$/.test(value) || value === "") {
+                          setAutoAcceptOffer(value);
+                        }
+                      }}
+                      className="w-full rounded border border-gray-300 py-2 pl-7 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
 
 
               </div>
@@ -3293,14 +3305,17 @@ const ListingForm = () => {
                     Your listing goes live immediately, unless you select a time and date you want it to start.
                   </p>
                 </div>
-                <EbaySwitch checked={scheduleEnabled} onChange={toggleScheduleEnabled} />
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" checked={scheduleEnabled} onChange={toggleScheduleEnabled} className="sr-only peer" />
+                  <div className="w-9 h-5 bg-gray-200 peer-checked:bg-blue-600 rounded-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+                </label>
               </div>
 
-              <div style={{ display: "none" }}><CalendarIcon id="icon-calendar-24" style={{ width: 24, height: 24 }} /></div>
+              <div style={{ display: "none" }}><HiCalendar style={{ width: 24, height: 24 }} /></div>
               {scheduleEnabled && (
                 <div className="date__select_listing" style={{ display: "flex", alignItems: "flex-end", gap: "12px" }}>
-                  <EbayField layout="block" style={{ marginBottom: "4px" }}>
-                    <EbayLabel stacked>Day</EbayLabel>
+                  <div className="space-y-1" style={{ marginBottom: "4px" }}>
+                    <label className="text-sm font-medium text-gray-700">Day</label>
                     <input
                       type="date"
                       value={date}
@@ -3314,56 +3329,55 @@ const ListingForm = () => {
                         fontSize: "14px"
                       }}
                     />
-                  </EbayField>
+                  </div>
 
                   {/* Time */}
-                  <EbayField layout="block">
-                    <EbayLabel stacked>Time</EbayLabel>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-700">Time</label>
                     <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                      <EbaySelect
+                      <select
                         value={hour}
                         onChange={(event) => setHour(event.target.value)}
-                        className="listing-select listing-select--no-icon"
+                        className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none listing-select listing-select--no-icon"
                         style={{ width: "70px", paddingInlineEnd: "0" }}
                       >
                         {Array.from({ length: 12 }, (_, i) => (
-                          <EbaySelectOption key={i} value={(i + 1).toString()}>
+                          <option key={i} value={(i + 1).toString()}>
                             {i + 1}
-                          </EbaySelectOption>
+                          </option>
                         ))}
-                      </EbaySelect>
+                      </select>
 
                       <span>:</span>
 
-                      <EbaySelect
+                      <select
                         value={minute}
                         onChange={(event) => setMinute(event.target.value)}
-                        className="listing-select listing-select--no-icon"
+                        className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none listing-select listing-select--no-icon"
                         style={{ width: "70px", paddingInlineEnd: "0" }}
                       >
                         {["00", "15", "30", "45"].map((m) => (
-                          <EbaySelectOption key={m} value={m}>
+                          <option key={m} value={m}>
                             {m}
-                          </EbaySelectOption>
+                          </option>
                         ))}
-                      </EbaySelect>
+                      </select>
 
-                      <EbaySelect
+                      <select
                         value={ampm}
                         onChange={(event) => setAmpm(event.target.value)}
-                        className="listing-select listing-select--no-icon"
+                        className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none listing-select listing-select--no-icon"
                       >
                         {["AM", "PM"].map((a) => (
-                          <EbaySelectOption key={a} value={a}>
+                          <option key={a} value={a}>
                             {a}
-                          </EbaySelectOption>
+                          </option>
                         ))}
-                      </EbaySelect>
+                      </select>
 
-                      {/* PDT cùng hàng */}
                       <span style={{ paddingLeft: "4px" }}>PDT</span>
                     </div>
-                  </EbayField>
+                  </div>
                 </div>
 
 
@@ -3391,8 +3405,9 @@ const ListingForm = () => {
 
           <div style={{ textAlign: "center", marginTop: "40px" }}>
             <h2>{isTemplateMode ? "Save your template." : "List it for free."}</h2>
-            <p><EbayButton
-              priority="primary"
+            <p><button
+              type="button"
+              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               style={{ width: "343px", height: "45px" }}
               disabled={isTemplateMode ? isTemplateSaving : isSubmitting}
               onClick={() => handleSubmit(false)}
@@ -3404,18 +3419,19 @@ const ListingForm = () => {
                     : "Save template"
                   : "List it"}
               </div>
-            </EbayButton></p>
+            </button></p>
 
             {!isTemplateMode && (
               statusPermissions.allowSaveDraft ? (
-                <p><EbayButton
-                  priority="tertiary"
+                <p><button
+                  type="button"
+                  className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                   style={{ width: "343px", height: "45px" }}
                   disabled={isSubmitting}
                   onClick={() => handleSubmit(true)}
                 >
                   <div style={{ fontSize: "16px" }}>Save for later</div>
-                </EbayButton></p>
+                </button></p>
               ) : (
                 <p style={{ fontSize: "13px", color: "#6f7780" }}>
                   Active listings can't be saved as drafts. Publish your changes to keep them live.

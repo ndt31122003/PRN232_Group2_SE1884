@@ -1,4 +1,4 @@
-﻿using PRN232_EbayClone.Domain.Shared.Results;
+using PRN232_EbayClone.Domain.Shared.Results;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
 
 namespace PRN232_EbayClone.Domain.Users.Errors;
@@ -43,4 +43,20 @@ public class UserErrors
     public static readonly Error InvalidPaymentCard = Error.Failure(
         "User.InvalidPaymentCard",
         "Thông tin thẻ thanh toán không hợp lệ hoặc đã hết hạn.");
+
+    public static readonly Error PhoneAlreadyVerified = Error.Failure(
+        "User.PhoneAlreadyVerified",
+        "Số điện thoại đã được xác minh.");
+
+    public static readonly Error PhoneNotVerified = Error.Failure(
+        "User.PhoneNotVerified",
+        "Bạn cần xác minh số điện thoại trước.");
+
+    public static readonly Error InvalidPhoneNumber = Error.Failure(
+        "User.InvalidPhoneNumber",
+        "Số điện thoại không hợp lệ.");
+
+    public static readonly Error BusinessAlreadyVerified = Error.Failure(
+        "User.BusinessAlreadyVerified",
+        "Thông tin doanh nghiệp đã được xác minh.");
 }

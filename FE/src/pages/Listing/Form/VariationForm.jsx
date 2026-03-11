@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { EbayButton } from '@ebay/ui-core-react/ebay-button';
-import { EbayFilePreviewCard } from '@ebay/ui-core-react/ebay-file-preview-card';
-import { ReactComponent as AddImageIcon } from '@ebay/skin/dist/svg/icon/icon-add-image-24.svg';
+import { HiPhoto, HiXMark } from 'react-icons/hi2';
 import FileService from '../../../services/FileService';
 import Notice from '../../../components/Common/CustomNotification';
 
@@ -1341,23 +1339,16 @@ const VariationForm = () => {
                                                 }}
                                             >
                                                 {defaultPhotos[0] ? (
-                                                    <EbayFilePreviewCard
-                                                        a11yCancelUploadText="Cancel upload"
-                                                        deleteText="Delete"
-                                                        file={defaultPhotos[0]}
-                                                        onDelete={() => removeDefaultPhoto(defaultPhotos[0].id)}
-                                                    />
+                                                    <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '12px', overflow: 'hidden' }}>
+                                                        <img src={defaultPhotos[0].src || defaultPhotos[0].preview} alt={defaultPhotos[0].name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <button type="button" onClick={() => removeDefaultPhoto(defaultPhotos[0].id)} style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <HiXMark style={{ width: 16, height: 16 }} />
+                                                        </button>
+                                                    </div>
                                                 ) : (
                                                     <div
                                                         role="button"
                                                         tabIndex={0}
-                                                        // onClick={openDefaultPhotosPicker}
-                                                        // onKeyDown={(event) => {
-                                                        //     if (event.key === 'Enter' || event.key === ' ') {
-                                                        //         event.preventDefault();
-                                                        //         openDefaultPhotosPicker();
-                                                        //     }
-                                                        // }}
                                                         style={{
                                                             display: 'flex',
                                                             flexDirection: 'column',
@@ -1369,12 +1360,12 @@ const VariationForm = () => {
                                                             cursor: 'pointer'
                                                         }}
                                                     >
-                                                        <AddImageIcon style={{ width: 24, height: 24 }} />
+                                                        <HiPhoto style={{ width: 24, height: 24, color: '#767676' }} />
                                                         <p style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Drag and drop files</p>
                                                         <div style={{ display: 'flex', gap: '12px' }}>
-                                                            <EbayButton priority="tertiary" type="button" onClick={openDefaultPhotosPicker}>
+                                                            <button type="button" onClick={openDefaultPhotosPicker} className="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                                                                 Upload from computer
-                                                            </EbayButton>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 )}
@@ -1390,13 +1381,12 @@ const VariationForm = () => {
                                                 }}
                                             >
                                                 {defaultPhotos.slice(1).map((item) => (
-                                                    <EbayFilePreviewCard
-                                                        key={item.id}
-                                                        a11yCancelUploadText="Cancel upload"
-                                                        deleteText="Delete"
-                                                        file={item}
-                                                        onDelete={() => removeDefaultPhoto(item.id)}
-                                                    />
+                                                    <div key={item.id} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
+                                                        <img src={item.src || item.preview} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                        <button type="button" onClick={() => removeDefaultPhoto(item.id)} style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
+                                                            <HiXMark style={{ width: 12, height: 12 }} />
+                                                        </button>
+                                                    </div>
                                                 ))}
 
                                                 {defaultPhotos.length < MAX_DEFAULT_PHOTOS && (
@@ -1422,7 +1412,7 @@ const VariationForm = () => {
                                                             color: '#5f6675'
                                                         }}
                                                     >
-                                                        <AddImageIcon style={{ width: 24, height: 24 }} />
+                                                        <HiPhoto style={{ width: 24, height: 24, color: '#5f6675' }} />
                                                         <span>Add</span>
                                                     </div>
                                                 )}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -76,6 +76,65 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                 {
                     { new Guid("9a7f6b12-5e2d-4d91-8c22-000000000004"), new Guid("70000000-0000-0000-0000-000000000001"), "Received the 64GB variant instead of 128GB.", new DateTime(2025, 11, 13, 23, 59, 0, 0, DateTimeKind.Utc), new DateTime(2025, 11, 10, 10, 20, 0, 0, DateTimeKind.Utc), null, new DateTime(2025, 11, 8, 9, 30, 0, 0, DateTimeKind.Utc), "seed", null, false, new Guid("0f0c1a22-11aa-4c6d-8f10-00000000001a"), 2, 2, null, new DateTime(2025, 11, 8, 9, 30, 0, 0, DateTimeKind.Utc), "FedEx", new Guid("70000000-0000-0000-0000-000000000003"), "Exchange approved once return is in transit.", new DateTime(2025, 11, 8, 12, 45, 0, 0, DateTimeKind.Utc), 2, "612999AA10NEWRT4", new DateTime(2025, 11, 10, 10, 20, 0, 0, DateTimeKind.Utc), "seed", 80.59m, "USD" },
                     { new Guid("9a7f6b12-5e2d-4d91-8c22-000000000005"), new Guid("70000000-0000-0000-0000-000000000002"), "Decided to keep a different model instead.", new DateTime(2025, 11, 14, 23, 59, 0, 0, DateTimeKind.Utc), new DateTime(2025, 11, 11, 8, 40, 0, 0, DateTimeKind.Utc), null, new DateTime(2025, 11, 9, 15, 0, 0, 0, DateTimeKind.Utc), "seed", new DateTime(2025, 11, 13, 16, 5, 0, 0, DateTimeKind.Utc), false, new Guid("0f0c1a22-11aa-4c6d-8f10-00000000001d"), 0, 6, null, new DateTime(2025, 11, 9, 15, 0, 0, 0, DateTimeKind.Utc), "USPS", new Guid("70000000-0000-0000-0000-000000000003"), "Refund pending inspection of returned item.", new DateTime(2025, 11, 9, 17, 15, 0, 0, DateTimeKind.Utc), 4, "9405511899223857264999", new DateTime(2025, 11, 13, 16, 5, 0, 0, DateTimeKind.Utc), "seed", 112.57m, "USD" }
+                });
+
+            migrationBuilder.CreateTable(
+                name: "dispute",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    listing_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    raised_by_id = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    reason = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<string>(type: "text", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_dispute", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_dispute_listing_listing_id",
+                        column: x => x.listing_id,
+                        principalTable: "listing",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "review",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    listing_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    reviewer_id = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    reviewer_role = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Buyer"),
+                    recipient_id = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    recipient_role = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Seller"),
+                    rating = table.Column<int>(type: "integer", nullable: false),
+                    comment = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    reply = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    replied_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    revision_status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValue: "None"),
+                    revision_requested_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_by = table.Column<string>(type: "text", nullable: true),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_by = table.Column<string>(type: "text", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_review", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_review_listing_listing_id",
+                        column: x => x.listing_id,
+                        principalTable: "listing",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

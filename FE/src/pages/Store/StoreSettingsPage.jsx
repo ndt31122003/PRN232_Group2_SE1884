@@ -3,13 +3,26 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import StoreService from "../../services/StoreService";
 import FileService from "../../services/FileService";
 import Notice from "../../components/Common/CustomNotification";
+import { HiGlobeAlt } from "react-icons/hi2";
 import "./StoreSettingsPage.scss";
+
+const DEFAULT_SOCIAL = { facebook: "", instagram: "", twitter: "" };
+
+const parseSocialLinks = (raw) => {
+    if (!raw) return { ...DEFAULT_SOCIAL };
+    try {
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+        return { ...DEFAULT_SOCIAL, ...parsed };
+    } catch {
+        return { ...DEFAULT_SOCIAL };
+    }
+};
 
 const StoreSettingsPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const storeId = searchParams.get("storeId");
-    
+
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
     const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -18,8 +31,12 @@ const StoreSettingsPage = () => {
         name: "",
         description: "",
         logoUrl: "",
-        bannerUrl: ""
+        bannerUrl: "",
+        themeColor: "#3b82f6",
+        contactEmail: "",
+        contactPhone: "",
     });
+    const [socialLinks, setSocialLinks] = useState({ ...DEFAULT_SOCIAL });
 
     useEffect(() => {
         if (storeId) {
@@ -35,13 +52,17 @@ const StoreSettingsPage = () => {
         try {
             const response = await StoreService.getStoreById(storeId);
             if (response?.data) {
-                const data = response.data;
+                const d = response.data;
                 setFormData({
-                    name: data.Name || data.name || "",
-                    description: data.Description || data.description || "",
-                    logoUrl: data.LogoUrl || data.logoUrl || "",
-                    bannerUrl: data.BannerUrl || data.bannerUrl || ""
+                    name: d.Name || d.name || "",
+                    description: d.Description || d.description || "",
+                    logoUrl: d.LogoUrl || d.logoUrl || "",
+                    bannerUrl: d.BannerUrl || d.bannerUrl || "",
+                    themeColor: d.ThemeColor || d.themeColor || "#3b82f6",
+                    contactEmail: d.ContactEmail || d.contactEmail || "",
+                    contactPhone: d.ContactPhone || d.contactPhone || "",
                 });
+                setSocialLinks(parseSocialLinks(d.SocialLinks || d.socialLinks));
             }
         } catch (error) {
             Notice("error", "Failed to load store data");
@@ -51,69 +72,59 @@ const StoreSettingsPage = () => {
     };
 
     const handleChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        setFormData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleSocialChange = (platform, value) => {
+        setSocialLinks((prev) => ({ ...prev, [platform]: value }));
     };
 
     const handleFileUpload = async (file, type) => {
-        if (type === 'logo') {
-            setUploadingLogo(true);
-        } else {
-            setUploadingBanner(true);
-        }
+        if (type === "logo") setUploadingLogo(true);
+        else setUploadingBanner(true);
 
         try {
             const response = await FileService.upload(file);
             const uploadedUrl = response?.data;
-
             if (!uploadedUrl || typeof uploadedUrl !== "string") {
                 throw new Error("Failed to get uploaded file URL");
             }
-
-            setFormData(prev => ({
+            setFormData((prev) => ({
                 ...prev,
-                [type === 'logo' ? 'logoUrl' : 'bannerUrl']: uploadedUrl
+                [type === "logo" ? "logoUrl" : "bannerUrl"]: uploadedUrl,
             }));
-
-            Notice("success", `${type === 'logo' ? 'Logo' : 'Banner'} uploaded successfully!`);
+            Notice("success", `${type === "logo" ? "Logo" : "Banner"} uploaded successfully!`);
         } catch (error) {
             console.error(`${type} upload failed:`, error);
             Notice("error", `Failed to upload ${type}. Please try again.`);
         } finally {
-            if (type === 'logo') {
-                setUploadingLogo(false);
-            } else {
-                setUploadingBanner(false);
-            }
+            if (type === "logo") setUploadingLogo(false);
+            else setUploadingBanner(false);
         }
     };
 
     const handleLogoChange = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
-        if (!file.type.startsWith('image/')) {
+        if (!file.type.startsWith("image/")) {
             Notice("error", "Please select an image file");
             return;
         }
-
-        handleFileUpload(file, 'logo');
+        handleFileUpload(file, "logo");
     };
 
     const handleBannerChange = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
-        if (!file.type.startsWith('image/')) {
+        if (!file.type.startsWith("image/")) {
             Notice("error", "Please select an image file");
             return;
         }
-
-        handleFileUpload(file, 'banner');
+        handleFileUpload(file, "banner");
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!formData.name.trim()) {
             Notice("error", "Store name is required");
             return;
@@ -121,7 +132,12 @@ const StoreSettingsPage = () => {
 
         setLoading(true);
         try {
-            await StoreService.updateStoreProfile(storeId, formData);
+            const hasSocial = Object.values(socialLinks).some((v) => v.trim());
+            const payload = {
+                ...formData,
+                socialLinks: hasSocial ? JSON.stringify(socialLinks) : null,
+            };
+            await StoreService.updateStoreProfile(storeId, payload);
             Notice("success", "Store profile updated successfully!");
         } catch (error) {
             Notice("error", error?.response?.data?.detail || "Failed to update store");
@@ -143,9 +159,10 @@ const StoreSettingsPage = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="settings-form">
+                    {/* Basic Information */}
                     <div className="form-section">
                         <h2>Basic Information</h2>
-                        
+
                         <div className="form-group">
                             <label htmlFor="store-name">Store Name *</label>
                             <input
@@ -172,9 +189,10 @@ const StoreSettingsPage = () => {
                         </div>
                     </div>
 
+                    {/* Store Images */}
                     <div className="form-section">
                         <h2>Store Images</h2>
-                        
+
                         <div className="form-group">
                             <label htmlFor="logo-upload">Store Logo</label>
                             <div className="file-upload-group">
@@ -195,7 +213,7 @@ const StoreSettingsPage = () => {
                                         <button
                                             type="button"
                                             className="remove-image"
-                                            onClick={() => setFormData(prev => ({ ...prev, logoUrl: "" }))}
+                                            onClick={() => setFormData((prev) => ({ ...prev, logoUrl: "" }))}
                                             disabled={uploadingLogo}
                                         >
                                             ×
@@ -226,7 +244,7 @@ const StoreSettingsPage = () => {
                                         <button
                                             type="button"
                                             className="remove-image"
-                                            onClick={() => setFormData(prev => ({ ...prev, bannerUrl: "" }))}
+                                            onClick={() => setFormData((prev) => ({ ...prev, bannerUrl: "" }))}
                                             disabled={uploadingBanner}
                                         >
                                             ×
@@ -238,6 +256,116 @@ const StoreSettingsPage = () => {
                         </div>
                     </div>
 
+                    {/* Theme */}
+                    <div className="form-section">
+                        <h2>Theme</h2>
+
+                        <div className="form-group">
+                            <label htmlFor="theme-color">Brand Color</label>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <input
+                                    type="color"
+                                    id="theme-color"
+                                    value={formData.themeColor}
+                                    onChange={(e) => handleChange("themeColor", e.target.value)}
+                                    style={{ width: 48, height: 48, padding: 0, border: "1px solid #d1d5db", borderRadius: 8, cursor: "pointer" }}
+                                />
+                                <input
+                                    type="text"
+                                    value={formData.themeColor}
+                                    onChange={(e) => handleChange("themeColor", e.target.value)}
+                                    maxLength={50}
+                                    placeholder="#3b82f6"
+                                    style={{ width: 120 }}
+                                />
+                                <div
+                                    style={{
+                                        width: 80,
+                                        height: 32,
+                                        borderRadius: 6,
+                                        backgroundColor: formData.themeColor,
+                                        border: "1px solid #e5e7eb",
+                                    }}
+                                />
+                            </div>
+                            <small>This color will be used for your store's branding accents</small>
+                        </div>
+                    </div>
+
+                    {/* Contact Information */}
+                    <div className="form-section">
+                        <h2>Contact Information</h2>
+
+                        <div className="form-group">
+                            <label htmlFor="contact-email">Contact Email</label>
+                            <input
+                                type="email"
+                                id="contact-email"
+                                maxLength={255}
+                                value={formData.contactEmail}
+                                onChange={(e) => handleChange("contactEmail", e.target.value)}
+                                placeholder="support@yourstore.com"
+                            />
+                            <small>Public email customers can reach you at</small>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="contact-phone">Contact Phone</label>
+                            <input
+                                type="tel"
+                                id="contact-phone"
+                                maxLength={50}
+                                value={formData.contactPhone}
+                                onChange={(e) => handleChange("contactPhone", e.target.value)}
+                                placeholder="+84 xxx xxx xxxx"
+                            />
+                            <small>Public phone number for customer inquiries</small>
+                        </div>
+                    </div>
+
+                    {/* Social Links */}
+                    <div className="form-section">
+                        <h2>
+                            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <HiGlobeAlt /> Social Links
+                            </span>
+                        </h2>
+
+                        <div className="form-group">
+                            <label htmlFor="social-facebook">Facebook</label>
+                            <input
+                                type="url"
+                                id="social-facebook"
+                                value={socialLinks.facebook}
+                                onChange={(e) => handleSocialChange("facebook", e.target.value)}
+                                placeholder="https://facebook.com/yourstore"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="social-instagram">Instagram</label>
+                            <input
+                                type="url"
+                                id="social-instagram"
+                                value={socialLinks.instagram}
+                                onChange={(e) => handleSocialChange("instagram", e.target.value)}
+                                placeholder="https://instagram.com/yourstore"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="social-twitter">Twitter / X</label>
+                            <input
+                                type="url"
+                                id="social-twitter"
+                                value={socialLinks.twitter}
+                                onChange={(e) => handleSocialChange("twitter", e.target.value)}
+                                placeholder="https://x.com/yourstore"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Actions */}
                     <div className="form-actions">
                         <button type="button" onClick={() => navigate(-1)} className="btn-secondary">
                             Cancel
@@ -253,4 +381,3 @@ const StoreSettingsPage = () => {
 };
 
 export default StoreSettingsPage;
-
