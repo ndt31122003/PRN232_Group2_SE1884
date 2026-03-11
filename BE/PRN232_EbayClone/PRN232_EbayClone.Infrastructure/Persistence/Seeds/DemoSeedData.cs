@@ -162,6 +162,10 @@ internal static class DemoSeedData
                 IsDeleted = false,
                 IsEmailVerified = true,
                 IsPaymentVerified = true,
+                IsPhoneVerified = false,
+                IsBusinessVerified = false,
+                PhoneNumber = (string?)null,
+                BusinessName = (string?)null,
                 PerformanceLevel = SellerPerformanceLevel.TopRated,
                 _activeTotalValue = Math.Round(totalValue, 2)
             });

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StoreService from "../../services/StoreService";
 import Notice from "../../components/Common/CustomNotification";
+import SellerVerificationBanner from "../../components/Common/SellerVerificationBanner";
+import { isSellerVerified } from "../../utils/auth";
 import "./CreateStorePage.scss";
 
 const STORE_TYPES = [
@@ -94,6 +96,20 @@ const CreateStorePage = () => {
             setLoading(false);
         }
     };
+
+    if (!isSellerVerified()) {
+        return (
+            <div className="create-store-page">
+                <div className="container">
+                    <div className="page-header">
+                        <h1>Create Your Store</h1>
+                        <p>Choose a subscription plan and set up your store profile</p>
+                    </div>
+                    <SellerVerificationBanner className="mt-6" />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="create-store-page">
