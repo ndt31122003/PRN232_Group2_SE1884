@@ -48,7 +48,8 @@ public sealed class SetPhoneNumberCommandHandler : ICommandHandler<SetPhoneNumbe
         _otpRepository = otpRepository;
         _otpGenerator = otpGenerator;
         _unitOfWork = unitOfWork;
-        _isSmsSimulation = !configuration.GetValue<bool>("Twilio:Enabled");
+        var provider = configuration.GetValue<string>("Sms:Provider")?.ToLowerInvariant();
+        _isSmsSimulation = string.IsNullOrEmpty(provider) || provider == "dev";
     }
 
     public async Task<Result<OtpDeliveryResult>> Handle(SetPhoneNumberCommand request, CancellationToken cancellationToken)

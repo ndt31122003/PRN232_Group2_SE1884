@@ -32,7 +32,8 @@ public sealed class ResendOtpCommandHandler : ICommandHandler<ResendOtpCommand, 
         _otpRepository = otpRepository;
         _otpGenerator = otpGenerator;
         _unitOfWork = unitOfWork;
-        _isSmsSimulation = !configuration.GetValue<bool>("Twilio:Enabled");
+        var provider = configuration.GetValue<string>("Sms:Provider")?.ToLowerInvariant();
+        _isSmsSimulation = string.IsNullOrEmpty(provider) || provider == "dev";
     }
 
     public async Task<Result<OtpDeliveryResult>> Handle(ResendOtpCommand request, CancellationToken cancellationToken)

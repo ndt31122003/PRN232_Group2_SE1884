@@ -39,6 +39,7 @@ using PRN232_EbayClone.Infrastructure.Sms;
 using PRN232_EbayClone.Application.Abstractions.Sms;
 using Quartz;
 using Quartz.Simpl;
+using Serilog;
 using StackExchange.Redis;
 using System.Text;
 
@@ -200,17 +201,23 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var twilioSection = configuration.GetSection("Twilio");
-        var enabled = twilioSection.GetValue<bool>("Enabled");
+        var smsProvider = configuration.GetValue<string>("Sms:Provider")?.ToLowerInvariant();
 
-        if (enabled)
+        switch (smsProvider)
         {
-            services.Configure<TwilioConfiguration>(twilioSection);
-            services.AddTransient<ISmsSender, TwilioSmsSender>();
-        }
-        else
-        {
-            services.AddTransient<ISmsSender, DevSmsSender>();
+            case "mocean":
+                services.Configure<MoceanConfiguration>(configuration.GetSection("Sms:Mocean"));
+                services.AddTransient<ISmsSender, MoceanSmsSender>();
+                break;
+
+            case "twilio":
+                services.Configure<TwilioConfiguration>(configuration.GetSection("Twilio"));
+                services.AddTransient<ISmsSender, TwilioSmsSender>();
+                break;
+
+            default:
+                services.AddTransient<ISmsSender, DevSmsSender>();
+                break;
         }
 
         return services;
@@ -226,25 +233,36 @@ services.AddScoped<ICouponRepository, CouponRepository>();
     private static IServiceCollection AddBackgroundJobsServices(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+        var useInMemoryStore = configuration.GetValue<bool>("Quartz:UseInMemoryStore", false);
 
         services.AddQuartz(configure =>
         {
             configure.SchedulerName = "EbayCloneSchedulerQuartz";
             configure.SchedulerId = "AUTO";
-            configure.SetProperty("quartz.serializer.type", "json");
 
-            configure.UsePersistentStore(store =>
+            if (useInMemoryStore)
             {
-                store.UsePostgres(connectionString);
+                Log.Warning("Quartz.NET using in-memory store (jobs won't persist across restarts)");
+                configure.UseInMemoryStore();
+            }
+            else
+            {
+                configure.SetProperty("quartz.serializer.type", "json");
+                configure.SetProperty("quartz.jobStore.performSchemaValidation", "false");
 
-                store.UseClustering(options =>
+                configure.UsePersistentStore(store =>
                 {
-                    options.CheckinInterval = TimeSpan.FromSeconds(15);
-                    options.CheckinMisfireThreshold = TimeSpan.FromSeconds(60);
-                });
+                    store.UsePostgres(connectionString);
 
-                store.UseNewtonsoftJsonSerializer();
-            });
+                    store.UseClustering(options =>
+                    {
+                        options.CheckinInterval = TimeSpan.FromSeconds(15);
+                        options.CheckinMisfireThreshold = TimeSpan.FromSeconds(60);
+                    });
+
+                    store.UseNewtonsoftJsonSerializer();
+                });
+            }
 
             void AddSimpleJob<TJob>(string jobName, int intervalSeconds)
                 where TJob : IJob
@@ -277,6 +295,8 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddQuartzHostedService(options =>
         {
             options.WaitForJobsToComplete = true;
+            options.AwaitApplicationStarted = true;
+            options.StartDelay = TimeSpan.FromSeconds(3);
         });
 
 
