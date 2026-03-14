@@ -121,6 +121,7 @@ internal static class ListingCloneFactory
             listing.OfferSettings.MinimumOffer,
             listing.OfferSettings.AutoAcceptOffer,
             variations,
+            images,
             status);
 
         if (createResult.IsFailure)
@@ -128,16 +129,7 @@ internal static class ListingCloneFactory
             return createResult.Error;
         }
 
-        var duplicate = createResult.Value;
-
-        foreach (var image in images)
-        {
-            var addImageResult = duplicate.AddImage(image.Url, image.IsPrimary);
-            if (addImageResult.IsFailure)
-                return addImageResult.Error;
-        }
-
-        return duplicate;
+        return createResult.Value;
     }
 
     private static Result<Listing> CloneAuction(

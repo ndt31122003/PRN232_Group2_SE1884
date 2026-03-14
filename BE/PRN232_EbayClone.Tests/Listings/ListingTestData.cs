@@ -58,7 +58,8 @@ internal static class ListingTestData
             true,
             5m,
             8m,
-            variations).Value;
+            variations,
+            Array.Empty<ListingImage>()).Value;
 
         return listing;
     }

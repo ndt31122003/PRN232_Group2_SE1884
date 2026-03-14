@@ -1,4 +1,4 @@
-﻿
+
 using PRN232_EbayClone.Domain.Listings.Enums;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
 using PRN232_EbayClone.Domain.Shared.Results;
@@ -70,6 +70,7 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
         decimal? minimumOffer,
         decimal? autoAcceptOffer,
         IEnumerable<Variation> variations,
+        IEnumerable<ListingImage> listingImages,
         ListingStatus status = ListingStatus.Draft)
     {
         if (variations.Count() < 2)
@@ -95,6 +96,13 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
             OfferSettings = offerSettingsResult.Value
         };
         listing._variations.UnionWith(variations);
+
+        foreach (var img in listingImages)
+        {
+            var addImageResult = listing.AddImage(img.Url, img.IsPrimary);
+            if (addImageResult.IsFailure) return addImageResult.Error;
+        }
+
         return listing;
     }
 

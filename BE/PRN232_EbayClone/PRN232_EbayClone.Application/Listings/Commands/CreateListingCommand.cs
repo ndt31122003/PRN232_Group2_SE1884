@@ -1,4 +1,5 @@
-﻿using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Storage;
 using PRN232_EbayClone.Domain.Categories.Entities;
 using PRN232_EbayClone.Domain.Categories.Errors;
 using PRN232_EbayClone.Domain.Listings.Entities;
@@ -9,6 +10,15 @@ using PRN232_EbayClone.Domain.Users.Errors;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
 
 namespace PRN232_EbayClone.Application.Listings.Commands;
+
+public sealed record CreateVariationDto(
+    string Sku, 
+    decimal Price, 
+    int Quantity, 
+    IEnumerable<VariationSpecific> VariationSpecifics, 
+    IEnumerable<ListingImage>? VariationImages,
+    IEnumerable<string>? Base64Images
+);
 
 public sealed record CreateListingCommand(
     ListingFormat Format,
@@ -21,9 +31,10 @@ public sealed record CreateListingCommand(
     string ConditionDescription,
     IEnumerable<ItemSpecific> ItemSpecifics,
     IEnumerable<ListingImage>? ListingImages,
+    IEnumerable<string>? Base64Images,
     decimal? Price,              // cho fixed price single
     int? Quantity,               // cho fixed price single
-    IEnumerable<VariationDto>? Variations, // cho multi variation
+    IEnumerable<CreateVariationDto>? Variations, // cho multi variation
     decimal? StartPrice,         // cho auction
     decimal? ReservePrice,
     decimal? BuyItNowPrice,
@@ -62,18 +73,22 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
     private readonly IUserRepository _userRepository;
     private readonly IUserContext _userContext;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICloudinaryService _cloudinaryService;
+
     public CreateListingCommandCommandHandler(
         IListingRepository listingRepository,
         IUnitOfWork unitOfWork,
         ICategoryRepository categoryRepository,
         IUserContext userContext,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        ICloudinaryService cloudinaryService)
     {
         _listingRepository = listingRepository;
         _unitOfWork = unitOfWork;
         _categoryRepository = categoryRepository;
         _userContext = userContext;
         _userRepository = userRepository;
+        _cloudinaryService = cloudinaryService;
     }
 
     public async Task<Result> Handle(CreateListingCommand request, CancellationToken cancellationToken)
@@ -93,13 +108,13 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
         Result<Listing> createResult = request.Format switch
         {
             ListingFormat.FixedPrice when request.Type == ListingType.Single
-                => HandleFixedPriceSingle(request, category.CategorySpecifics),
+                => await HandleFixedPriceSingleAsync(request, category.CategorySpecifics, cancellationToken),
 
             ListingFormat.FixedPrice when request.Type == ListingType.MultiVariation
-                => HandleFixedPriceMultiVariation(request, category.CategorySpecifics),
+                => await HandleFixedPriceMultiVariationAsync(request, category.CategorySpecifics, cancellationToken),
 
             ListingFormat.Auction
-                => HandleAuction(request, category.CategorySpecifics),
+                => await HandleAuctionAsync(request, category.CategorySpecifics, cancellationToken),
 
             _ => Error.Failure("Listing.InvalidFormat", "Unsupported listing format.")
         };
@@ -113,7 +128,7 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             return ListingErrors.Unauthorized;
         }
 
-        var seller = await _userRepository.GetByIdAsync(
+        var seller = await _userRepository.GetByIdAsNoTrackingAsync(
             new UserId(sellerGuid),
             cancellationToken);
         if (seller is null)
@@ -139,12 +154,89 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
         return Result.Success();
     }
 
-    private static Result<Listing> HandleFixedPriceSingle(
+    private async Task<Result<ListingImage>> UploadListingImageAsync(string base64Image, bool isPrimary, CancellationToken cancellationToken)
+    {
+        var uploadResult = await _cloudinaryService.UploadImageAsync(base64Image, cancellationToken);
+        if (uploadResult.IsFailure)
+            return Result.Failure<ListingImage>(uploadResult.Error);
+
+        return new ListingImage(uploadResult.Value, isPrimary);
+    }
+
+    private async Task<Result<IEnumerable<ListingImage>>> UploadImagesAsync(
+        IEnumerable<ListingImage>? existingImages,
+        IEnumerable<string>? base64Images, 
+        CancellationToken cancellationToken)
+    {
+        var listingImages = new List<ListingImage>();
+
+        if (existingImages != null)
+        {
+            listingImages.AddRange(existingImages);
+        }
+
+        if (base64Images != null)
+        {
+            bool isFirst = !listingImages.Any();
+            foreach (var imgBase64 in base64Images)
+            {
+                var uploadRes = await UploadListingImageAsync(imgBase64, isFirst, cancellationToken);
+                if (uploadRes.IsFailure) return Result.Failure<IEnumerable<ListingImage>>(uploadRes.Error);
+                listingImages.Add(uploadRes.Value);
+                isFirst = false;
+            }
+        }
+
+        return listingImages;
+    }
+
+    private async Task<Result<VariationImage>> UploadVariationImageAsync(string base64Image, bool isPrimary, CancellationToken cancellationToken)
+    {
+        var uploadResult = await _cloudinaryService.UploadImageAsync(base64Image, cancellationToken);
+        if (uploadResult.IsFailure)
+            return Result.Failure<VariationImage>(uploadResult.Error);
+
+        return new VariationImage(uploadResult.Value, isPrimary);
+    }
+
+    private async Task<Result<IEnumerable<VariationImage>>> UploadVariationImagesAsync(
+        IEnumerable<ListingImage>? existingImages,
+        IEnumerable<string>? base64Images, 
+        CancellationToken cancellationToken)
+    {
+        var variationImages = new List<VariationImage>();
+
+        if (existingImages != null)
+        {
+            variationImages.AddRange(existingImages.Select(i => new VariationImage(i.Url, i.IsPrimary)));
+        }
+
+        if (base64Images != null)
+        {
+            bool isFirst = !variationImages.Any();
+            foreach (var imgBase64 in base64Images)
+            {
+                var uploadRes = await UploadVariationImageAsync(imgBase64, isFirst, cancellationToken);
+                if (uploadRes.IsFailure) return Result.Failure<IEnumerable<VariationImage>>(uploadRes.Error);
+                variationImages.Add(uploadRes.Value);
+                isFirst = false;
+            }
+        }
+
+        return variationImages;
+    }
+
+
+    private async Task<Result<Listing>> HandleFixedPriceSingleAsync(
         CreateListingCommand request,
-        IEnumerable<CategorySpecific> categorySpecifics)
+        IEnumerable<CategorySpecific> categorySpecifics,
+        CancellationToken cancellationToken)
     {
         var validateResult = Category.ValidateSpecifics(request.ItemSpecifics, categorySpecifics);
         if (validateResult.IsFailure) return validateResult.Error;
+
+        var imagesRes = await UploadImagesAsync(request.ListingImages, request.Base64Images, cancellationToken);
+        if (imagesRes.IsFailure) return imagesRes.Error;
 
         var listingOrError = FixedPriceListing.CreateSingle(
             request.Title,
@@ -158,16 +250,17 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             request.AllowOffers,
             request.MinimumOffer,
             request.AutoAcceptOffer,
-            request.ListingImages ?? [],
+            imagesRes.Value,
             request.Quantity!.Value
         );
         if (listingOrError.IsFailure) return listingOrError.Error;
         return listingOrError.Value;
     }
 
-    private static Result<Listing> HandleFixedPriceMultiVariation(
+    private async Task<Result<Listing>> HandleFixedPriceMultiVariationAsync(
         CreateListingCommand request,
-        IEnumerable<CategorySpecific> categorySpecifics)
+        IEnumerable<CategorySpecific> categorySpecifics,
+        CancellationToken cancellationToken)
     {
         var variations = new List<Variation>();
         foreach (var v in request.Variations ?? [])
@@ -175,17 +268,23 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             var validateResult = Category.ValidateSpecifics(v.VariationSpecifics, categorySpecifics);
             if (validateResult.IsFailure) return validateResult.Error;
 
+            var imagesRes = await UploadVariationImagesAsync(v.VariationImages, v.Base64Images, cancellationToken);
+            if (imagesRes.IsFailure) return imagesRes.Error;
+
             var variationOrError = Variation.Create(
                 v.Sku,
                 v.Price,
                 v.VariationSpecifics,
-                v.VariationImages ?? [],
+                imagesRes.Value,
                 v.Quantity
             );
             if (variationOrError.IsFailure) return variationOrError.Error;
 
             variations.Add(variationOrError.Value);
         }
+
+        var listingImagesRes = await UploadImagesAsync(request.ListingImages, request.Base64Images, cancellationToken);
+        if (listingImagesRes.IsFailure) return listingImagesRes.Error;
 
         var listingOrError = FixedPriceListing.CreateWithMultiVariation(
             request.Title,
@@ -197,18 +296,23 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             request.AllowOffers,
             request.MinimumOffer,
             request.AutoAcceptOffer,
-            variations
+            variations,
+            listingImagesRes.Value
         );
         if (listingOrError.IsFailure) return listingOrError.Error;
         return listingOrError.Value;
     }
 
-    private static Result<Listing> HandleAuction(
+    private async Task<Result<Listing>> HandleAuctionAsync(
         CreateListingCommand request,
-        IEnumerable<CategorySpecific> categorySpecifics)
+        IEnumerable<CategorySpecific> categorySpecifics,
+        CancellationToken cancellationToken)
     {
         var validateResult = Category.ValidateSpecifics(request.ItemSpecifics, categorySpecifics);
         if (validateResult.IsFailure) return validateResult.Error;
+
+        var imagesRes = await UploadImagesAsync(request.ListingImages, request.Base64Images, cancellationToken);
+        if (imagesRes.IsFailure) return imagesRes.Error;
 
         var listingOrError = AuctionListing.Create(
             request.Title,
@@ -222,7 +326,7 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             request.ReservePrice,
             request.BuyItNowPrice,
             request.Duration,
-            request.ListingImages ?? []
+            imagesRes.Value
         );
         if (listingOrError.IsFailure) return listingOrError.Error;
         return listingOrError.Value;
