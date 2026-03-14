@@ -12,13 +12,13 @@ internal sealed class CloudinaryService : ICloudinaryService
 
     public CloudinaryService(IConfiguration configuration)
     {
-        var cloudName = configuration["Cloudinary:CloudName"];
-        var apiKey = configuration["Cloudinary:ApiKey"];
-        var apiSecret = configuration["Cloudinary:ApiSecret"];
+        var cloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME") ?? configuration["Cloudinary:CloudName"];
+        var apiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? configuration["Cloudinary:ApiKey"];
+        var apiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? configuration["Cloudinary:ApiSecret"];
 
         if (string.IsNullOrEmpty(cloudName) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret))
         {
-            throw new InvalidOperationException("Cloudinary credentials are missing in the configuration.");
+            throw new InvalidOperationException("Cloudinary credentials are missing. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in .env or appsettings.json.");
         }
 
         var account = new Account(cloudName, apiKey, apiSecret);

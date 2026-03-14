@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using PRN232_EbayClone.Api;
@@ -10,6 +10,8 @@ using PRN232_EbayClone.Infrastructure.Extensions;
 using PRN232_EbayClone.Infrastructure.Realtime;
 using Serilog;
 using PRN232_EbayClone.Infrastructure.BackgroundJobs;
+
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
