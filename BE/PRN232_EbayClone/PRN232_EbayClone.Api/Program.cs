@@ -55,6 +55,8 @@ try
     builder.Host.UseSerilog((context, configuration) => configuration
         .ReadFrom.Configuration(context.Configuration));
 
+    builder.Services.Configure<List<RateLimitRule>>(builder.Configuration.GetSection("RedisRateLimits"));
+
     builder.Services
         .AddInfrastructureServices(builder.Configuration)
         .AddApplicationServices()
@@ -121,10 +123,10 @@ try
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.UseSlidingWindowRateLimiter();
-
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.UseSlidingWindowRateLimiter();
 
     app.MapHub<NotificationHub>("/hub");
 
