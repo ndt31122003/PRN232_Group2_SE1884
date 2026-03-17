@@ -18,4 +18,17 @@ internal static class DisputeMappingExtensions
             dispute.Status,
             dispute.CreatedAt);
     }
+
+    public static DisputeMessageDto ToDto(this DisputeMessage message)
+    {
+        return new DisputeMessageDto
+        {
+            Id = message.Id,
+            SenderId = message.SenderId,
+            SenderUsername = string.Empty, // Would need to load from User
+            SenderRole = message.SenderRole.ToString(),
+            MessageText = message.MessageText,
+            SentAt = message.SentAt.DateTime
+        };
+    }
 }

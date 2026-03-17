@@ -5518,3 +5518,323 @@ BEGIN
 END $EF$;
 COMMIT;
 
+
+-- Migration: Add Customer Relations Module
+-- Date: 2026-03-15
+-- Description: Adds tables for review replies, disputes, and support tickets
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    -- Add star_rating column to order_buyer_feedback if not exists
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'order_buyer_feedback' AND column_name = 'star_rating'
+    ) THEN
+        ALTER TABLE order_buyer_feedback ADD COLUMN star_rating integer;
+        ALTER TABLE order_buyer_feedback ADD CONSTRAINT chk_star_rating CHECK (star_rating >= 1 AND star_rating <= 5);
+    END IF;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE seller_review_reply (
+        id uuid NOT NULL,
+        review_id uuid NOT NULL,
+        seller_id uuid NOT NULL,
+        reply_text character varying(500) NOT NULL,
+        replied_at timestamp with time zone NOT NULL,
+        edited_at timestamp with time zone,
+        is_edited boolean NOT NULL DEFAULT false,
+        created_at timestamp with time zone NOT NULL,
+        created_by text,
+        updated_at timestamp with time zone,
+        updated_by text,
+        is_deleted boolean NOT NULL DEFAULT false,
+        CONSTRAINT pk_seller_review_reply PRIMARY KEY (id),
+        CONSTRAINT fk_seller_review_reply_order_buyer_feedback FOREIGN KEY (review_id) 
+            REFERENCES order_buyer_feedback (id) ON DELETE CASCADE,
+        CONSTRAINT fk_seller_review_reply_user FOREIGN KEY (seller_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE INDEX ix_seller_review_reply_review_id ON seller_review_reply (review_id);
+    CREATE INDEX ix_seller_review_reply_seller_id ON seller_review_reply (seller_id);
+    CREATE UNIQUE INDEX ux_seller_review_reply_review ON seller_review_reply (review_id) 
+        WHERE is_deleted = false;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE dispute (
+        id uuid NOT NULL,
+        order_id uuid NOT NULL,
+        listing_id uuid NOT NULL,
+        buyer_id uuid NOT NULL,
+        seller_id uuid NOT NULL,
+        dispute_type character varying(50) NOT NULL,
+        reason text NOT NULL,
+        status character varying(50) NOT NULL,
+        resolution_type character varying(50),
+        refund_amount numeric(18,2),
+        refund_currency character varying(3),
+        opened_at timestamp with time zone NOT NULL,
+        resolved_at timestamp with time zone,
+        closed_at timestamp with time zone,
+        escalated_at timestamp with time zone,
+        deadline_at timestamp with time zone,
+        is_deadline_approaching boolean NOT NULL DEFAULT false,
+        created_at timestamp with time zone NOT NULL,
+        created_by text,
+        updated_at timestamp with time zone,
+        updated_by text,
+        is_deleted boolean NOT NULL DEFAULT false,
+        CONSTRAINT pk_dispute PRIMARY KEY (id),
+        CONSTRAINT fk_dispute_orders FOREIGN KEY (order_id) 
+            REFERENCES orders (id) ON DELETE CASCADE,
+        CONSTRAINT fk_dispute_listing FOREIGN KEY (listing_id) 
+            REFERENCES listing (id) ON DELETE RESTRICT,
+        CONSTRAINT fk_dispute_buyer FOREIGN KEY (buyer_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT,
+        CONSTRAINT fk_dispute_seller FOREIGN KEY (seller_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT,
+        CONSTRAINT chk_dispute_status CHECK (status IN 
+            ('OPEN', 'WAITING_SELLER', 'WAITING_BUYER', 'ESCALATED', 'RESOLVED', 'CLOSED')),
+        CONSTRAINT chk_dispute_type CHECK (dispute_type IN 
+            ('RETURN_REQUEST', 'REFUND_REQUEST', 'ITEM_NOT_RECEIVED', 'ITEM_NOT_AS_DESCRIBED', 'OTHER'))
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE INDEX ix_dispute_order_id ON dispute (order_id);
+    CREATE INDEX ix_dispute_seller_id ON dispute (seller_id);
+    CREATE INDEX ix_dispute_buyer_id ON dispute (buyer_id);
+    CREATE INDEX ix_dispute_status ON dispute (status);
+    CREATE INDEX ix_dispute_deadline_approaching ON dispute (is_deadline_approaching, status) 
+        WHERE is_deleted = false;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE dispute_message (
+        id uuid NOT NULL,
+        dispute_id uuid NOT NULL,
+        sender_id uuid NOT NULL,
+        sender_role character varying(20) NOT NULL,
+        message_text text NOT NULL,
+        sent_at timestamp with time zone NOT NULL,
+        created_at timestamp with time zone NOT NULL,
+        created_by text,
+        updated_at timestamp with time zone,
+        updated_by text,
+        is_deleted boolean NOT NULL DEFAULT false,
+        CONSTRAINT pk_dispute_message PRIMARY KEY (id),
+        CONSTRAINT fk_dispute_message_dispute FOREIGN KEY (dispute_id) 
+            REFERENCES dispute (id) ON DELETE CASCADE,
+        CONSTRAINT fk_dispute_message_sender FOREIGN KEY (sender_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT,
+        CONSTRAINT chk_sender_role CHECK (sender_role IN ('BUYER', 'SELLER', 'ADMIN'))
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE INDEX ix_dispute_message_dispute_id ON dispute_message (dispute_id);
+    CREATE INDEX ix_dispute_message_sent_at ON dispute_message (sent_at DESC);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE dispute_evidence (
+        id uuid NOT NULL,
+        dispute_id uuid NOT NULL,
+        uploaded_by_id uuid NOT NULL,
+        file_name character varying(255) NOT NULL,
+        file_url character varying(1024) NOT NULL,
+        file_type character varying(100) NOT NULL,
+        file_size bigint NOT NULL,
+        description character varying(500),
+        uploaded_at timestamp with time zone NOT NULL,
+        created_at timestamp with time zone NOT NULL,
+        created_by text,
+        updated_at timestamp with time zone,
+        updated_by text,
+        is_deleted boolean NOT NULL DEFAULT false,
+        CONSTRAINT pk_dispute_evidence PRIMARY KEY (id),
+        CONSTRAINT fk_dispute_evidence_dispute FOREIGN KEY (dispute_id) 
+            REFERENCES dispute (id) ON DELETE CASCADE,
+        CONSTRAINT fk_dispute_evidence_uploader FOREIGN KEY (uploaded_by_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE INDEX ix_dispute_evidence_dispute_id ON dispute_evidence (dispute_id);
+    CREATE INDEX ix_dispute_evidence_uploaded_at ON dispute_evidence (uploaded_at DESC);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE dispute_status_history (
+        id uuid NOT NULL,
+        dispute_id uuid NOT NULL,
+        from_status character varying(50) NOT NULL,
+        to_status character varying(50) NOT NULL,
+        changed_by_id uuid NOT NULL,
+        changed_by_role character varying(20) NOT NULL,
+        reason text,
+        changed_at timestamp with time zone NOT NULL,
+        CONSTRAINT pk_dispute_status_history PRIMARY KEY (id),
+        CONSTRAINT fk_dispute_status_history_dispute FOREIGN KEY (dispute_id) 
+            REFERENCES dispute (id) ON DELETE CASCADE,
+        CONSTRAINT fk_dispute_status_history_user FOREIGN KEY (changed_by_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE INDEX ix_dispute_status_history_dispute_id ON dispute_status_history (dispute_id);
+    CREATE INDEX ix_dispute_status_history_changed_at ON dispute_status_history (changed_at DESC);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE support_ticket (
+        id uuid NOT NULL,
+        ticket_number character varying(50) NOT NULL,
+        seller_id uuid NOT NULL,
+        category character varying(100) NOT NULL,
+        subject character varying(200) NOT NULL,
+        message text NOT NULL,
+        status character varying(50) NOT NULL,
+        priority character varying(20) NOT NULL DEFAULT 'NORMAL',
+        assigned_to_admin_id uuid,
+        created_at timestamp with time zone NOT NULL,
+        created_by text,
+        updated_at timestamp with time zone,
+        updated_by text,
+        resolved_at timestamp with time zone,
+        closed_at timestamp with time zone,
+        is_deleted boolean NOT NULL DEFAULT false,
+        CONSTRAINT pk_support_ticket PRIMARY KEY (id),
+        CONSTRAINT fk_support_ticket_seller FOREIGN KEY (seller_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT,
+        CONSTRAINT fk_support_ticket_admin FOREIGN KEY (assigned_to_admin_id) 
+            REFERENCES "user" (id) ON DELETE SET NULL,
+        CONSTRAINT chk_support_ticket_status CHECK (status IN 
+            ('OPEN', 'PENDING', 'IN_PROGRESS', 'WAITING_SELLER', 'RESOLVED', 'CLOSED')),
+        CONSTRAINT chk_support_ticket_priority CHECK (priority IN 
+            ('LOW', 'NORMAL', 'HIGH', 'URGENT'))
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE UNIQUE INDEX ux_support_ticket_number ON support_ticket (ticket_number);
+    CREATE INDEX ix_support_ticket_seller_id ON support_ticket (seller_id);
+    CREATE INDEX ix_support_ticket_status ON support_ticket (status);
+    CREATE INDEX ix_support_ticket_created_at ON support_ticket (created_at DESC);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE support_ticket_attachment (
+        id uuid NOT NULL,
+        ticket_id uuid NOT NULL,
+        file_name character varying(255) NOT NULL,
+        file_url character varying(1024) NOT NULL,
+        file_type character varying(100) NOT NULL,
+        file_size bigint NOT NULL,
+        uploaded_at timestamp with time zone NOT NULL,
+        created_at timestamp with time zone NOT NULL,
+        created_by text,
+        updated_at timestamp with time zone,
+        updated_by text,
+        is_deleted boolean NOT NULL DEFAULT false,
+        CONSTRAINT pk_support_ticket_attachment PRIMARY KEY (id),
+        CONSTRAINT fk_support_ticket_attachment_ticket FOREIGN KEY (ticket_id) 
+            REFERENCES support_ticket (id) ON DELETE CASCADE
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE INDEX ix_support_ticket_attachment_ticket_id ON support_ticket_attachment (ticket_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE TABLE support_ticket_response (
+        id uuid NOT NULL,
+        ticket_id uuid NOT NULL,
+        responder_id uuid NOT NULL,
+        responder_role character varying(20) NOT NULL,
+        message text NOT NULL,
+        is_internal_note boolean NOT NULL DEFAULT false,
+        responded_at timestamp with time zone NOT NULL,
+        created_at timestamp with time zone NOT NULL,
+        created_by text,
+        updated_at timestamp with time zone,
+        updated_by text,
+        is_deleted boolean NOT NULL DEFAULT false,
+        CONSTRAINT pk_support_ticket_response PRIMARY KEY (id),
+        CONSTRAINT fk_support_ticket_response_ticket FOREIGN KEY (ticket_id) 
+            REFERENCES support_ticket (id) ON DELETE CASCADE,
+        CONSTRAINT fk_support_ticket_response_responder FOREIGN KEY (responder_id) 
+            REFERENCES "user" (id) ON DELETE RESTRICT,
+        CONSTRAINT chk_responder_role CHECK (responder_role IN ('SELLER', 'ADMIN'))
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    CREATE INDEX ix_support_ticket_response_ticket_id ON support_ticket_response (ticket_id);
+    CREATE INDEX ix_support_ticket_response_responded_at ON support_ticket_response (responded_at DESC);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "migration_id" = '20260315100000_AddCustomerRelationsModule') THEN
+    INSERT INTO "__EFMigrationsHistory" (migration_id, product_version)
+    VALUES ('20260315100000_AddCustomerRelationsModule', '9.0.8');
+    END IF;
+END $EF$;

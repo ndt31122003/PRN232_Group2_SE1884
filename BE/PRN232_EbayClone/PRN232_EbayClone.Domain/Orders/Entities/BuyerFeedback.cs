@@ -15,6 +15,7 @@ public sealed class BuyerFeedback : Entity<Guid>
     public string Comment { get; private set; } = string.Empty;
     public bool UsesStoredComment { get; private set; }
     public string? StoredCommentKey { get; private set; }
+    public int? StarRating { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public string? FollowUpComment { get; private set; }
     public DateTimeOffset? FollowUpCommentedAt { get; private set; }
@@ -49,6 +50,7 @@ public sealed class BuyerFeedback : Entity<Guid>
         string comment,
         bool usesStoredComment,
         string? storedCommentKey,
+        int? starRating,
         DateTimeOffset createdAt)
     {
         if (orderId == Guid.Empty)
@@ -79,6 +81,11 @@ public sealed class BuyerFeedback : Entity<Guid>
                 $"Feedback comment cannot exceed {MaxCommentLength} characters.");
         }
 
+        if (starRating.HasValue && (starRating.Value < 1 || starRating.Value > 5))
+        {
+            return Error.Failure("Feedback.InvalidRating", "Star rating must be between 1 and 5.");
+        }
+
         string? trimmedStoredKey = null;
         if (usesStoredComment)
         {
@@ -98,6 +105,8 @@ public sealed class BuyerFeedback : Entity<Guid>
             usesStoredComment,
             trimmedStoredKey,
             createdAt);
+
+        feedback.StarRating = starRating;
 
         return feedback;
     }

@@ -40,6 +40,9 @@ public sealed class BuyerFeedbackConfiguration : IEntityTypeConfiguration<BuyerF
             .HasColumnName("stored_comment_key")
             .HasMaxLength(100);
 
+        builder.Property(feedback => feedback.StarRating)
+            .HasColumnName("star_rating");
+
         builder.Property(feedback => feedback.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired();

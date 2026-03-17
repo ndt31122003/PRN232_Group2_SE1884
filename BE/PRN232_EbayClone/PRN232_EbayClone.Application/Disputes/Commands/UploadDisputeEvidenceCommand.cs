@@ -69,6 +69,12 @@ public sealed class UploadDisputeEvidenceCommandHandler :
             return DisputeErrors.CannotUpdate;
         }
 
+        // Verify seller ownership
+        if (dispute.SellerId.ToString() != _userContext.UserId)
+        {
+            return DisputeErrors.Unauthorized;
+        }
+
         // Upload files
         var uploadResult = await _fileManager.UploadMultipleFilesAsync(request.Files);
         if (uploadResult.IsFailure)
@@ -77,6 +83,19 @@ public sealed class UploadDisputeEvidenceCommandHandler :
         }
 
         var fileUrls = uploadResult.Value.Select(f => f.Url).ToList();
+
+        // Update dispute status to WaitingBuyer after providing evidence
+        var statusResult = dispute.ProvideEvidence(_userContext.UserId);
+        if (statusResult.IsFailure)
+        {
+            return statusResult.Error;
+        }
+
+        _disputeRepository.Update(dispute);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // TODO: Create DisputeEvidence records for each file
+        // TODO: Raise DisputeEvidenceUploadedDomainEvent for notifications
 
         return Result.Success(new UploadDisputeEvidenceCommandResult(fileUrls));
     }

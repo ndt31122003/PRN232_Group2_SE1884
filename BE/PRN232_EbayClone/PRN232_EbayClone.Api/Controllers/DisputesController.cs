@@ -103,6 +103,26 @@ public sealed class DisputesController(ISender sender) : ApiController(sender)
         var command = new UploadDisputeEvidenceCommand(disputeId, files);
         return await SendAsync(command, cancellationToken);
     }
+
+    [HttpPost("{disputeId}/accept-refund")]
+    public Task<IActionResult> AcceptRefund(
+        Guid disputeId,
+        [FromBody] AcceptRefundRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new AcceptRefundCommand(disputeId, request.RefundAmount, request.Message);
+        return SendAsync(command, cancellationToken);
+    }
+
+    [HttpPost("{disputeId}/messages")]
+    public Task<IActionResult> AddDisputeMessage(
+        Guid disputeId,
+        [FromBody] AddDisputeMessageRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new AddDisputeMessageCommand(disputeId, request.Message);
+        return SendAsync(command, cancellationToken);
+    }
 }
 
 public sealed record CreateDisputeRequest(

@@ -273,6 +273,7 @@ public class Order : AggregateRoot<Guid>
             comment,
             usesStoredComment,
             storedCommentKey,
+            null, // starRating
             createdAt);
 
         if (createResult.IsFailure)

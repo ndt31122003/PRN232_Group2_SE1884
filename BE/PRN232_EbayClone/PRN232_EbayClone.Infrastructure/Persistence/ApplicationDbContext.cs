@@ -16,6 +16,7 @@ using PRN232_EbayClone.Domain.Coupons.Entities;
 using PRN232_EbayClone.Domain.Vouchers.Entities;
 using PRN232_EbayClone.Domain.Reviews.Entities;
 using PRN232_EbayClone.Domain.Disputes.Entities;
+using PRN232_EbayClone.Domain.SupportTickets.Entities;
 using PRN232_EbayClone.Infrastructure.Outbox;
 using System.Reflection;
 
@@ -67,6 +68,15 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Dispute> Disputes => Set<Dispute>();
     public DbSet<SellerPreference> SellerPreferences => Set<SellerPreference>();
+
+    // Customer Relations Module DbSets
+    public DbSet<SellerReviewReply> SellerReviewReplies => Set<SellerReviewReply>();
+    public DbSet<DisputeMessage> DisputeMessages => Set<DisputeMessage>();
+    public DbSet<DisputeEvidence> DisputeEvidences => Set<DisputeEvidence>();
+    public DbSet<DisputeStatusHistory> DisputeStatusHistories => Set<DisputeStatusHistory>();
+    public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
+    public DbSet<SupportTicketAttachment> SupportTicketAttachments => Set<SupportTicketAttachment>();
+    public DbSet<SupportTicketResponse> SupportTicketResponses => Set<SupportTicketResponse>();
 
 
 

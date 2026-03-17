@@ -319,6 +319,23 @@ services.AddScoped<ICouponRepository, CouponRepository>();
     {
         services.Configure<CloudinaryConfiguration>(configuration.GetSection("Cloudinary"));
         services.AddTransient<IFileManager, CloudinaryFileManager>();
+
+        // Register file storage service based on configuration
+        var storageProvider = configuration.GetValue<string>("FileStorage:Provider", "Azure");
+
+        if (storageProvider.Equals("S3", StringComparison.OrdinalIgnoreCase))
+        {
+            services.Configure<AwsS3Configuration>(configuration.GetSection("FileStorage:AwsS3"));
+            services.AddAWSService<Amazon.S3.IAmazonS3>();
+            services.AddTransient<IFileStorageService, AwsS3StorageService>();
+        }
+        else
+        {
+            // Default to Azure Blob Storage
+            services.Configure<AzureBlobStorageConfiguration>(configuration.GetSection("FileStorage:AzureBlob"));
+            services.AddTransient<IFileStorageService, AzureBlobStorageService>();
+        }
+
         return services;
     }
 
