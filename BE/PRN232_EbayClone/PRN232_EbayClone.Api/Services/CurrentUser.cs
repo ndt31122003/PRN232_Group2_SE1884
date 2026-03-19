@@ -3,7 +3,7 @@ using System.Security.Claims;
 
 namespace PRN232_EbayClone.Api.Services;
 
-public class CurrentUser : IUserContext
+public class CurrentUser : IUserContext, ICurrentUser
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     public CurrentUser(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
@@ -13,4 +13,13 @@ public class CurrentUser : IUserContext
 
     public string? Username
         => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
+
+    public Guid Id
+    {
+        get
+        {
+            var userIdString = UserId;
+            return string.IsNullOrEmpty(userIdString) ? Guid.Empty : Guid.Parse(userIdString);
+        }
+    }
 }

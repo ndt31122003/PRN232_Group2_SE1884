@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.AddScoped<IUserContext, CurrentUser>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }

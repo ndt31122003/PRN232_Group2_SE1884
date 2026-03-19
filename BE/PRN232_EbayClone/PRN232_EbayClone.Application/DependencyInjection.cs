@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PRN232_EbayClone.Application.Behaviors;
+using PRN232_EbayClone.Application.Disputes.Services;
 using System.Reflection;
 
 namespace PRN232_EbayClone.Application;
@@ -17,6 +18,9 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationPipelineBehavior<,>));
+
+        // Register dispute state machine
+        services.AddScoped<IDisputeStateMachine, DisputeStateMachine>();
 
         return services;
     }
