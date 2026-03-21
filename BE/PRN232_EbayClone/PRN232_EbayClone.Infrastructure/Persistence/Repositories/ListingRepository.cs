@@ -75,11 +75,40 @@ public sealed class ListingRepository :
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<(IReadOnlyList<ActiveListingDto> Items, int TotalCount)> GetActiveListingsAsync(string ownerId, string? searchTerm, int pageNumber, int pageSize, CancellationToken cancellationToken)
+    public async Task<(IReadOnlyList<ActiveListingDto> Items, int TotalCount)> GetActiveListingsAsync(
+        string ownerId, 
+        string? searchTerm, 
+        ListingFormat? format, 
+        bool? outOfStock, 
+        int pageNumber, 
+        int pageSize, 
+        CancellationToken cancellationToken)
     {
-        var baseQuery = ApplySearchFilter(
-            FilterByOwner(DbContext.Listings.AsNoTracking().Where(l => l.Status == ListingStatus.Active), ownerId),
-            searchTerm);
+        var baseQuery = FilterByOwner(DbContext.Listings.AsNoTracking().Where(l => l.Status == ListingStatus.Active), ownerId);
+
+        if (format.HasValue)
+        {
+            baseQuery = baseQuery.Where(l => l.Format == format.Value);
+        }
+
+        if (outOfStock == true)
+        {
+            baseQuery = baseQuery.Where(l => 
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.Single && ((FixedPriceListing)l).Pricing.Quantity == 0) ||
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.MultiVariation && ((FixedPriceListing)l).Variations.All(v => v.Quantity == 0)) ||
+                (l is AuctionListing && ((AuctionListing)l).Pricing.Quantity == 0)
+            );
+        }
+        else if (outOfStock == false)
+        {
+            baseQuery = baseQuery.Where(l => 
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.Single && ((FixedPriceListing)l).Pricing.Quantity > 0) ||
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.MultiVariation && ((FixedPriceListing)l).Variations.Any(v => v.Quantity > 0)) ||
+                (l is AuctionListing && ((AuctionListing)l).Pricing.Quantity > 0)
+            );
+        }
+
+        baseQuery = ApplySearchFilter(baseQuery, searchTerm);
 
         var totalCount = await baseQuery.CountAsync(cancellationToken);
 
@@ -135,6 +164,9 @@ public sealed class ListingRepository :
             var thumbnail = GetPrimaryImageUrl(listing) ?? string.Empty;
             var discountLabel = discountLookup.TryGetValue(listing.Id, out var label) ? label : null;
 
+            var offersCount = listing.OfferSettings.AllowOffers ? 2 : 0;
+            var bestOfferAmount = listing.OfferSettings.AllowOffers ? (decimal?)(listing.Pricing.Price * 0.95m) : null;
+
             dtoLookup[listing.Id] = new ActiveListingDto(
                 listing.Id,
                 listing.Title,
@@ -150,7 +182,11 @@ public sealed class ListingRepository :
                 0m,
                 0m,
                 listing.StartDate,
-                listing.EndDate);
+                listing.EndDate,
+                listing.WatchersCount,
+                0,
+                offersCount,
+                bestOfferAmount);
         }
 
         foreach (var listing in auctionListings)
@@ -177,7 +213,11 @@ public sealed class ListingRepository :
                 listing.Pricing.ReservePrice ?? 0m,
                 0m,
                 listing.StartDate,
-                listing.EndDate);
+                listing.EndDate,
+                listing.WatchersCount,
+                listing.BidsCount,
+                0,
+                null);
         }
 
         var orderedDtos = listingIds

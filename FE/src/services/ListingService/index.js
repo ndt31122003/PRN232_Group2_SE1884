@@ -116,6 +116,11 @@ const importCsv = (file) => {
         .then((response) => response?.data ?? null);
 };
 
+const acceptOffer = (id, offerAmount, buyerId) =>
+    axios
+        .patch(`${resource}/${id}/offers/accept`, { offerAmount, buyerId })
+        .then((response) => response?.data ?? null);
+
 const ListingService = {
     create,
     update,
@@ -133,6 +138,7 @@ const ListingService = {
     promoteListings,
     archiveListings,
     exportCsv,
-    importCsv
+    importCsv,
+    acceptOffer
 }
 export default ListingService

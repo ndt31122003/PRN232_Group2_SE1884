@@ -13,6 +13,8 @@ import ListingService from "../../../services/ListingService";
 import CategoryService from "../../../services/CategoryService";
 import FileService from "../../../services/FileService";
 import ListingTemplateService from "../../../services/ListingTemplateService";
+import StoreService from "../../../services/StoreService";
+import PolicyService from "../../../services/PolicyService";
 import Notice from "../../../components/Common/CustomNotification";
 import { LoadingScreen } from "../../../components/LoadingScreen/LoadingScreen";
 import { getStoredUser } from "../../../utils/auth";
@@ -264,6 +266,10 @@ const ListingForm = () => {
   const [templateFormatLabel, setTemplateFormatLabel] = useState("");
   const [templateThumbnailUrl, setTemplateThumbnailUrl] = useState("");
   const [isTemplateSaving, setIsTemplateSaving] = useState(false);
+  const [shippingPolicies, setShippingPolicies] = useState([]);
+  const [selectedShippingPolicyId, setSelectedShippingPolicyId] = useState(null);
+  const [returnPolicy, setReturnPolicy] = useState(null);
+  const [selectedReturnPolicyId, setSelectedReturnPolicyId] = useState(null);
   const [fromTemplateId, setFromTemplateId] = useState(null);
   const isTemplateMode = templateContext.mode === "create" || templateContext.mode === "edit";
 
@@ -317,6 +323,33 @@ const ListingForm = () => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const storesResponse = await StoreService.getMyStores();
+        const store = storesResponse?.data?.[0] || storesResponse?.data?.items?.[0];
+        if (store?.id) {
+          const [shippingRes, returnRes] = await Promise.all([
+            PolicyService.getShippingPolicies(store.id),
+            PolicyService.getReturnPolicy(store.id)
+          ]);
+          setShippingPolicies(shippingRes?.data ?? []);
+          setReturnPolicy(returnRes?.data ?? null);
+
+          // Set defaults if not in edit mode
+          if (!activeListingId) {
+            const defaultShipping = (shippingRes?.data ?? []).find(p => p.isDefault);
+            if (defaultShipping) setSelectedShippingPolicyId(defaultShipping.id);
+            if (returnRes?.data) setSelectedReturnPolicyId(returnRes.data.id);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch policies", error);
+      }
+    };
+    fetchPolicies();
+  }, [activeListingId]);
 
   useEffect(() => {
     const state = location.state;
@@ -1436,6 +1469,8 @@ const ListingForm = () => {
     setCategoryModalOpen(false);
     setConditionModalOpen(false);
     setListingStatus(DEFAULT_LISTING_STATUS);
+    setSelectedShippingPolicyId(null);
+    setSelectedReturnPolicyId(null);
   }, [releaseVariationMedia]);
 
   const buildListingDraft = useCallback(() => ({
@@ -1469,7 +1504,9 @@ const ListingForm = () => {
     hour,
     minute,
     ampm,
-    allowOfferEnabled
+    allowOfferEnabled,
+    selectedShippingPolicyId,
+    selectedReturnPolicyId
   }), [
     activeListingId,
     listingStatus,
@@ -1501,7 +1538,9 @@ const ListingForm = () => {
     hour,
     minute,
     ampm,
-    allowOfferEnabled
+    allowOfferEnabled,
+    selectedShippingPolicyId,
+    selectedReturnPolicyId
   ]);
 
   const hydrateListing = useCallback(
@@ -1537,6 +1576,8 @@ const ListingForm = () => {
       setListingDescription(listing.listingDescription ?? "");
       setConditionDescription(listing.conditionDescription ?? "");
       setSelectedCategoryId(listing.categoryId ?? null);
+      setSelectedShippingPolicyId(listing.shippingPolicyId ?? null);
+      setSelectedReturnPolicyId(listing.returnPolicyId ?? null);
 
       let categoryDetailDto = null;
       if (listing.categoryId) {
@@ -2177,6 +2218,8 @@ const ListingForm = () => {
       allowOffers: allowOfferEnabled,
       minimumOffer: allowOfferEnabled ? minimumOfferValue : null,
       autoAcceptOffer: allowOfferEnabled ? autoAcceptValue : null,
+      shippingPolicyId: selectedShippingPolicyId,
+      returnPolicyId: selectedReturnPolicyId,
       isDraft: saveAsDraft
     };
 
@@ -2318,7 +2361,7 @@ const ListingForm = () => {
           });
         }
 
-  navigate("/listings/listing-templates", { replace: true });
+        navigate("/listings/listing-templates", { replace: true });
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error("Template submission failed", error);
@@ -2590,11 +2633,17 @@ const ListingForm = () => {
 
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">Item title</label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <label className="text-sm font-medium text-gray-700">Item title</label>
+              <span style={{ fontSize: "12px", color: title.length > 80 ? "#c40000" : "#6f7780" }}>
+                {title.length}/80
+              </span>
+            </div>
             <input
               type="text"
               name="itemTitle"
               value={title}
+              maxLength={80}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
               style={{ height: "45px" }}
@@ -3032,6 +3081,46 @@ const ListingForm = () => {
             placeholder="Write a detailed description of your item"
             className="w-full rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
           />
+        </div>
+
+        <hr />
+
+        <div style={{ marginBottom: "48px" }}>
+          <h3>SHIPPING & RETURNS</h3>
+          <div style={{ display: "flex", gap: "32px", marginTop: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label className="text-sm font-medium text-gray-700 block mb-2">Shipping Policy</label>
+              <select
+                value={selectedShippingPolicyId || ""}
+                onChange={(e) => setSelectedShippingPolicyId(e.target.value)}
+                className="w-full rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                style={{ height: "40px" }}
+              >
+                <option value="">Select a shipping policy</option>
+                {shippingPolicies.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.serviceName} ({p.carrier}) - ${p.costAmount}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="text-sm font-medium text-gray-700 block mb-2">Return Policy</label>
+              <select
+                value={selectedReturnPolicyId || ""}
+                onChange={(e) => setSelectedReturnPolicyId(e.target.value)}
+                className="w-full rounded border border-gray-300 py-2 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                style={{ height: "40px" }}
+              >
+                <option value="">Select a return policy</option>
+                {returnPolicy && (
+                  <option value={returnPolicy.id}>
+                    {returnPolicy.acceptReturns ? `Returns accepted (${returnPolicy.returnPeriodDays} days)` : "No returns accepted"}
+                  </option>
+                )}
+              </select>
+            </div>
+          </div>
         </div>
 
         <hr />

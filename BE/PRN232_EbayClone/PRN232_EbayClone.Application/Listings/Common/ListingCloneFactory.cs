@@ -71,6 +71,8 @@ internal static class ListingCloneFactory
             listing.OfferSettings.AutoAcceptOffer,
             images,
             listing.Pricing.Quantity,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
         if (createResult.IsFailure)
         {
@@ -122,6 +124,8 @@ internal static class ListingCloneFactory
             listing.OfferSettings.AutoAcceptOffer,
             variations,
             images,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
 
         if (createResult.IsFailure)
@@ -154,6 +158,8 @@ internal static class ListingCloneFactory
             listing.Pricing.BuyItNowPrice,
             listing.Duration,
             images,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
         if (createResult.IsFailure)
         {
@@ -193,6 +199,8 @@ internal static class ListingCloneFactory
             null,
             images,
             1,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
 
         if (createResult.IsFailure)

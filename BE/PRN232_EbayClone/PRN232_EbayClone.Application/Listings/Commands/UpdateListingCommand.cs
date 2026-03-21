@@ -31,6 +31,8 @@ public sealed record UpdateListingCommand(
     bool AllowOffers,
     decimal? MinimumOffer,
     decimal? AutoAcceptOffer,
+    Guid? ShippingPolicyId,
+    Guid? ReturnPolicyId,
     bool IsDraft,
     DateTime? ScheduledStartTime = null
 ) : ICommand;
@@ -43,7 +45,7 @@ public sealed class UpdateListingCommandValidator : AbstractValidator<UpdateList
             .NotEmpty().WithMessage("Listing ID is required.");
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")
-            .MaximumLength(100).WithMessage("Title must not exceed 100 characters.");
+            .MaximumLength(80).WithMessage("Title must not exceed 80 characters.");
         RuleFor(x => x.Sku)
             .NotEmpty().WithMessage("SKU is required.")
             .MaximumLength(50).WithMessage("SKU must not exceed 50 characters.");
@@ -96,6 +98,18 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
             return ListingErrors.Unauthorized;
         }
 
+        if (listing is AuctionListing auctionListingForCheck && auctionListingForCheck.BidsCount > 0)
+        {
+            if (request.Title != auctionListingForCheck.Title || 
+                request.CategoryId != auctionListingForCheck.CategoryId || 
+                request.Format != auctionListingForCheck.Format)
+            {
+                return Error.Failure(
+                    "Listing.ReviseNotAllowed", 
+                    "Cannot change title, category, or format once an auction has bids.");
+            }
+        }
+
         var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
         if (category is null)
             return CategoryErrors.NotFound;
@@ -131,7 +145,9 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
             request.ConditionId,
             request.ConditionDescription,
             request.ItemSpecifics,
-            request.ListingImages ?? []);
+            request.ListingImages ?? [],
+            request.ShippingPolicyId,
+            request.ReturnPolicyId);
         if (updateCommonResult.IsFailure) return updateCommonResult.Error;
 
         switch (listing)

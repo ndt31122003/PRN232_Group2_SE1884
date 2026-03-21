@@ -161,7 +161,16 @@ public class ListingsController(ISender sender) : ApiController(sender)
     public Task<IActionResult> DeleteListing(Guid id, CancellationToken cancellationToken)
         => SendAsync(new RemoveListingCommand(id), cancellationToken);
 
+    [HttpPatch("{id:guid}/offers/accept")]
+    public Task<IActionResult> AcceptOffer(Guid id, [FromBody] AcceptOfferRequest request, CancellationToken cancellationToken)
+    {
+        var command = new AcceptOfferCommand(id, request.OfferAmount, request.BuyerId);
+        return SendAsync(command, cancellationToken);
+    }
+
 }
+
+public sealed record AcceptOfferRequest(decimal OfferAmount, Guid BuyerId);
 
 public sealed record ExportListingsRequest(
     string? Status,

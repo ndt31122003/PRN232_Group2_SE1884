@@ -43,6 +43,8 @@ public sealed record CreateListingCommand(
     bool AllowOffers,
     decimal? MinimumOffer,
     decimal? AutoAcceptOffer,
+    Guid? ShippingPolicyId,
+    Guid? ReturnPolicyId,
     bool IsDraft
 ) : ICommand;
 
@@ -52,7 +54,7 @@ public sealed class CreateListingCommandValidator : AbstractValidator<CreateList
     {
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")
-            .MaximumLength(100).WithMessage("Title must not exceed 100 characters.");
+            .MaximumLength(80).WithMessage("Title must not exceed 80 characters.");
         RuleFor(x => x.Sku)
             .NotEmpty().WithMessage("SKU is required.")
             .MaximumLength(50).WithMessage("SKU must not exceed 50 characters.");
@@ -251,7 +253,9 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             request.MinimumOffer,
             request.AutoAcceptOffer,
             imagesRes.Value,
-            request.Quantity!.Value
+            request.Quantity!.Value,
+            request.ShippingPolicyId,
+            request.ReturnPolicyId
         );
         if (listingOrError.IsFailure) return listingOrError.Error;
         return listingOrError.Value;
@@ -297,7 +301,9 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             request.MinimumOffer,
             request.AutoAcceptOffer,
             variations,
-            listingImagesRes.Value
+            listingImagesRes.Value,
+            request.ShippingPolicyId,
+            request.ReturnPolicyId
         );
         if (listingOrError.IsFailure) return listingOrError.Error;
         return listingOrError.Value;
@@ -326,7 +332,9 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
             request.ReservePrice,
             request.BuyItNowPrice,
             request.Duration,
-            imagesRes.Value
+            imagesRes.Value,
+            request.ShippingPolicyId,
+            request.ReturnPolicyId
         );
         if (listingOrError.IsFailure) return listingOrError.Error;
         return listingOrError.Value;

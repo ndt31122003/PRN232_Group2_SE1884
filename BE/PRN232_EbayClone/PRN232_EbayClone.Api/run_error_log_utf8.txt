@@ -1,0 +1,52 @@
+﻿Using launch settings from D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Api\Properties\launchSettings.json...
+Building...
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Infrastructure\PRN232_EbayClone.Infrastructure.csproj : warning NU1608: Detected package version outside of dependency constraint: Mocean.Csharp.Client 2.1.0 requires Newtonsoft.Json (>= 12.0.0 && < 13.0.0) but version Newtonsoft.Json 13.0.4 was resolved. [D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Api\PRN232_EbayClone.Api.csproj]
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Api\PRN232_EbayClone.Api.csproj : warning NU1608: Detected package version outside of dependency constraint: Mocean.Csharp.Client 2.1.0 requires Newtonsoft.Json (>= 12.0.0 && < 13.0.0) but version Newtonsoft.Json 13.0.4 was resolved.
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Api\PRN232_EbayClone.Api.csproj : warning NU1701: Package 'System.Xml.XmlSerializer 4.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Infrastructure\PRN232_EbayClone.Infrastructure.csproj : warning NU1701: Package 'System.Xml.XmlSerializer 4.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project. [D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Api\PRN232_EbayClone.Api.csproj]
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Api\PRN232_EbayClone.Api.csproj : warning NU1608: Detected package version outside of dependency constraint: Mocean.Csharp.Client 2.1.0 requires Newtonsoft.Json (>= 12.0.0 && < 13.0.0) but version Newtonsoft.Json 13.0.4 was resolved.
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Api\PRN232_EbayClone.Api.csproj : warning NU1701: Package 'System.Xml.XmlSerializer 4.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Infrastructure\PRN232_EbayClone.Infrastructure.csproj : warning NU1608: Detected package version outside of dependency constraint: Mocean.Csharp.Client 2.1.0 requires Newtonsoft.Json (>= 12.0.0 && < 13.0.0) but version Newtonsoft.Json 13.0.4 was resolved.
+D:\Project_PRN232_SE1884_Semester8\PRN232_Group2_SE1884\BE\PRN232_EbayClone\PRN232_EbayClone.Infrastructure\PRN232_EbayClone.Infrastructure.csproj : warning NU1701: Package 'System.Xml.XmlSerializer 4.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.
+[22:17:42 INF] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+[22:17:42 INF] Quartz Scheduler created
+[22:17:42 INF] JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory
+[22:17:42 INF] RAMJobStore initialized.
+[22:17:42 INF] Quartz Scheduler 3.15.0.0 - 'EbayCloneSchedulerQuartz' with instanceId 'NON_CLUSTERED' initialized
+[22:17:42 INF] Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+[22:17:42 INF] Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+[22:17:42 INF] Adding 5 jobs, 5 triggers.
+[22:17:42 INF] Adding job: DEFAULT.ProcessOutboxMessagesJob
+[22:17:42 INF] Adding job: DEFAULT.ActivateListingJob
+[22:17:42 INF] Adding job: DEFAULT.EndListingJob
+[22:17:42 INF] Adding job: DEFAULT.BuyerCancellationTimeoutJob
+[22:17:42 INF] Adding job: DEFAULT.AwaitingShipmentStatusUpdateJob
+[22:17:42 INF] Seller Level Evaluation Job started. Will check daily at 02:00:00 UTC.
+[22:17:42 INF] ΓÅ░ Next evaluation check scheduled at 03/22/2026 02:00:00 UTC (in 10h 42m)
+[22:17:42 ERR] Hosting failed to start
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5149: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+ ---> System.Net.Sockets.SocketException (10048): Only one usage of each socket address (protocol/network address/port) is normally permitted.
+   at System.Net.Sockets.Socket.UpdateStatusAfterSocketErrorAndThrowException(SocketError error, Boolean disconnectOnFailure, String callerName)
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindAsync(ListenOptions[] listenOptions, AddressBindContext context, Func`2 useHttps, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__15_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+[22:17:42 INF] Seller Level Evaluation Job stopped.

@@ -12,13 +12,13 @@ internal sealed class CloudinaryService : ICloudinaryService
 
     public CloudinaryService(IConfiguration configuration)
     {
-        var cloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME") ?? configuration["Cloudinary:CloudName"];
-        var apiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? configuration["Cloudinary:ApiKey"];
-        var apiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? configuration["Cloudinary:ApiSecret"];
+        var cloudName = (Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME") ?? configuration["Cloudinary:CloudName"])?.Trim();
+        var apiKey = (Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? configuration["Cloudinary:ApiKey"])?.Trim();
+        var apiSecret = (Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? configuration["Cloudinary:ApiSecret"])?.Trim();
 
         if (string.IsNullOrEmpty(cloudName) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret))
         {
-            throw new InvalidOperationException("Cloudinary credentials are missing. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in .env or appsettings.json.");
+            throw new InvalidOperationException($"Cloudinary credentials missing. CloudName: '{cloudName}', ApiKey exists: {!string.IsNullOrEmpty(apiKey)}, ApiSecret exists: {!string.IsNullOrEmpty(apiSecret)}");
         }
 
         var account = new Account(cloudName, apiKey, apiSecret);

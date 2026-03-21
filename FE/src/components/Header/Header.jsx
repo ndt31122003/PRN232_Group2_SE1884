@@ -229,7 +229,8 @@ const NavHeader = ({ setCurrentSession }) => {
           ),
           onClick: () => {
             setActiveNav("marketing");
-            showComingSoon("Offers");
+            setPromotionMenuOpen(false);
+            navigate("/marketing/offers");
           }
         },
         {

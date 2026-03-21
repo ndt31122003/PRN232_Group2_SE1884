@@ -11,7 +11,7 @@ public interface IListingRepository : IRepository<Listing, Guid>
 {
     Task<List<Listing>> GetListingsToActivateAsync(DateTime now, int batchSize = 100, CancellationToken cancellationToken = default);
     Task<List<Listing>> GetListingsToEndAsync(DateTime now, int batchSize = 100, CancellationToken cancellationToken = default);
-    Task<(IReadOnlyList<ActiveListingDto> Items, int TotalCount)> GetActiveListingsAsync(string ownerId, string? searchTerm, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<(IReadOnlyList<ActiveListingDto> Items, int TotalCount)> GetActiveListingsAsync(string ownerId, string? searchTerm, ListingFormat? format, bool? outOfStock, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<DraftListingDto> Items, int TotalCount)> GetDraftListingsAsync(string ownerId, string? searchTerm, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<ScheduledListingDto> Items, int TotalCount)> GetScheduledListingsAsync(string ownerId, string? searchTerm, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<EndedListingDto> Items, int TotalCount)> GetEndedListingsAsync(

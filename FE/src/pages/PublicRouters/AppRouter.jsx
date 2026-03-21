@@ -19,6 +19,7 @@ const CouponsSummaryPage = lazy(() => import("../Coupons/CouponsSummary"));
 const SaleEventsSummaryPage = lazy(() => import("../Marketing/SaleEvents/SaleEventsSummary"));
 const CreateSaleEventPage = lazy(() => import("../Marketing/SaleEvents/CreateSaleEvent"));
 const OverviewPage = lazy(() => import("../Overview/OverviewPage"));
+const OffersManagementPage = lazy(() => import("../Marketing/Offers/OffersManagementPage"));
 const ResearchLayout = lazy(() => import("../Research/ResearchLayout"));
 const ProductResearchPage = lazy(() => import("../Research/ProductResearchPage"));
 const SourcingInsightsPage = lazy(() => import("../Research/SourcingInsightsPage"));
@@ -357,10 +358,18 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "marketing/offers",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <OffersManagementPage />
+          </Suspense>
+        ),
+      },
+      {
         path: "marketing",
         element: <Navigate to="/marketing/sale-events" replace />
       },
-      
+
       // ================================
       // Store Module
       // ================================

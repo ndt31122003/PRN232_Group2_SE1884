@@ -28,6 +28,8 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
         decimal? autoAcceptOffer,
         IEnumerable<ListingImage> listingImages,
         int quantity = 1,
+        Guid? shippingPolicyId = null,
+        Guid? returnPolicyId = null,
         ListingStatus status = ListingStatus.Draft)
     {
         var offerSettingsResult = OfferSettings.Create(allowOffers, minimumOffer, autoAcceptOffer);
@@ -46,6 +48,8 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
             Pricing = new FixedPricePricing(price, quantity),
             Status = status,
             Duration = Duration.Gtc,
+            ShippingPolicyId = shippingPolicyId,
+            ReturnPolicyId = returnPolicyId,
             OfferSettings = offerSettingsResult.Value
         };
         listing._itemSpecifics.UnionWith(itemSpecifics);
@@ -71,6 +75,8 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
         decimal? autoAcceptOffer,
         IEnumerable<Variation> variations,
         IEnumerable<ListingImage> listingImages,
+        Guid? shippingPolicyId = null,
+        Guid? returnPolicyId = null,
         ListingStatus status = ListingStatus.Draft)
     {
         if (variations.Count() < 2)
@@ -93,6 +99,8 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
             ConditionDescription = conditionDescription,
             Status = status,
             Duration = Duration.Gtc,
+            ShippingPolicyId = shippingPolicyId,
+            ReturnPolicyId = returnPolicyId,
             OfferSettings = offerSettingsResult.Value
         };
         listing._variations.UnionWith(variations);
