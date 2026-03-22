@@ -139,6 +139,14 @@ const ListingService = {
     archiveListings,
     exportCsv,
     importCsv,
-    acceptOffer
+    acceptOffer,
+    getOffers: (listingId) =>
+        axios
+            .get(`${resource}/offers`, { params: { listingId } })
+            .then((response) => response?.data ?? []),
+    getBids: (listingId) =>
+        axios
+            .get(`${resource}/bids`, { params: { listingId } })
+            .then((response) => response?.data ?? [])
 }
 export default ListingService

@@ -1,0 +1,170 @@
+.product-detail-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #fff;
+}
+
+.product-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: #0050ee;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.product-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #191919;
+    margin: 0;
+}
+
+.product-content {
+    display: flex;
+    gap: 50px;
+}
+
+.product-gallery {
+    flex: 1;
+    max-width: 500px;
+}
+
+.product-gallery img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.price-section {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.label {
+    color: #707070;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.actions-section {
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.fixed-price-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.buy-now-btn {
+    background-color: #0052d9;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.make-offer-btn {
+    background-color: white;
+    color: #0052d9;
+    border: 1px solid #0052d9;
+    padding: 12px;
+    border-radius: 25px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.bid-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.bid-input-group input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.place-bid-btn {
+    background-color: #3665f3;
+    color: white;
+    border: none;
+    padding: 0 25px;
+    border-radius: 25px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Modal Styles */
+.offer-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.offer-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+}
+
+.offer-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.offer-input-group input {
+    flex: 1;
+    padding: 10px;
+    font-size: 18px;
+    border: 1px solid #ddd;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.submit-offer-btn {
+    background: #3665f3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+}

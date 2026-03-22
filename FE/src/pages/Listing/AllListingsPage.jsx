@@ -1959,25 +1959,46 @@ const AllListingsPage = () => {
             return DURATION_LABELS[val] ?? DURATION_LABELS[asNumber] ?? normalized;
         }
 
-        if (keyLower === "offerscount" || keyLower === "bestofferamount") {
+        if (keyLower === "offerscount" || keyLower === "bestofferamount" || keyLower === "bidscount") {
             const rowId = extractListingId(row);
             const asNumber = Number(val);
             if (asNumber > 0 || keyLower === "bestofferamount") {
-                const displayVal = keyLower === "bestofferamount"
-                    ? asNumber.toLocaleString(undefined, { style: "currency", currency: "USD" })
-                    : val.toLocaleString();
+                let displayVal = val.toLocaleString();
+                let targetPath = `/marketing/offers?listingId=${encodeURIComponent(rowId)}`;
+
+                if (keyLower === "bestofferamount") {
+                    displayVal = asNumber.toLocaleString(undefined, { style: "currency", currency: "USD" });
+                    targetPath = `/marketing/offers?listingId=${encodeURIComponent(rowId)}`;
+                } else if (keyLower === "bidscount") {
+                    targetPath = `/marketing/bids?listingId=${encodeURIComponent(rowId)}`;
+                }
 
                 return (
                     <button
                         type="button"
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/marketing/offers?listingId=${encodeURIComponent(rowId)}`);
+                            navigate(targetPath);
                         }}
                         style={{ color: "#0041b2", textDecoration: "underline", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: "600" }}
                     >
                         {displayVal}
                     </button>
+                );
+            }
+        }
+
+        if (keyLower === "currentprice" || keyLower === "startprice") {
+            const formatVal = row.Format ?? row.format;
+            const isAuction = formatVal === 1 || String(formatVal).toLowerCase() === "auction";
+            const binPrice = row.BuyItNowPrice ?? row.buyItNowPrice;
+
+            if (isAuction && typeof binPrice === "number" && binPrice > 0) {
+                return (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span>{Number(val).toLocaleString(undefined, { style: "currency", currency: "USD" })}</span>
+                        <span style={{ fontSize: '12px', color: '#707070', whiteSpace: 'nowrap' }}>(BIN: {binPrice.toLocaleString(undefined, { style: "currency", currency: "USD" })})</span>
+                    </div>
                 );
             }
         }
@@ -2294,6 +2315,14 @@ const AllListingsPage = () => {
                                                 />
                                             </td>
                                             <td className="listing-dashboard__actions-cell">
+                                                <button
+                                                    type="button"
+                                                    className="listing-dashboard__row-action"
+                                                    onClick={() => navigate(`/p/${rowId}`)}
+                                                    style={{ color: "#3665f3", fontWeight: "600" }}
+                                                >
+                                                    View as Buyer
+                                                </button>
                                                 <button
                                                     type="button"
                                                     className="listing-dashboard__row-action"

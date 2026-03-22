@@ -4,77 +4,76 @@ import Notice from "../../../components/Common/CustomNotification";
 import ListingService from "../../../services/ListingService";
 import "./OffersManagement.css";
 
-const MOCK_OFFERS = [
-    {
-        id: "offer-1",
-        listingId: "14845ea2-0f3c-4838-8501-0091d26cdf3a", // Real Laptop ID from DB
-        title: "Bán laptop siêu cấp vip pro",
-        thumbnail: "https://res.cloudinary.com/djmftornv/image/upload/v1774108440/ebay-clone/laptop-1_9aea42c8-98b2-4664-b0d8-5b88e664755f.jpg",
-        buyer: "buyer_premium_99",
-        amount: 855.00,
-        currentPrice: 900.00,
-        status: "Pending",
-        timeLeft: "23h 45m",
-        date: "Mar 21, 2026"
-    },
-    {
-        id: "offer-2",
-        listingId: "14845ea2-0f3c-4838-8501-0091d26cdf3a",
-        title: "Bán laptop siêu cấp vip pro",
-        thumbnail: "https://images.unsplash.com/photo-1517336713481-48c938f70105?q=80&w=300&auto=format&fit=crop",
-        buyer: "tech_enthusiast",
-        amount: 870.00,
-        currentPrice: 900.00,
-        status: "Pending",
-        timeLeft: "1d 2h",
-        date: "Mar 21, 2026"
-    },
-    {
-        id: "offer-3",
-        listingId: "71000000-0000-0000-0000-000000000002",
-        title: "iPhone 15 Pro Max - Silver - 256GB",
-        thumbnail: "https://images.unsplash.com/photo-1696446701796-da61225697cc?q=80&w=300&auto=format&fit=crop",
-        buyer: "johndoe_82",
-        amount: 1050.00,
-        currentPrice: 1199.00,
-        status: "Declined",
-        timeLeft: "Expired",
-        date: "Mar 20, 2026"
-    }
-];
+const STATUS_MAP = {
+    0: "Pending",
+    1: "Accepted",
+    2: "Declined",
+    3: "Countered",
+    4: "Expired"
+};
 
 const OffersManagementPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const listingId = searchParams.get('listingId');
-    const [offers, setOffers] = useState(MOCK_OFFERS);
+    const [offers, setOffers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('All');
+
+    React.useEffect(() => {
+        const fetchOffers = async () => {
+            setLoading(true);
+            try {
+                // Pass null if 'all' or no listingId
+                const id = (listingId && listingId !== 'all') ? listingId : null;
+                const data = await ListingService.getOffers(id);
+                
+                // Map backend DTO to UI fields
+                const mapped = data.map(o => ({
+                    id: o.id,
+                    listingId: o.listingId,
+                    title: o.listingTitle,
+                    thumbnail: o.listingThumbnail || "https://images.unsplash.com/photo-1544731612-de7f96afe55f?q=80&w=300&auto=format&fit=crop",
+                    buyer: o.buyerName,
+                    amount: o.amount,
+                    currentPrice: o.currentPrice,
+                    status: STATUS_MAP[o.status] || "Unknown",
+                    timeLeft: "Active", // Backend could provide real time left later
+                    date: new Date(o.createdAt).toLocaleDateString(),
+                    buyerId: o.buyerId
+                }));
+                
+                setOffers(mapped);
+            } catch (err) {
+                console.error("Failed to fetch offers:", err);
+                Notice({
+                    msg: "Fetch Failed",
+                    desc: "Could not load real offers from the database.",
+                    isSuccess: false
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOffers();
+    }, [listingId]);
 
     const filteredOffers = useMemo(() => {
         let result = offers;
-        if (listingId && listingId !== 'all') {
-            // Filter by the ID in URL or match our mock ID for the laptop
-            result = result.filter(o => o.listingId === listingId || (listingId === '14845ea2-0f3c-4838-8501-0091d26cdf3a' && o.listingId === '14845ea2-0f3c-4838-8501-0091d26cdf3a'));
-        }
         if (filter !== 'All') {
             result = result.filter(o => o.status === filter);
         }
         return result;
-    }, [offers, listingId, filter]);
+    }, [offers, filter]);
 
     const handleAction = async (offerId, action) => {
+        const offer = offers.find(o => o.id === offerId);
+        if (!offer) return;
+
         if (action === 'accept') {
-            const offer = offers.find(o => o.id === offerId);
             try {
-                // Bridge to real backend: Create an Order
-                // For demo, we use the real listing ID provided by you
-                const lid = (listingId && listingId !== 'all' && listingId !== '14845ea2-0f3c-4838-8501-0091d26cdf3a')
-                    ? listingId
-                    : "14845ea2-0f3c-4838-8501-0091d26cdf3a"; // Laptop ID
-
-                const demoBuyerId = "70000000-0000-0000-0000-000000000003"; // Demo Buyer (Cecilia)
-
-                await ListingService.acceptOffer(lid, offer.amount, demoBuyerId);
+                await ListingService.acceptOffer(offer.listingId, offer.amount, offer.buyerId);
 
                 setOffers(prev => prev.map(o =>
                     o.id === offerId ? { ...o, status: 'Accepted' } : o
@@ -94,12 +93,14 @@ const OffersManagementPage = () => {
                 });
             }
         } else {
+            // Logic for decline would go here (e.g., ListingService.declineOffer)
+            // For now, we just update local state to reflect the UI
             setOffers(prev => prev.map(o =>
                 o.id === offerId ? { ...o, status: 'Declined' } : o
             ));
             Notice({
                 msg: "Offer Declined",
-                desc: "The offer has been removed from your active list.",
+                desc: "The offer status has been updated.",
                 isSuccess: false
             });
         }
@@ -138,7 +139,7 @@ const OffersManagementPage = () => {
                                     <img src={offer.thumbnail} alt={offer.title} />
                                 </div>
                                 <div className="offer-card__details">
-                                    <h3 className="offer-card__title">{offer.title}</h3>
+                                    <h3 className="offer-card__title" onClick={() => navigate(`/p/${offer.listingId}`)} style={{ cursor: "pointer", color: "#3665f3" }}>{offer.title}</h3>
                                     <div className="offer-card__meta">
                                         <span>Buyer: <strong className="text-blue-600">{offer.buyer}</strong></span>
                                         <span className="separator">•</span>

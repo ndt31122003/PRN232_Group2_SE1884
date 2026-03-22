@@ -234,6 +234,20 @@ const NavHeader = ({ setCurrentSession }) => {
           }
         },
         {
+          id: "marketing-bids",
+          label: (
+            <span className="marketing-menu__label">
+              Bids
+              <span className="marketing-menu__badge">NEW</span>
+            </span>
+          ),
+          onClick: () => {
+            setActiveNav("marketing");
+            setPromotionMenuOpen(false);
+            navigate("/marketing/bids");
+          }
+        },
+        {
           id: "marketing-social",
           label: "Social",
           onClick: () => {

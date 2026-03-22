@@ -1,4 +1,4 @@
-﻿using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Common.Dtos;
 using PRN232_EbayClone.Domain.Listings.Enums;
@@ -33,7 +33,8 @@ public sealed record ActiveListingDto(
     int WatchersCount,
     int BidsCount,
     int OffersCount,
-    decimal? BestOfferAmount
+    decimal? BestOfferAmount,
+    decimal? BuyItNowPrice
 );
 
 public sealed class GetActiveListingsQueryHandler : IQueryHandler<GetActiveListingsQuery, PagingResult<ActiveListingDto>>

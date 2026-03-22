@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Dtos;
 using PRN232_EbayClone.Application.Listings.Queries;
@@ -136,6 +136,30 @@ public sealed class ListingRepository :
             .Select(g => new { ListingId = g.Key, Quantity = g.Sum(oi => oi.Quantity) })
             .ToDictionaryAsync(x => x.ListingId, x => x.Quantity, cancellationToken);
 
+        var offerStats = await DbContext.Offers
+            .AsNoTracking()
+            .Where(o => listingIds.Contains(o.ListingId) && o.Status == OfferStatus.Pending) // Only count pending offers
+            .GroupBy(o => o.ListingId)
+            .Select(g => new
+            {
+                ListingId = g.Key,
+                Count = g.Count(),
+                MaxAmount = g.Max(o => o.Amount)
+            })
+            .ToDictionaryAsync(x => x.ListingId, x => x, cancellationToken);
+
+        var bidStats = await DbContext.Bids
+            .AsNoTracking()
+            .Where(b => listingIds.Contains(b.ListingId)) // Count all bids for auction stats
+            .GroupBy(b => b.ListingId)
+            .Select(g => new
+            {
+                ListingId = g.Key,
+                Count = g.Count(),
+                MaxAmount = (decimal?)g.Max(b => b.Amount)
+            })
+            .ToDictionaryAsync(x => x.ListingId, x => x, cancellationToken);
+
         var fixedPriceListings = await DbContext.FixedPriceListings
             .AsNoTracking()
             .Include(l => l.Images)
@@ -164,8 +188,8 @@ public sealed class ListingRepository :
             var thumbnail = GetPrimaryImageUrl(listing) ?? string.Empty;
             var discountLabel = discountLookup.TryGetValue(listing.Id, out var label) ? label : null;
 
-            var offersCount = listing.OfferSettings.AllowOffers ? 2 : 0;
-            var bestOfferAmount = listing.OfferSettings.AllowOffers ? (decimal?)(listing.Pricing.Price * 0.95m) : null;
+            var offersCount = offerStats.TryGetValue(listing.Id, out var stats) ? stats.Count : 0;
+            var bestOfferAmount = offerStats.TryGetValue(listing.Id, out var s) ? s.MaxAmount : (decimal?)null;
 
             dtoLookup[listing.Id] = new ActiveListingDto(
                 listing.Id,
@@ -186,7 +210,8 @@ public sealed class ListingRepository :
                 listing.WatchersCount,
                 0,
                 offersCount,
-                bestOfferAmount);
+                bestOfferAmount,
+                null); // BuyItNowPrice is null for Fixed Price
         }
 
         foreach (var listing in auctionListings)
@@ -198,6 +223,11 @@ public sealed class ListingRepository :
             var thumbnail = GetPrimaryImageUrl(listing) ?? string.Empty;
             var discountLabel = discountLookup.TryGetValue(listing.Id, out var label) ? label : null;
 
+            var bidsCount = bidStats.TryGetValue(listing.Id, out var bStats) ? bStats.Count : 0;
+            var highestBid = bidStats.TryGetValue(listing.Id, out var b) ? b.MaxAmount : null;
+            var offersCount = offerStats.TryGetValue(listing.Id, out var oStats) ? oStats.Count : 0;
+            var bestOfferAmount = offerStats.TryGetValue(listing.Id, out var o) ? o.MaxAmount : (decimal?)null;
+
             dtoLookup[listing.Id] = new ActiveListingDto(
                 listing.Id,
                 listing.Title,
@@ -207,7 +237,7 @@ public sealed class ListingRepository :
                 listing.Pricing.Quantity,
                 soldQuantity,
                 listing.Duration,
-                listing.Pricing.StartPrice,
+                highestBid ?? listing.Pricing.StartPrice, // Use highest bid as current price
                 discountLabel,
                 listing.Pricing.StartPrice,
                 listing.Pricing.ReservePrice ?? 0m,
@@ -215,9 +245,10 @@ public sealed class ListingRepository :
                 listing.StartDate,
                 listing.EndDate,
                 listing.WatchersCount,
-                listing.BidsCount,
-                0,
-                null);
+                bidsCount,
+                offersCount,
+                bestOfferAmount,
+                listing.Pricing.BuyItNowPrice);
         }
 
         var orderedDtos = listingIds

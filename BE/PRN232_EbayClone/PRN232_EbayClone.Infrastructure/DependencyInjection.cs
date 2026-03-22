@@ -120,6 +120,8 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();
         services.AddScoped<ISellerPreferenceRepository, SellerPreferenceRepository>();
+        services.AddScoped<IOfferRepository, OfferRepository>();
+        services.AddScoped<IBidRepository, BidRepository>();
 
 
         return services;

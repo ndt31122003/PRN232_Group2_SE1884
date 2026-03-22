@@ -20,6 +20,7 @@ const SaleEventsSummaryPage = lazy(() => import("../Marketing/SaleEvents/SaleEve
 const CreateSaleEventPage = lazy(() => import("../Marketing/SaleEvents/CreateSaleEvent"));
 const OverviewPage = lazy(() => import("../Overview/OverviewPage"));
 const OffersManagementPage = lazy(() => import("../Marketing/Offers/OffersManagementPage"));
+const BidsManagementPage = lazy(() => import("../Marketing/Bids/BidsManagementPage"));
 const ResearchLayout = lazy(() => import("../Research/ResearchLayout"));
 const ProductResearchPage = lazy(() => import("../Research/ProductResearchPage"));
 const SourcingInsightsPage = lazy(() => import("../Research/SourcingInsightsPage"));
@@ -83,6 +84,7 @@ const SubscriptionPage = lazy(() => import("../Store/SubscriptionPage"));
 const CreateDisputePage = lazy(() => import("../Disputes/CreateDispute"));
 const DisputeDetailPage = lazy(() => import("../Disputes/DisputeDetail"));
 const DisputeActionPage = lazy(() => import("../Disputes/DisputeAction"));
+const ProductDetailPage = lazy(() => import("../Public/ProductDetailPage"));
 
 // 🔹 Khởi tạo router
 const router = createBrowserRouter([
@@ -366,6 +368,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "marketing/bids",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <BidsManagementPage />
+          </Suspense>
+        ),
+      },
+      {
         path: "marketing",
         element: <Navigate to="/marketing/sale-events" replace />
       },
@@ -396,6 +406,15 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+
+  {
+    path: "/p/:id",
+    element: (
+      <Suspense fallback={<LoadingScreen />}>
+        <ProductDetailPage />
+      </Suspense>
+    ),
   },
 
   {

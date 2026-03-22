@@ -66,6 +66,8 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<ReturnPolicy> ReturnPolicies => Set<ReturnPolicy>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Dispute> Disputes => Set<Dispute>();
+    public DbSet<Offer> Offers => Set<Offer>();
+    public DbSet<Bid> Bids => Set<Bid>();
     public DbSet<SellerPreference> SellerPreferences => Set<SellerPreference>();
 
 

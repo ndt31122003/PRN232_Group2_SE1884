@@ -62,6 +62,13 @@ yarn-error.log*
 
 
 *.log
+# Build and Error Logs
+*build_error*
+*build_log*
+*error_log*
+*errors_final*
+build_output.txt
+errors_readable.txt
 
 # Secrets - DO NOT commit real credentials
 appsettings.Development.json

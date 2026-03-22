@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using PRN232_EbayClone.Application.Listings.Commands;
 using PRN232_EbayClone.Application.Listings.Common;
+using PRN232_EbayClone.Application.Listings.Dtos;
 using PRN232_EbayClone.Application.Listings.Queries;
 
 namespace PRN232_EbayClone.Api.Controllers;
@@ -161,12 +162,20 @@ public class ListingsController(ISender sender) : ApiController(sender)
     public Task<IActionResult> DeleteListing(Guid id, CancellationToken cancellationToken)
         => SendAsync(new RemoveListingCommand(id), cancellationToken);
 
+    [HttpGet("offers")]
+    public Task<IActionResult> GetListingOffers([FromQuery] Guid? listingId, CancellationToken cancellationToken)
+        => SendAsync(new GetListingOffersQuery(listingId), cancellationToken);
+
     [HttpPatch("{id:guid}/offers/accept")]
     public Task<IActionResult> AcceptOffer(Guid id, [FromBody] AcceptOfferRequest request, CancellationToken cancellationToken)
     {
         var command = new AcceptOfferCommand(id, request.OfferAmount, request.BuyerId);
         return SendAsync(command, cancellationToken);
     }
+
+    [HttpGet("bids")]
+    public Task<IActionResult> GetListingBids([FromQuery] Guid? listingId, CancellationToken cancellationToken)
+        => SendAsync(new GetListingBidsQuery(listingId), cancellationToken);
 
 }
 
