@@ -6,8 +6,11 @@ import AuthService from "../../../services/AuthService";
 import STORAGE, { setStorage } from "../../../lib/storage";
 import Notice from "../../../components/Common/CustomNotification";
 import { isAuthenticated, persistAuthSession } from "../../../utils/auth";
+import ReCaptcha from "../../../components/Common/ReCaptcha";
+import { useCaptcha } from "../../../hooks/useCaptcha";
 
 const { login } = AuthService;
+const LOGIN_CAPTCHA_ACTION = "identity.login";
 
 export default function LoginPage() {
   const location = useLocation();
@@ -21,22 +24,52 @@ export default function LoginPage() {
     return redirect.startsWith("/") ? redirect : "/";
   }, [location.search]);
   const [loading, setLoading] = useState(false);
+  const {
+    captchaRef,
+    token,
+    onChange,
+    shouldRequireCaptcha,
+    registerFailure,
+    registerSuccess,
+    withCaptchaPayload,
+    resetCaptcha,
+  } = useCaptcha();
+
+  const isCaptchaRequired = shouldRequireCaptcha(LOGIN_CAPTCHA_ACTION);
+
   useEffect(() => {
     if (isAuthenticated()) {
       navigate(redirectTarget, { replace: true });
     }
   }, [navigate, redirectTarget]);
   const onLogin = async () => {
+    if (isCaptchaRequired && !token) {
+      Notice({
+        msg: "CAPTCHA required",
+        desc: "Please complete CAPTCHA before signing in.",
+        isSuccess: false,
+      });
+      return;
+    }
+
     try {
       setLoading(true);
-      const values = { username: email, password };
+      const values = withCaptchaPayload(
+        { username: email, password },
+        LOGIN_CAPTCHA_ACTION
+      );
+
       const res = await login(values);
       const data = res?.data;
       if (res.status === 200 && data?.accessToken && data?.refreshToken) {
+        registerSuccess(LOGIN_CAPTCHA_ACTION);
+        resetCaptcha();
         setStorage(STORAGE.REMEMBER_LOGIN, staySignedIn);
         persistAuthSession(data.accessToken, data.refreshToken);
         navigate(redirectTarget, { replace: true });
       } else {
+        registerFailure(LOGIN_CAPTCHA_ACTION);
+        resetCaptcha();
         Notice({
           msg: "Unable to log in",
           desc: res?.object || "Invalid credentials",
@@ -45,6 +78,8 @@ export default function LoginPage() {
         });
       }
     } catch (err) {
+      registerFailure(LOGIN_CAPTCHA_ACTION);
+      resetCaptcha();
       console.error("Login error:", err);
       Notice({
         msg: "Login failed",
@@ -128,6 +163,12 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+
+            {isCaptchaRequired && (
+              <div className="pt-2">
+                <ReCaptcha ref={captchaRef} onChange={onChange} />
+              </div>
+            )}
 
             <button
               type="submit"

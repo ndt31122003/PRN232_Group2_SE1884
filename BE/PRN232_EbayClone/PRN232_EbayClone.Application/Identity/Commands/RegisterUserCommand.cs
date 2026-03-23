@@ -1,4 +1,5 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Security;
 using PRN232_EbayClone.Domain.Identity.Entities;
 using PRN232_EbayClone.Domain.Users.Entities;
 using PRN232_EbayClone.Domain.Users.Services;
@@ -8,7 +9,9 @@ namespace PRN232_EbayClone.Application.Identity.Commands;
 public sealed record RegisterUserCommand(
     string Email,
     string FullName,
-    string Password
+    string Password,
+    string? CaptchaToken = null,
+    string? CaptchaAction = null
 ) : ICommand<LoginCommandResult>;
 
 public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
@@ -39,6 +42,7 @@ public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCom
     private readonly ITokenProvider _tokenProvider;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IEmailUniquenessChecker _emailUniquenessChecker;
+    private readonly ICaptchaProtectionService _captchaProtectionService;
     private readonly IUnitOfWork _unitOfWork;
 
     public RegisterUserCommandHandler(
@@ -47,6 +51,7 @@ public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCom
         ITokenProvider tokenProvider,
         IRefreshTokenRepository refreshTokenRepository,
         IEmailUniquenessChecker emailUniquenessChecker,
+        ICaptchaProtectionService captchaProtectionService,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
@@ -54,11 +59,24 @@ public sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCom
         _tokenProvider = tokenProvider;
         _refreshTokenRepository = refreshTokenRepository;
         _emailUniquenessChecker = emailUniquenessChecker;
+        _captchaProtectionService = captchaProtectionService;
         _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<LoginCommandResult>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
+        var captchaResult = await _captchaProtectionService.EnsureValidAsync(
+            CaptchaActions.IdentityRegister,
+            request.CaptchaToken,
+            request.CaptchaAction,
+            request.Email,
+            cancellationToken);
+
+        if (captchaResult.IsFailure)
+        {
+            return captchaResult.Error;
+        }
+
         var passwordHash = _passwordHasher.Hash(request.Password);
 
         var userOrError = await User.RegisterAsync(

@@ -15,6 +15,16 @@ const verifyEmail = (payload) =>
     .post(`${resource}/verify-email`, payload)
     .then((response) => response?.data ?? null);
 
+const forgotPassword = (payload) =>
+  axios
+    .post(`${resource}/forgot-password`, payload)
+    .then((response) => response?.data ?? null);
+
+const resetPassword = (payload) =>
+  axios
+    .post(`${resource}/reset-password`, payload)
+    .then((response) => response?.data ?? null);
+
 const setPhoneNumber = (payload) =>
   axios.post(`${resource}/set-phone`, payload);
 
@@ -31,6 +41,8 @@ const IdentityService = {
   register,
   requestOtp,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
   setPhoneNumber,
   verifyPhone,
   submitBusiness,
