@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../../utils/axiosCustomize";
+import { getCurrentUserId } from "../../utils/jwtUtils";
 import "./PromotionsOverview.scss";
 
 const PromotionsOverview = () => {
@@ -29,11 +30,13 @@ const PromotionsOverview = () => {
     try {
       setLoading(true);
       
-      // Fetch both coupons and order discounts
-      const [couponsRes, orderDiscountsRes] = await Promise.all([
-        instance.get('/coupons').catch(() => ({ data: [] })),
-        instance.get('/order-discounts/seller/00000000-0000-0000-0000-000000000000').catch(() => ({ data: [] }))
-      ]);
+      // Fetch all promotion types sequentially to prevent exhausting Supabase connection pool limits
+      const sellerId = getCurrentUserId() ?? '00000000-0000-0000-0000-000000000000';
+      
+      const couponsRes = await instance.get('/coupons').catch(() => ({ data: [] }));
+      const orderDiscountsRes = await instance.get(`/order-discounts/seller/${sellerId}`).catch(() => ({ data: [] }));
+      const shippingRes = await instance.get(`/shipping-discounts/seller/${sellerId}`).catch(() => ({ data: [] }));
+      const volumeRes = await instance.get(`/volume-pricings/seller/${sellerId}`).catch(() => ({ data: [] }));
       
       // Combine and format promotions
       const allPromotions = [
@@ -50,6 +53,18 @@ const PromotionsOverview = () => {
           typeDescription: d.thresholdType === 1 
             ? `Spend $${d.thresholdAmount}+` 
             : `Buy ${d.thresholdQuantity}+ items`
+        })),
+        ...(shippingRes.data || []).map(s => ({
+          ...s,
+          promotionType: 'Shipping discount',
+          discountDisplay: s.isFreeShipping ? 'Free Shipping' : (s.discountUnit === "percent" || s.discountUnit === 1 ? `${s.discountValue}%` : `$${s.discountValue}`),
+          typeDescription: `Shipping offer`
+        })),
+        ...(volumeRes.data || []).map(v => ({
+          ...v,
+          promotionType: 'Volume pricing',
+          discountDisplay: v.tiers?.length ? `Up to ${Math.max(...v.tiers.map(t => t.discountValue))}${v.tiers[0].discountUnit === 1 ? '%' : '$'} off` : 'Volume discount',
+          typeDescription: `Multi-buy tiers`
         }))
       ];
       
@@ -92,9 +107,15 @@ const PromotionsOverview = () => {
       
       if (promo.promotionType === 'Coupon') {
         await instance.patch(`/coupons/${promo.id}/status`, { isActive: newStatus });
-      } else {
+      } else if (promo.promotionType === 'Order discount') {
         const endpoint = newStatus ? 'activate' : 'deactivate';
         await instance.post(`/order-discounts/${promo.id}/${endpoint}`);
+      } else if (promo.promotionType === 'Shipping discount') {
+        const endpoint = newStatus ? 'activate' : 'deactivate';
+        await instance.post(`/shipping-discounts/${promo.id}/${endpoint}`);
+      } else if (promo.promotionType === 'Volume pricing') {
+        const endpoint = newStatus ? 'activate' : 'deactivate';
+        await instance.post(`/volume-pricings/${promo.id}/${endpoint}`);
       }
       
       // Refresh promotions
@@ -114,8 +135,12 @@ const PromotionsOverview = () => {
     try {
       if (promo.promotionType === 'Coupon') {
         await instance.delete(`/coupons/${promo.id}`);
-      } else {
+      } else if (promo.promotionType === 'Order discount') {
         await instance.delete(`/order-discounts/${promo.id}`);
+      } else if (promo.promotionType === 'Shipping discount') {
+        await instance.delete(`/shipping-discounts/${promo.id}`);
+      } else if (promo.promotionType === 'Volume pricing') {
+        await instance.delete(`/volume-pricings/${promo.id}`);
       }
       
       // Refresh promotions

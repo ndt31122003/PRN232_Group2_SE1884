@@ -120,6 +120,8 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();
         services.AddScoped<ISellerPreferenceRepository, SellerPreferenceRepository>();
         services.AddScoped<IOrderDiscountRepository, OrderDiscountRepository>();
+        services.AddScoped<IShippingDiscountRepository, ShippingDiscountRepository>();
+        services.AddScoped<IVolumePricingRepository, VolumePricingRepository>();
         services.AddScoped<ISaleEventRepository, SaleEventRepository>();
 
 

@@ -416,7 +416,7 @@ const NavHeader = ({ setCurrentSession }) => {
       label: "Shipping discount",
       onClick: () => {
         setPromotionMenuOpen(false);
-        showComingSoon("Shipping discount");
+        navigate("/marketing/shipping-discounts/create");
       }
     },
     {
@@ -424,7 +424,7 @@ const NavHeader = ({ setCurrentSession }) => {
       label: "Volume pricing",
       onClick: () => {
         setPromotionMenuOpen(false);
-        showComingSoon("Volume pricing");
+        navigate("/marketing/volume-pricing/create");
       }
     }
   ];

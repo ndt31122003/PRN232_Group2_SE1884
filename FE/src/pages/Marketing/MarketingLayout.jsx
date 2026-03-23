@@ -26,6 +26,7 @@ const MarketingLayout = () => {
       available: false,
       badge: "NEW"
     },
+
     {
       id: "buyer-groups",
       label: "Buyer groups",
