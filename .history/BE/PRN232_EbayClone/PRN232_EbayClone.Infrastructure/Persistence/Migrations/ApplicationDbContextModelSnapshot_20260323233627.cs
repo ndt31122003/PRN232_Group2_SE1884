@@ -4528,47 +4528,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)")
                         .HasColumnName("buyer_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_offers");
-
-                    b.HasIndex("BuyerId")
-                        .HasDatabaseName("ix_offers_buyer_id");
-
-                    b.HasIndex("ListingId")
-                        .HasDatabaseName("ix_offers_listing_id");
-
-                    b.ToTable("offers", (string)null);
-                });
-
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4609,6 +4568,9 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("listing_id");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
                     b.Property<int>("ReservedQuantity")
                         .HasColumnType("integer")
                         .HasColumnName("reserved_quantity");
@@ -4620,10 +4582,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<int>("SoldQuantity")
                         .HasColumnType("integer")
                         .HasColumnName("sold_quantity");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
 
                     b.Property<int?>("ThresholdQuantity")
                         .HasColumnType("integer")
@@ -4642,6 +4600,15 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnName("updated_by");
 
                     b.HasKey("Id")
+                        .HasName("pk_offers");
+
+                    b.HasIndex("BuyerId")
+                        .HasDatabaseName("ix_offers_buyer_id");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_offers_listing_id");
+
+                    b.ToTable("offers", (string)null);
                         .HasName("pk_inventory");
 
                     b.HasIndex("LastUpdatedAt")
@@ -16185,9 +16152,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_offers_listing_listing_id");
-
-                });
-
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.Inventory", b =>
                 {
                     b.OwnsMany("PRN232_EbayClone.Domain.Listings.Inventory.ValueObjects.InventoryReservation", "Reservations", b1 =>

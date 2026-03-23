@@ -4511,6 +4511,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+<<<<<<< Updated upstream
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Offer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4528,47 +4529,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)")
                         .HasColumnName("buyer_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_offers");
-
-                    b.HasIndex("BuyerId")
-                        .HasDatabaseName("ix_offers_buyer_id");
-
-                    b.HasIndex("ListingId")
-                        .HasDatabaseName("ix_offers_listing_id");
-
-                    b.ToTable("offers", (string)null);
-                });
-
+=======
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4578,6 +4539,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<int>("AvailableQuantity")
                         .HasColumnType("integer")
                         .HasColumnName("available_quantity");
+>>>>>>> Stashed changes
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -4591,6 +4553,8 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
+<<<<<<< Updated upstream
+=======
                     b.Property<bool>("IsLowStock")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -4605,10 +4569,16 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_updated_at");
 
+>>>>>>> Stashed changes
                     b.Property<Guid>("ListingId")
                         .HasColumnType("uuid")
                         .HasColumnName("listing_id");
 
+<<<<<<< Updated upstream
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+=======
                     b.Property<int>("ReservedQuantity")
                         .HasColumnType("integer")
                         .HasColumnName("reserved_quantity");
@@ -4621,10 +4591,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("sold_quantity");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
                     b.Property<int?>("ThresholdQuantity")
                         .HasColumnType("integer")
                         .HasColumnName("threshold_quantity");
@@ -4632,6 +4598,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<int>("TotalQuantity")
                         .HasColumnType("integer")
                         .HasColumnName("total_quantity");
+>>>>>>> Stashed changes
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -4642,6 +4609,17 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnName("updated_by");
 
                     b.HasKey("Id")
+<<<<<<< Updated upstream
+                        .HasName("pk_offers");
+
+                    b.HasIndex("BuyerId")
+                        .HasDatabaseName("ix_offers_buyer_id");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_offers_listing_id");
+
+                    b.ToTable("offers", (string)null);
+=======
                         .HasName("pk_inventory");
 
                     b.HasIndex("LastUpdatedAt")
@@ -4703,6 +4681,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("idx_inventory_adjustment_inventory_id");
 
                     b.ToTable("inventory_adjustment", (string)null);
+>>>>>>> Stashed changes
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback", b =>
@@ -16177,6 +16156,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Navigation("ItemSpecifics");
                 });
 
+<<<<<<< Updated upstream
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Offer", b =>
                 {
                     b.HasOne("PRN232_EbayClone.Domain.Listings.Entities.Listing", null)
@@ -16185,9 +16165,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_offers_listing_listing_id");
-
-                });
-
+=======
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.Inventory", b =>
                 {
                     b.OwnsMany("PRN232_EbayClone.Domain.Listings.Inventory.ValueObjects.InventoryReservation", "Reservations", b1 =>
@@ -16249,6 +16227,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         });
 
                     b.Navigation("Reservations");
+>>>>>>> Stashed changes
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback", b =>

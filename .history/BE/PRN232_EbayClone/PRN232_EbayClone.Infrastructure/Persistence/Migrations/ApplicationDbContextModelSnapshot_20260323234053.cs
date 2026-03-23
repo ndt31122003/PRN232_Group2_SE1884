@@ -16185,9 +16185,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_offers_listing_listing_id");
-
-                });
-
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.Inventory", b =>
                 {
                     b.OwnsMany("PRN232_EbayClone.Domain.Listings.Inventory.ValueObjects.InventoryReservation", "Reservations", b1 =>
