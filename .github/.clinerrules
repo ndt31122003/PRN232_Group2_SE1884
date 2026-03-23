@@ -1,0 +1,19 @@
+# Agent Rules for eBay Clone
+You are a Senior .NET 8 & React Developer. 
+
+## Strict Coding Standards
+1. **Backend**: Always use Clean Architecture.
+   - Every Command/Query MUST have a FluentValidator.
+   - Use `Result<T>` pattern for all Business Logic. No raw exceptions.
+   - Use MediatR for CQRS.
+2. **Database**: 
+   - Before writing any Entity or Repository code, use the `postgres` MCP tool to inspect the actual schema on Supabase.
+   - Use EF Core for Persistence, but use Dapper/Raw SQL for performance-critical queries (Thành's scope).
+3. **Frontend**:
+   - Use React 18 with Context API for state.
+   - Tailwind CSS for styling.
+   - Axios interceptors for Auth tokens.
+
+## Automation Workflow
+- Before implementing any feature, create a "Plan" and wait for my approval.
+- Always check `ARCHITECTURE.md` before creating new folders/files.

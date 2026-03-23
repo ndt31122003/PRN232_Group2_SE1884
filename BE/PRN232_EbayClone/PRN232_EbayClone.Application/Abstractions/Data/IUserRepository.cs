@@ -7,6 +7,7 @@ namespace PRN232_EbayClone.Application.Abstractions.Data;
 public interface IUserRepository : IRepository<User, UserId>
 {
     Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken);
+    Task<User?> GetByUsernameOrEmailAsync(string identifier, CancellationToken cancellationToken);
     Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken);
 
     /// <summary>

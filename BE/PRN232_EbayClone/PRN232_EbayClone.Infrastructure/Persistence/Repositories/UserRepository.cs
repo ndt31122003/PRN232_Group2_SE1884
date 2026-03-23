@@ -2,6 +2,7 @@ using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
 using PRN232_EbayClone.Domain.Users.Entities;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
+using System.Linq;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence.Repositories;
 
@@ -44,7 +45,18 @@ public sealed class UserRepository :
     {
         return DbContext.Users
             .Include(u => u.Roles)
-            .SingleOrDefaultAsync(u => u.Username == username, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+    }
+
+    public Task<User?> GetByUsernameOrEmailAsync(string identifier, CancellationToken cancellationToken)
+    {
+        var normalizedIdentifier = identifier.Trim();
+
+        return DbContext.Users
+            .Include(u => u.Roles)
+            .FirstOrDefaultAsync(
+                u => u.Username == normalizedIdentifier || u.Email.Value == normalizedIdentifier,
+                cancellationToken);
     }
 
     // Add this method

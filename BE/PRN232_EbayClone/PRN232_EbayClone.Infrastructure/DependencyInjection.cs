@@ -99,6 +99,7 @@ public static class DependencyInjection
         services.AddScoped<IOtpRepository, OtpRepository>();
         services.AddScoped<IFileMetadataRepository, FileMetadataRepository>();
         services.AddScoped<IListingRepository, ListingRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<IListingTemplateRepository, ListingTemplateRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
