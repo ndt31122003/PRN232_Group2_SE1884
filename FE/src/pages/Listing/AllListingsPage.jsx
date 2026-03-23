@@ -49,7 +49,11 @@ const TABLE_COLUMNS = [
     { key: "soldQty", label: "Sold qty" },
     { key: "duration", label: "Duration" },
     { key: "endDate", label: "End date" },
-    { key: "startDate", label: "Start date" }
+    { key: "startDate", label: "Start date" },
+    { key: "watchersCount", label: "Watchers" },
+    { key: "bidsCount", label: "Bids" },
+    { key: "offersCount", label: "Offers" },
+    { key: "bestOfferAmount", label: "Best Offer" }
 ];
 
 const normalizeFailures = (rawFailures) => {
@@ -144,11 +148,11 @@ const evaluateEditRule = (status, row) => {
         case "active": {
             const format = Number(row.Format ?? row.format);
             if (Number.isFinite(format) && format === 1) {
-                const soldQuantity = Number(row.SoldQuantity ?? row.soldQuantity ?? 0);
-                if (Number.isFinite(soldQuantity) && soldQuantity > 0) {
+                const bidsCount = Number(row.BidsCount ?? row.bidsCount ?? 0);
+                if (Number.isFinite(bidsCount) && bidsCount > 0) {
                     return {
                         canEdit: false,
-                        reason: "Auctions with bids or sales can't be edited on eBay."
+                        reason: "Auctions with bids can't be revised on eBay."
                     };
                 }
 
@@ -200,12 +204,12 @@ const buildStatusToolbarActions = (status, context) => {
     const {
         selectedCount,
         selectedRows,
-        onEditSelected = () => {},
-        onDeleteDrafts = () => {},
-        onCopyDrafts = () => {},
-        onRelist = () => {},
-        onRelistFixedPrice = () => {},
-        onSellSimilar = () => {},
+        onEditSelected = () => { },
+        onDeleteDrafts = () => { },
+        onCopyDrafts = () => { },
+        onRelist = () => { },
+        onRelistFixedPrice = () => { },
+        onSellSimilar = () => { },
         isBusy,
         actionMenuItems = []
     } = context;
@@ -366,7 +370,7 @@ const DURATION_LABELS = {
     7: "7 days",
     10: "10 days"
 };
-const CURRENCY_FIELD_KEYS = ["CurrentPrice", "StartPrice", "ReservePrice", "ShippingCost", "BuyItNowPrice"];
+const CURRENCY_FIELD_KEYS = ["CurrentPrice", "StartPrice", "ReservePrice", "ShippingCost", "BuyItNowPrice", "BestOfferAmount"];
 const CURRENCY_FIELDS = new Set(CURRENCY_FIELD_KEYS);
 const CURRENCY_FIELDS_NORMALIZED = new Set(CURRENCY_FIELD_KEYS.map((key) => key.toLowerCase()));
 const RELIST_MODES = {
@@ -389,7 +393,11 @@ const HEADER_LABEL_MAP = {
     BuyItNowPrice: "Buy it now price",
     SoldStatus: "Sold status",
     RelistStatus: "Relist status",
-    Format: "Format"
+    Format: "Format",
+    WatchersCount: "Watchers",
+    BidsCount: "Bids",
+    OffersCount: "Offers",
+    BestOfferAmount: "Best Offer"
 };
 
 const COLUMN_CONFIG_STORAGE_KEY = "listing-table-config";
@@ -655,6 +663,8 @@ const AllListingsPage = () => {
     const [isProcessingCsv, setIsProcessingCsv] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [selectedIds, setSelectedIds] = useState([]);
+    const [formatFilter, setFormatFilter] = useState("");
+    const [stockFilter, setStockFilter] = useState("");
     const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
     const [customizeDraft, setCustomizeDraft] = useState([]);
     const headerCheckboxRef = useRef(null);
@@ -666,6 +676,8 @@ const AllListingsPage = () => {
         setPageNumber(1);
         setPageSize(20);
         setSelectedIds([]);
+        setFormatFilter("");
+        setStockFilter("");
     }, [statusSlug]);
 
     useEffect(() => {
@@ -677,7 +689,9 @@ const AllListingsPage = () => {
                 const params = {
                     searchTerm: searchTerm || undefined,
                     pageNumber,
-                    pageSize
+                    pageSize,
+                    format: formatFilter || undefined,
+                    outOfStock: stockFilter === "out" ? true : (stockFilter === "in" ? false : undefined)
                 };
 
                 const data = statusSlug === "unsold"
@@ -734,7 +748,7 @@ const AllListingsPage = () => {
         return () => {
             cancelled = true;
         };
-    }, [statusSlug, searchTerm, pageNumber, pageSize, refreshKey]);
+    }, [statusSlug, searchTerm, pageNumber, pageSize, formatFilter, stockFilter, refreshKey]);
 
     const handleSearchSubmit = (event) => {
         event.preventDefault();
@@ -1244,8 +1258,14 @@ const AllListingsPage = () => {
 
         setIsPerformingAction(true);
         try {
-            await performSellSimilar(selectedIds);
+            const { count, listingIds } = await performSellSimilar(selectedIds);
             setSelectedIds([]);
+
+            if (count === 1 && listingIds.length > 0) {
+                navigate(`/listing-form/${encodeURIComponent(listingIds[0])}`);
+                return;
+            }
+
             setRefreshKey((prev) => prev + 1);
         } catch (error) {
             // handled via Notice
@@ -1939,6 +1959,50 @@ const AllListingsPage = () => {
             return DURATION_LABELS[val] ?? DURATION_LABELS[asNumber] ?? normalized;
         }
 
+        if (keyLower === "offerscount" || keyLower === "bestofferamount" || keyLower === "bidscount") {
+            const rowId = extractListingId(row);
+            const asNumber = Number(val);
+            if (asNumber > 0 || keyLower === "bestofferamount") {
+                let displayVal = val.toLocaleString();
+                let targetPath = `/marketing/offers?listingId=${encodeURIComponent(rowId)}`;
+
+                if (keyLower === "bestofferamount") {
+                    displayVal = asNumber.toLocaleString(undefined, { style: "currency", currency: "USD" });
+                    targetPath = `/marketing/offers?listingId=${encodeURIComponent(rowId)}`;
+                } else if (keyLower === "bidscount") {
+                    targetPath = `/marketing/bids?listingId=${encodeURIComponent(rowId)}`;
+                }
+
+                return (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(targetPath);
+                        }}
+                        style={{ color: "#0041b2", textDecoration: "underline", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: "600" }}
+                    >
+                        {displayVal}
+                    </button>
+                );
+            }
+        }
+
+        if (keyLower === "currentprice" || keyLower === "startprice") {
+            const formatVal = row.Format ?? row.format;
+            const isAuction = formatVal === 1 || String(formatVal).toLowerCase() === "auction";
+            const binPrice = row.BuyItNowPrice ?? row.buyItNowPrice;
+
+            if (isAuction && typeof binPrice === "number" && binPrice > 0) {
+                return (
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span>{Number(val).toLocaleString(undefined, { style: "currency", currency: "USD" })}</span>
+                        <span style={{ fontSize: '12px', color: '#707070', whiteSpace: 'nowrap' }}>(BIN: {binPrice.toLocaleString(undefined, { style: "currency", currency: "USD" })})</span>
+                    </div>
+                );
+            }
+        }
+
         if (typeof val === "number") {
             if (CURRENCY_FIELDS.has(key) || CURRENCY_FIELDS_NORMALIZED.has(keyLower)) {
                 return val.toLocaleString(undefined, { style: "currency", currency: "USD" });
@@ -1999,6 +2063,32 @@ const AllListingsPage = () => {
                             )}
                         </div>
                     </form>
+
+                    {statusSlug === "active" && (
+                        <div className="listing-dashboard__filters" style={{ display: "flex", gap: "12px", marginLeft: "24px" }}>
+                            <select
+                                value={formatFilter}
+                                onChange={(e) => setFormatFilter(e.target.value)}
+                                className="rounded border border-gray-300 py-1 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                                style={{ height: "40px" }}
+                            >
+                                <option value="">All Formats</option>
+                                <option value="1">Auction</option>
+                                <option value="2">Fixed Price</option>
+                            </select>
+
+                            <select
+                                value={stockFilter}
+                                onChange={(e) => setStockFilter(e.target.value)}
+                                className="rounded border border-gray-300 py-1 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                                style={{ height: "40px" }}
+                            >
+                                <option value="">All Stock</option>
+                                <option value="in">In Stock</option>
+                                <option value="out">Out of Stock</option>
+                            </select>
+                        </div>
+                    )}
                 </div>
 
                 <div className="listing-dashboard__controls-row">
@@ -2088,7 +2178,7 @@ const AllListingsPage = () => {
                         )
                     ))}
                 </div>
-            </section>
+            </section >
 
             {isCustomizeOpen && (
                 <div className="listing-customize" role="dialog" aria-modal="true">
@@ -2228,6 +2318,14 @@ const AllListingsPage = () => {
                                                 <button
                                                     type="button"
                                                     className="listing-dashboard__row-action"
+                                                    onClick={() => navigate(`/p/${rowId}`)}
+                                                    style={{ color: "#3665f3", fontWeight: "600" }}
+                                                >
+                                                    View as Buyer
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="listing-dashboard__row-action"
                                                     onClick={() => handleRowEdit(row)}
                                                     disabled={!editMeta.canEdit}
                                                     title={editMeta.canEdit ? undefined : editMeta.reason}
@@ -2253,7 +2351,7 @@ const AllListingsPage = () => {
                 style={{ display: "none" }}
                 onChange={handleUploadFile}
             />
-        </div>
+        </div >
     );
 };
 

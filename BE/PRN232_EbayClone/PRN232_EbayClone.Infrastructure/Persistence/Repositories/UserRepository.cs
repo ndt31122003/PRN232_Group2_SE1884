@@ -1,4 +1,4 @@
-﻿using PRN232_EbayClone.Application.Abstractions.Data;
+using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
 using PRN232_EbayClone.Domain.Users.Entities;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
@@ -27,6 +27,16 @@ public sealed class UserRepository :
     {
         return DbContext.Users
             .Include(u => u.Roles)
+            .Include(u => u.ActiveListings)
+            .SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
+    }
+
+    public Task<User?> GetByIdAsNoTrackingAsync(UserId userId, CancellationToken cancellationToken)
+    {
+        return DbContext.Users
+            .AsNoTracking()
+            .Include(u => u.Roles)
+            .Include(u => u.ActiveListings)
             .SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 

@@ -3484,6 +3484,519 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.AppliedSaleEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AppliedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("applied_at");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("discount_amount");
+
+                    b.Property<Guid?>("DiscountTierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("discount_tier_id");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_applied_sale_events");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_applied_sale_events_order_id");
+
+                    b.HasIndex("SaleEventId")
+                        .HasDatabaseName("ix_applied_sale_events_sale_event_id");
+
+                    b.ToTable("applied_sale_events", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("ApplyToAllItems")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("apply_to_all_items");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<int>("DiscountUnit")
+                        .HasColumnType("integer")
+                        .HasColumnName("discount_unit");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("discount_value");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<decimal?>("MaxDiscount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("max_discount");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<decimal?>("ThresholdAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("threshold_amount");
+
+                    b.Property<int?>("ThresholdQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("threshold_quantity");
+
+                    b.Property<int>("ThresholdType")
+                        .HasColumnType("integer")
+                        .HasColumnName("threshold_type");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discounts");
+
+                    b.HasIndex("SellerId")
+                        .HasDatabaseName("ix_order_discounts_seller_id");
+
+                    b.HasIndex("IsActive", "StartDate", "EndDate")
+                        .HasDatabaseName("ix_order_discounts_active");
+
+                    b.ToTable("order_discounts", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountCategoryRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<bool>("IsExclusion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_exclusion");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_category_rules");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_order_discount_category_rules_order_discount_id");
+
+                    b.ToTable("order_discount_category_rules", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountItemRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsExclusion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_exclusion");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_item_rules");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_order_discount_item_rules_listing_id");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_order_discount_item_rules_order_discount_id");
+
+                    b.ToTable("order_discount_item_rules", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountPerformanceMetrics", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_updated");
+
+                    b.Property<int>("OrderCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("order_count");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.Property<decimal>("TotalDiscountAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("total_discount_amount");
+
+                    b.Property<int>("TotalItemsSold")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("total_items_sold");
+
+                    b.Property<decimal>("TotalSalesRevenue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("total_sales_revenue");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_performance_metrics");
+
+                    b.ToTable("order_discount_performance_metrics", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountTier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("discount_value");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.Property<decimal>("ThresholdValue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("threshold_value");
+
+                    b.Property<int>("TierOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("tier_order");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_tiers");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_order_discount_tiers_order_discount_id");
+
+                    b.ToTable("order_discount_tiers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("BlockPriceIncreaseRevisions")
+                        .HasColumnType("boolean")
+                        .HasColumnName("block_price_increase_revisions");
+
+                    b.Property<string>("BuyerMessageLabel")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("buyer_message_label");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<decimal?>("HighlightPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("highlight_percentage");
+
+                    b.Property<bool>("IncludeSkippedItems")
+                        .HasColumnType("boolean")
+                        .HasColumnName("include_skipped_items");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("integer")
+                        .HasColumnName("mode");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<bool>("OfferFreeShipping")
+                        .HasColumnType("boolean")
+                        .HasColumnName("offer_free_shipping");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_events");
+
+                    b.HasIndex("SellerId")
+                        .HasDatabaseName("ix_sale_events_seller_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_sale_events_status");
+
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("ix_sale_events_start_date_end_date");
+
+                    b.ToTable("sale_events", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("integer")
+                        .HasColumnName("discount_type");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("discount_value");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("label");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_discount_tiers");
+
+                    b.HasIndex("SaleEventId", "Priority")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_discount_tiers_sale_event_id_priority");
+
+                    b.ToTable("sale_event_discount_tiers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventListing", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("assigned_at");
+
+                    b.Property<Guid>("DiscountTierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("discount_tier_id");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_listings");
+
+                    b.HasIndex("DiscountTierId")
+                        .HasDatabaseName("ix_sale_event_listings_discount_tier_id");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_sale_event_listings_listing_id");
+
+                    b.HasIndex("SaleEventId", "ListingId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_listings_sale_event_id_listing_id");
+
+                    b.ToTable("sale_event_listings", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventPerformanceMetrics", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_updated");
+
+                    b.Property<int>("OrderCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("order_count");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.Property<decimal>("TotalDiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("total_discount_amount");
+
+                    b.Property<int>("TotalItemsSold")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_items_sold");
+
+                    b.Property<decimal>("TotalSalesRevenue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("total_sales_revenue");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_performance_metrics");
+
+                    b.HasIndex("SaleEventId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_performance_metrics_sale_event_id");
+
+                    b.ToTable("sale_event_performance_metrics", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventPriceSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<decimal>("OriginalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("original_price");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.Property<DateTime>("SnapshotAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("snapshot_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_price_snapshots");
+
+                    b.HasIndex("SaleEventId", "ListingId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_price_snapshots_sale_event_id_listing_id");
+
+                    b.ToTable("sale_event_price_snapshots", (string)null);
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Disputes.Entities.Dispute", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3811,6 +4324,60 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Bid", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("BidderId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)")
+                        .HasColumnName("bidder_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_bids");
+
+                    b.HasIndex("BidderId")
+                        .HasDatabaseName("ix_bids_bidder_id");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_bids_listing_id");
+
+                    b.ToTable("bids", (string)null);
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Listing", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3859,14 +4426,26 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
+                    b.Property<DateTime?>("LastPriceChangeDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_price_change_date");
+
                     b.Property<string>("ListingDescription")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("listing_description");
 
+                    b.Property<Guid?>("ReturnPolicyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("return_policy_id");
+
                     b.Property<DateTime?>("ScheduledStartTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("scheduled_start_time");
+
+                    b.Property<Guid?>("ShippingPolicyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shipping_policy_id");
 
                     b.Property<string>("Sku")
                         .IsRequired()
@@ -3893,6 +4472,10 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text")
                         .HasColumnName("updated_by");
+
+                    b.Property<int>("WatchersCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("watchers_count");
 
                     b.Property<int>("listing_format")
                         .HasColumnType("integer")
@@ -3926,6 +4509,64 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.HasDiscriminator<int>("listing_format");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Offer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("BuyerId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)")
+                        .HasColumnName("buyer_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_offers");
+
+                    b.HasIndex("BuyerId")
+                        .HasDatabaseName("ix_offers_buyer_id");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_offers_listing_id");
+
+                    b.ToTable("offers", (string)null);
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback", b =>
@@ -6727,161 +7368,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.ToTable("role", (string)null);
                 });
 
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<bool>("BlockPriceIncreaseRevisions")
-                        .HasColumnType("boolean")
-                        .HasColumnName("block_price_increase_revisions");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("description");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
-
-                    b.Property<decimal?>("HighlightPercentage")
-                        .HasColumnType("numeric(5,2)")
-                        .HasColumnName("highlight_percentage");
-
-                    b.Property<bool>("IncludeSkippedItems")
-                        .HasColumnType("boolean")
-                        .HasColumnName("include_skipped_items");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("Mode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("mode");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(90)
-                        .HasColumnType("character varying(90)")
-                        .HasColumnName("name");
-
-                    b.Property<bool>("OfferFreeShipping")
-                        .HasColumnType("boolean")
-                        .HasColumnName("offer_free_shipping");
-
-                    b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event");
-
-                    b.ToTable("sale_event", (string)null);
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("DiscountType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("discount_type");
-
-                    b.Property<decimal>("DiscountValue")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("discount_value");
-
-                    b.Property<string>("Label")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("label");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("integer")
-                        .HasColumnName("priority");
-
-                    b.Property<Guid>("SaleEventId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sale_event_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event_discount_tier");
-
-                    b.HasIndex("SaleEventId")
-                        .HasDatabaseName("ix_sale_event_discount_tier_sale_event_id");
-
-                    b.ToTable("sale_event_discount_tier", (string)null);
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("DiscountTierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("discount_tier_id");
-
-                    b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
-
-                    b.Property<Guid>("SaleEventId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sale_event_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event_listing");
-
-                    b.HasIndex("DiscountTierId")
-                        .HasDatabaseName("ix_sale_event_listing_discount_tier_id");
-
-                    b.HasIndex("SaleEventId", "ListingId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_sale_event_listing_sale_event_id_listing_id");
-
-                    b.ToTable("sale_event_listing", (string)null);
-                });
-
             modelBuilder.Entity("PRN232_EbayClone.Domain.SellingPreferences.Entities.SellerPreference", b =>
                 {
                     b.Property<Guid>("Id")
@@ -7413,6 +7899,45 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.ToTable("outbox_message", (string)null);
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Infrastructure.Persistence.Repositories.AppliedOrderDiscount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AppliedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("applied_at");
+
+                    b.Property<Guid?>("AppliedTierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("applied_tier_id");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("discount_amount");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_applied_order_discounts");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_applied_order_discounts_order_discount_id");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_applied_order_discounts_order_id");
+
+                    b.ToTable("applied_order_discounts", (string)null);
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
@@ -7435,6 +7960,10 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.AuctionListing", b =>
                 {
                     b.HasBaseType("PRN232_EbayClone.Domain.Listings.Entities.Listing");
+
+                    b.Property<int>("BidsCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("bids_count");
 
                     b.HasDiscriminator().HasValue(1);
                 });
@@ -7466,6 +7995,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #1",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7484,6 +8014,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #2",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7502,6 +8033,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #3",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7520,6 +8052,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #4",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7538,6 +8071,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #5",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7556,6 +8090,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #6",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7574,6 +8109,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #7",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7592,6 +8128,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #8",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7610,6 +8147,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #9",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7628,6 +8166,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #10",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7646,6 +8185,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #11",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7664,6 +8204,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #12",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7682,6 +8223,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #13",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7700,6 +8242,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #14",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7718,6 +8261,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #15",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7736,6 +8280,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #16",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7754,6 +8299,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #17",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7772,6 +8318,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #18",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7790,6 +8337,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #19",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7808,6 +8356,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #20",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7826,6 +8375,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #21",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7844,6 +8394,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #22",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7862,6 +8413,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #23",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7880,6 +8432,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #24",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7898,6 +8451,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #25",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7916,6 +8470,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #26",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7934,6 +8489,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #27",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7952,6 +8508,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #28",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7970,6 +8527,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #29",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -7988,6 +8546,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #30",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8006,6 +8565,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #31",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8024,6 +8584,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #32",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8042,6 +8603,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #33",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8060,6 +8622,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #34",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8078,6 +8641,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #35",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8096,6 +8660,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #36",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8114,6 +8679,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #37",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8132,6 +8698,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #38",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8150,6 +8717,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #39",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8168,6 +8736,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #40",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8186,6 +8755,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #41",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8204,6 +8774,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #42",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8222,6 +8793,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #43",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8240,6 +8812,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #44",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8258,6 +8831,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #45",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8276,6 +8850,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #46",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8294,6 +8869,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #47",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8312,6 +8888,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #48",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8330,6 +8907,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #49",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8348,6 +8926,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #50",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8366,6 +8945,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #51",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8384,6 +8964,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #52",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8402,6 +8983,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #53",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8420,6 +9002,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #54",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8438,6 +9021,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #55",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8456,6 +9040,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #56",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8474,6 +9059,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #57",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8492,6 +9078,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #58",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8510,6 +9097,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #59",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8528,6 +9116,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #60",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8546,6 +9135,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #61",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8564,6 +9154,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #62",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8582,6 +9173,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #63",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8600,6 +9192,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #64",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8618,6 +9211,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #65",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8636,6 +9230,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #66",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8654,6 +9249,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #67",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8672,6 +9268,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #68",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8690,6 +9287,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #69",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8708,6 +9306,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #70",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8726,6 +9325,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #71",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8744,6 +9344,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #72",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8762,6 +9363,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #73",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8780,6 +9382,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #74",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8798,6 +9401,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #75",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8816,6 +9420,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #76",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8834,6 +9439,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #77",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8852,6 +9458,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #78",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8870,6 +9477,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #79",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8888,6 +9496,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #80",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8906,6 +9515,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #81",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8924,6 +9534,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #82",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8942,6 +9553,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #83",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8960,6 +9572,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #84",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8978,6 +9591,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #85",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -8996,6 +9610,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #86",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9014,6 +9629,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #87",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9032,6 +9648,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #88",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9050,6 +9667,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #89",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9068,6 +9686,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #90",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9086,6 +9705,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #91",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9104,6 +9724,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #92",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9122,6 +9743,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #93",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9140,6 +9762,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #94",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9158,6 +9781,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #95",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9176,6 +9800,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #96",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9194,6 +9819,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #97",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9212,6 +9838,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #98",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9230,6 +9857,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #99",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9248,6 +9876,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Alice's Item #100",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9266,6 +9895,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #1",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9284,6 +9914,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #2",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9302,6 +9933,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #3",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9320,6 +9952,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #4",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9338,6 +9971,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #5",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9356,6 +9990,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #6",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9374,6 +10009,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #7",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9392,6 +10028,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #8",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9410,6 +10047,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #9",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9428,6 +10066,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #10",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9446,6 +10085,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #11",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9464,6 +10104,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #12",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9482,6 +10123,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #13",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9500,6 +10142,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #14",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9518,6 +10161,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #15",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9536,6 +10180,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #16",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9554,6 +10199,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #17",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9572,6 +10218,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #18",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9590,6 +10237,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #19",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9608,6 +10256,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #20",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9626,6 +10275,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #21",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9644,6 +10294,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #22",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9662,6 +10313,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #23",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9680,6 +10332,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #24",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9698,6 +10351,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #25",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9716,6 +10370,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #26",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9734,6 +10389,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #27",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9752,6 +10408,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #28",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9770,6 +10427,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #29",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9788,6 +10446,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #30",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9806,6 +10465,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #31",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9824,6 +10484,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #32",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9842,6 +10503,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #33",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9860,6 +10522,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #34",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9878,6 +10541,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #35",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9896,6 +10560,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #36",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9914,6 +10579,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #37",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9932,6 +10598,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #38",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9950,6 +10617,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #39",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9968,6 +10636,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #40",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -9986,6 +10655,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #41",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10004,6 +10674,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #42",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10022,6 +10693,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #43",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10040,6 +10712,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #44",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10058,6 +10731,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #45",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10076,6 +10750,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #46",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10094,6 +10769,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #47",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10112,6 +10788,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #48",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10130,6 +10807,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #49",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10148,6 +10826,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #50",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10166,6 +10845,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #51",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10184,6 +10864,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #52",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10202,6 +10883,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #53",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10220,6 +10902,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #54",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10238,6 +10921,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #55",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10256,6 +10940,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #56",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10274,6 +10959,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #57",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10292,6 +10978,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #58",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10310,6 +10997,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #59",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10328,6 +11016,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #60",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10346,6 +11035,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #61",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10364,6 +11054,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #62",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10382,6 +11073,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #63",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10400,6 +11092,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #64",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10418,6 +11111,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #65",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10436,6 +11130,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #66",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10454,6 +11149,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #67",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10472,6 +11168,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #68",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10490,6 +11187,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #69",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10508,6 +11206,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #70",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10526,6 +11225,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #71",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10544,6 +11244,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #72",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10562,6 +11263,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #73",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10580,6 +11282,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #74",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10598,6 +11301,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #75",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10616,6 +11320,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #76",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10634,6 +11339,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #77",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10652,6 +11358,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #78",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10670,6 +11377,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #79",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10688,6 +11396,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #80",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10706,6 +11415,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #81",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10724,6 +11434,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #82",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10742,6 +11453,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #83",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10760,6 +11472,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #84",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10778,6 +11491,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #85",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10796,6 +11510,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #86",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10814,6 +11529,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #87",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10832,6 +11548,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #88",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10850,6 +11567,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #89",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10868,6 +11586,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #90",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10886,6 +11605,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #91",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10904,6 +11624,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #92",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10922,6 +11643,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #93",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10940,6 +11662,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #94",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10958,6 +11681,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #95",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10976,6 +11700,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #96",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -10994,6 +11719,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #97",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11012,6 +11738,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #98",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11030,6 +11757,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #99",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11048,6 +11776,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Brian's Item #100",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11066,6 +11795,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #1",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11084,6 +11814,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #2",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11102,6 +11833,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #3",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11120,6 +11852,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #4",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11138,6 +11871,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #5",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11156,6 +11890,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #6",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11174,6 +11909,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #7",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11192,6 +11928,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #8",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11210,6 +11947,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #9",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11228,6 +11966,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #10",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11246,6 +11985,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #11",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11264,6 +12004,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #12",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11282,6 +12023,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #13",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11300,6 +12042,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #14",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11318,6 +12061,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #15",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11336,6 +12080,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #16",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11354,6 +12099,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #17",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11372,6 +12118,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #18",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11390,6 +12137,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #19",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11408,6 +12156,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #20",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11426,6 +12175,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #21",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11444,6 +12194,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #22",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11462,6 +12213,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #23",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11480,6 +12232,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #24",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11498,6 +12251,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #25",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11516,6 +12270,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #26",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11534,6 +12289,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #27",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11552,6 +12308,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #28",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11570,6 +12327,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #29",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11588,6 +12346,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #30",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11606,6 +12365,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #31",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11624,6 +12384,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #32",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11642,6 +12403,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #33",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11660,6 +12422,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #34",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11678,6 +12441,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #35",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11696,6 +12460,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #36",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11714,6 +12479,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #37",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11732,6 +12498,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #38",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11750,6 +12517,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #39",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11768,6 +12536,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #40",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11786,6 +12555,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #41",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11804,6 +12574,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #42",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11822,6 +12593,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #43",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11840,6 +12612,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #44",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11858,6 +12631,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #45",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11876,6 +12650,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #46",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11894,6 +12669,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #47",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11912,6 +12688,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #48",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11930,6 +12707,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #49",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11948,6 +12726,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #50",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11966,6 +12745,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #51",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -11984,6 +12764,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #52",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12002,6 +12783,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #53",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12020,6 +12802,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #54",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12038,6 +12821,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #55",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12056,6 +12840,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #56",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12074,6 +12859,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #57",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12092,6 +12878,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #58",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12110,6 +12897,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #59",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12128,6 +12916,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #60",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12146,6 +12935,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #61",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12164,6 +12954,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #62",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12182,6 +12973,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #63",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12200,6 +12992,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #64",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12218,6 +13011,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #65",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12236,6 +13030,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #66",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12254,6 +13049,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #67",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12272,6 +13068,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #68",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12290,6 +13087,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #69",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12308,6 +13106,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 11, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #70",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12326,6 +13125,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #71",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12344,6 +13144,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 31, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #72",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12362,6 +13163,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 30, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #73",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12380,6 +13182,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 29, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #74",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12398,6 +13201,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 28, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #75",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12416,6 +13220,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 27, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #76",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12434,6 +13239,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 26, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #77",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12452,6 +13258,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #78",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12470,6 +13277,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 24, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #79",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12488,6 +13296,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #80",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12506,6 +13315,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #81",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12524,6 +13334,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #82",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12542,6 +13353,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #83",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12560,6 +13372,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 19, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #84",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12578,6 +13391,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #85",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12596,6 +13410,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #86",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12614,6 +13429,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 16, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #87",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12632,6 +13448,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #88",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12650,6 +13467,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 14, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #89",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12668,6 +13486,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 13, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #90",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12686,6 +13505,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #91",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12704,6 +13524,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #92",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12722,6 +13543,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #93",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12740,6 +13562,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 9, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #94",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12758,6 +13581,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 8, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #95",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12776,6 +13600,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 7, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #96",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12794,6 +13619,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #97",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12812,6 +13638,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #98",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12830,6 +13657,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #99",
+                            WatchersCount = 0,
                             Type = 1
                         },
                         new
@@ -12848,6 +13676,7 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                             StartDate = new DateTime(2023, 12, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 3,
                             Title = "Cecilia's Item #100",
+                            WatchersCount = 0,
                             Type = 1
                         });
                 });
@@ -12946,6 +13775,63 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Navigation("Coupon");
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountCategoryRule", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", null)
+                        .WithMany("CategoryRules")
+                        .HasForeignKey("OrderDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_discount_category_rules_order_discounts_order_discoun");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountItemRule", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", null)
+                        .WithMany("ItemRules")
+                        .HasForeignKey("OrderDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_discount_item_rules_order_discounts_order_discount_id");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountTier", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", null)
+                        .WithMany("Tiers")
+                        .HasForeignKey("OrderDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_discount_tiers_order_discounts_order_discount_id");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", null)
+                        .WithMany("DiscountTiers")
+                        .HasForeignKey("SaleEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sale_event_discount_tiers_sale_events_sale_event_id");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventListing", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", null)
+                        .WithMany("Listings")
+                        .HasForeignKey("DiscountTierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sale_event_listings_sale_event_discount_tiers_discount_tier");
+
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", null)
+                        .WithMany("Listings")
+                        .HasForeignKey("SaleEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sale_event_listings_sale_events_sale_event_id");
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Disputes.Entities.Dispute", b =>
                 {
                     b.HasOne("PRN232_EbayClone.Domain.Listings.Entities.Listing", "Listing")
@@ -12968,6 +13854,16 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_refresh_token_user_user_id");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Bid", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Listings.Entities.Listing", null)
+                        .WithMany()
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_bids_listings_listing_id");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Listing", b =>
@@ -15145,6 +16041,16 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Navigation("ItemSpecifics");
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Entities.Offer", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Listings.Entities.Listing", null)
+                        .WithMany()
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_offers_listing_listing_id");
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback", b =>
                 {
                     b.HasOne("PRN232_EbayClone.Domain.Users.Entities.User", null)
@@ -17262,33 +18168,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         });
 
                     b.Navigation("Permissions");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", null)
-                        .WithMany("DiscountTiers")
-                        .HasForeignKey("SaleEventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_discount_tier_sale_event_sale_event_id");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", null)
-                        .WithMany("Listings")
-                        .HasForeignKey("DiscountTierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_listing_sale_event_discount_tier_discount_tier_id");
-
-                    b.HasOne("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", null)
-                        .WithMany("Listings")
-                        .HasForeignKey("SaleEventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_listing_sale_event_sale_event_id");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.SellingPreferences.Entities.SellerPreference", b =>
@@ -22828,6 +23707,27 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Navigation("TargetAudiences");
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", b =>
+                {
+                    b.Navigation("CategoryRules");
+
+                    b.Navigation("ItemRules");
+
+                    b.Navigation("Tiers");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", b =>
+                {
+                    b.Navigation("DiscountTiers");
+
+                    b.Navigation("Listings");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", b =>
+                {
+                    b.Navigation("Listings");
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.Order", b =>
                 {
                     b.Navigation("CancellationRequests");
@@ -22846,18 +23746,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.OrderStatus", b =>
                 {
                     b.Navigation("AllowedTransitions");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", b =>
-                {
-                    b.Navigation("DiscountTiers");
-
-                    b.Navigation("Listings");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", b =>
-                {
-                    b.Navigation("Listings");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Stores.Entities.Store", b =>

@@ -1,0 +1,185 @@
+.sale-event-analytics {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 24px;
+}
+
+.sale-event-analytics__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sale-event-analytics__back {
+  background: none;
+  border: none;
+  color: #d11a2a;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.sale-event-analytics__back:hover {
+  text-decoration: underline;
+}
+
+.sale-event-analytics__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.sale-event-analytics__header p {
+  margin: 0.35rem 0 0;
+  color: #4a5568;
+}
+
+.sale-event-analytics__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.sale-event-analytics__filters {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.sale-event-analytics__filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sale-event-analytics__filters label span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.sale-event-analytics__filters input {
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.sale-event-analytics__overview {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.sale-event-analytics__overview h2 {
+  margin: 0 0 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sale-event-analytics__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.sale-event-analytics__metric {
+  padding: 1.25rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.sale-event-analytics__metric-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.sale-event-analytics__metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.sale-event-analytics__tiers {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.sale-event-analytics__tiers h2 {
+  margin: 0 0 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sale-event-analytics__table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.sale-event-analytics__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sale-event-analytics__table thead tr {
+  background: #f1f5f9;
+}
+
+.sale-event-analytics__table th,
+.sale-event-analytics__table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.sale-event-analytics__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sale-event-analytics__table th {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.sale-event-analytics__table td {
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.sale-event-analytics__footer {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6b7280;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.sale-event-analytics__loading,
+.sale-event-analytics__empty {
+  padding: 48px;
+  text-align: center;
+  border: 1px dashed #d2d6dc;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #4a5568;
+}
+
+.sale-event-analytics__empty p {
+  margin: 0.5rem 0;
+}

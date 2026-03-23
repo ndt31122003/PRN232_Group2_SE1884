@@ -7,6 +7,7 @@ using FluentAssertions;
 using NSubstitute;
 using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
+using PRN232_EbayClone.Application.Abstractions.Storage;
 using PRN232_EbayClone.Application.Listings.Commands;
 using PRN232_EbayClone.Domain.Categories.Entities;
 using PRN232_EbayClone.Domain.Categories.Errors;
@@ -23,6 +24,7 @@ public sealed class CreateListingCommandHandlerTests
     private readonly IUserRepository _userRepository = Substitute.For<IUserRepository>();
     private readonly IUserContext _userContext = Substitute.For<IUserContext>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly ICloudinaryService _cloudinaryService = Substitute.For<ICloudinaryService>();
     private readonly CreateListingCommandCommandHandler _handler;
 
     private readonly Category _category;
@@ -35,7 +37,8 @@ public sealed class CreateListingCommandHandlerTests
             _unitOfWork,
             _categoryRepository,
             _userContext,
-            _userRepository);
+            _userRepository,
+            _cloudinaryService);
 
         _category = ListingTestData.CreateLeafCategory(
             ListingTestData.CreateSpecific("Color", required: true, allowMultiple: true),
@@ -58,7 +61,8 @@ public sealed class CreateListingCommandHandlerTests
             Guid.NewGuid(),
             "Cond",
             new[] { new ItemSpecific("Color", new[] { "Red" }) },
-            new[] { new ListingImage("http://image", true) },
+            null, // ListingImages
+            new[] { "base64_string_here" }, // Base64Images
             20m,
             5,
             null,
@@ -92,13 +96,14 @@ public sealed class CreateListingCommandHandlerTests
             Guid.NewGuid(),
             "Cond",
             new[] { new ItemSpecific("Color", new[] { "Red" }) },
-            null,
-            null,
-            null,
+            null, // ListingImages
+            null, // Base64Images
+            null, // Price
+            null, // Quantity
             new[]
             {
-                new VariationDto("SKU-1", 10m, 1, new[] { new VariationSpecific("Color", new[] { "Red" }) }, null),
-                new VariationDto("SKU-2", 12m, 2, new[] { new VariationSpecific("Color", new[] { "Blue" }) }, null)
+                new CreateVariationDto("SKU-1", 10m, 1, new[] { new VariationSpecific("Color", new[] { "Red" }) }, null, null),
+                new CreateVariationDto("SKU-2", 12m, 2, new[] { new VariationSpecific("Color", new[] { "Blue" }) }, null, null)
             },
             null,
             null,
@@ -130,7 +135,8 @@ public sealed class CreateListingCommandHandlerTests
             Guid.NewGuid(),
             "Cond",
             new[] { new ItemSpecific("Color", new[] { "Red" }) },
-            new[] { new ListingImage("http://image", true) },
+            null, // ListingImages
+            new[] { "base64_string_here" }, // Base64Images
             null,
             null,
             null,
@@ -163,11 +169,12 @@ public sealed class CreateListingCommandHandlerTests
             "Title",
             "SKU",
             "Desc",
-            Guid.NewGuid(),
+            _category.Id,
             Guid.NewGuid(),
             "Cond",
             new[] { new ItemSpecific("Color", new[] { "Red" }) },
-            null,
+            null, // ListingImages
+            null, // Base64Images
             20m,
             5,
             null,
@@ -201,7 +208,8 @@ public sealed class CreateListingCommandHandlerTests
             Guid.NewGuid(),
             "Cond",
             Array.Empty<ItemSpecific>(),
-            null,
+            null, // ListingImages
+            null, // Base64Images
             20m,
             5,
             null,

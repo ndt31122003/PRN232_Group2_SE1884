@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Dtos;
 using PRN232_EbayClone.Application.Listings.Queries;
@@ -6,7 +6,7 @@ using PRN232_EbayClone.Application.Research.Dtos;
 using PRN232_EbayClone.Application.SaleEvents.Dtos;
 using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.Enums;
-using PRN232_EbayClone.Domain.SaleEvents.Enums;
+using PRN232_EbayClone.Domain.Discounts.Enums;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
 using System.Data;
 using System.Globalization;
@@ -75,11 +75,40 @@ public sealed class ListingRepository :
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<(IReadOnlyList<ActiveListingDto> Items, int TotalCount)> GetActiveListingsAsync(string ownerId, string? searchTerm, int pageNumber, int pageSize, CancellationToken cancellationToken)
+    public async Task<(IReadOnlyList<ActiveListingDto> Items, int TotalCount)> GetActiveListingsAsync(
+        string ownerId, 
+        string? searchTerm, 
+        ListingFormat? format, 
+        bool? outOfStock, 
+        int pageNumber, 
+        int pageSize, 
+        CancellationToken cancellationToken)
     {
-        var baseQuery = ApplySearchFilter(
-            FilterByOwner(DbContext.Listings.AsNoTracking().Where(l => l.Status == ListingStatus.Active), ownerId),
-            searchTerm);
+        var baseQuery = FilterByOwner(DbContext.Listings.AsNoTracking().Where(l => l.Status == ListingStatus.Active), ownerId);
+
+        if (format.HasValue)
+        {
+            baseQuery = baseQuery.Where(l => l.Format == format.Value);
+        }
+
+        if (outOfStock == true)
+        {
+            baseQuery = baseQuery.Where(l => 
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.Single && ((FixedPriceListing)l).Pricing.Quantity == 0) ||
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.MultiVariation && ((FixedPriceListing)l).Variations.All(v => v.Quantity == 0)) ||
+                (l is AuctionListing && ((AuctionListing)l).Pricing.Quantity == 0)
+            );
+        }
+        else if (outOfStock == false)
+        {
+            baseQuery = baseQuery.Where(l => 
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.Single && ((FixedPriceListing)l).Pricing.Quantity > 0) ||
+                (l is FixedPriceListing && ((FixedPriceListing)l).Type == ListingType.MultiVariation && ((FixedPriceListing)l).Variations.Any(v => v.Quantity > 0)) ||
+                (l is AuctionListing && ((AuctionListing)l).Pricing.Quantity > 0)
+            );
+        }
+
+        baseQuery = ApplySearchFilter(baseQuery, searchTerm);
 
         var totalCount = await baseQuery.CountAsync(cancellationToken);
 
@@ -106,6 +135,30 @@ public sealed class ListingRepository :
             .GroupBy(oi => oi.ListingId)
             .Select(g => new { ListingId = g.Key, Quantity = g.Sum(oi => oi.Quantity) })
             .ToDictionaryAsync(x => x.ListingId, x => x.Quantity, cancellationToken);
+
+        var offerStats = await DbContext.Offers
+            .AsNoTracking()
+            .Where(o => listingIds.Contains(o.ListingId) && o.Status == OfferStatus.Pending) // Only count pending offers
+            .GroupBy(o => o.ListingId)
+            .Select(g => new
+            {
+                ListingId = g.Key,
+                Count = g.Count(),
+                MaxAmount = g.Max(o => o.Amount)
+            })
+            .ToDictionaryAsync(x => x.ListingId, x => x, cancellationToken);
+
+        var bidStats = await DbContext.Bids
+            .AsNoTracking()
+            .Where(b => listingIds.Contains(b.ListingId)) // Count all bids for auction stats
+            .GroupBy(b => b.ListingId)
+            .Select(g => new
+            {
+                ListingId = g.Key,
+                Count = g.Count(),
+                MaxAmount = (decimal?)g.Max(b => b.Amount)
+            })
+            .ToDictionaryAsync(x => x.ListingId, x => x, cancellationToken);
 
         var fixedPriceListings = await DbContext.FixedPriceListings
             .AsNoTracking()
@@ -135,6 +188,9 @@ public sealed class ListingRepository :
             var thumbnail = GetPrimaryImageUrl(listing) ?? string.Empty;
             var discountLabel = discountLookup.TryGetValue(listing.Id, out var label) ? label : null;
 
+            var offersCount = offerStats.TryGetValue(listing.Id, out var stats) ? stats.Count : 0;
+            var bestOfferAmount = offerStats.TryGetValue(listing.Id, out var s) ? s.MaxAmount : (decimal?)null;
+
             dtoLookup[listing.Id] = new ActiveListingDto(
                 listing.Id,
                 listing.Title,
@@ -150,7 +206,12 @@ public sealed class ListingRepository :
                 0m,
                 0m,
                 listing.StartDate,
-                listing.EndDate);
+                listing.EndDate,
+                listing.WatchersCount,
+                0,
+                offersCount,
+                bestOfferAmount,
+                null); // BuyItNowPrice is null for Fixed Price
         }
 
         foreach (var listing in auctionListings)
@@ -162,6 +223,11 @@ public sealed class ListingRepository :
             var thumbnail = GetPrimaryImageUrl(listing) ?? string.Empty;
             var discountLabel = discountLookup.TryGetValue(listing.Id, out var label) ? label : null;
 
+            var bidsCount = bidStats.TryGetValue(listing.Id, out var bStats) ? bStats.Count : 0;
+            var highestBid = bidStats.TryGetValue(listing.Id, out var b) ? b.MaxAmount : null;
+            var offersCount = offerStats.TryGetValue(listing.Id, out var oStats) ? oStats.Count : 0;
+            var bestOfferAmount = offerStats.TryGetValue(listing.Id, out var o) ? o.MaxAmount : (decimal?)null;
+
             dtoLookup[listing.Id] = new ActiveListingDto(
                 listing.Id,
                 listing.Title,
@@ -171,13 +237,18 @@ public sealed class ListingRepository :
                 listing.Pricing.Quantity,
                 soldQuantity,
                 listing.Duration,
-                listing.Pricing.StartPrice,
+                highestBid ?? listing.Pricing.StartPrice, // Use highest bid as current price
                 discountLabel,
                 listing.Pricing.StartPrice,
                 listing.Pricing.ReservePrice ?? 0m,
                 0m,
                 listing.StartDate,
-                listing.EndDate);
+                listing.EndDate,
+                listing.WatchersCount,
+                bidsCount,
+                offersCount,
+                bestOfferAmount,
+                listing.Pricing.BuyItNowPrice);
         }
 
         var orderedDtos = listingIds
@@ -642,7 +713,7 @@ public sealed class ListingRepository :
                 join tier in DbContext.SaleEventDiscountTiers.AsNoTracking() on listing.DiscountTierId equals tier.Id
                 join saleEvent in DbContext.SaleEvents.AsNoTracking() on listing.SaleEventId equals saleEvent.Id
                 where listingIds.Contains(listing.ListingId)
-                      && saleEvent.SellerId == sellerId
+                      && saleEvent.SellerId == sellerId.Value
                       && saleEvent.Mode == SaleEventMode.DiscountAndSaleEvent
                       && (saleEvent.Status == SaleEventStatus.Active || saleEvent.Status == SaleEventStatus.Scheduled)
                 select new
@@ -676,8 +747,10 @@ public sealed class ListingRepository :
 
         var result = new Dictionary<Guid, string>(chosenAssignments.Count);
 
-        foreach (var (listingId, assignment) in chosenAssignments)
+        foreach (var kvp in chosenAssignments)
         {
+            var listingId = kvp.Key;
+            var assignment = kvp.Value;
             var discountText = assignment.DiscountType switch
             {
                 SaleEventDiscountType.Percent => $"{assignment.DiscountValue:0.##}% off",
@@ -927,7 +1000,7 @@ SELECT jsonb_build_object(
             var assignedListingIds = await (from saleEventListing in DbContext.SaleEventListings.AsNoTracking()
                                              join saleEvent in DbContext.SaleEvents.AsNoTracking()
                                                  on saleEventListing.SaleEventId equals saleEvent.Id
-                                             where saleEvent.SellerId == sellerId &&
+                                             where saleEvent.SellerId == sellerId.Value &&
                                                    (saleEvent.Status == SaleEventStatus.Scheduled ||
                                                     saleEvent.Status == SaleEventStatus.Active)
                                              select saleEventListing.ListingId)

@@ -18,7 +18,15 @@ const CreateSellerCouponPage = lazy(() => import("../Coupons/CreateSellerCoupon"
 const CouponsSummaryPage = lazy(() => import("../Coupons/CouponsSummary"));
 const SaleEventsSummaryPage = lazy(() => import("../Marketing/SaleEvents/SaleEventsSummary"));
 const CreateSaleEventPage = lazy(() => import("../Marketing/SaleEvents/CreateSaleEvent"));
+const EditSaleEventPage = lazy(() => import("../Marketing/SaleEvents/EditSaleEvent"));
+const SaleEventAnalyticsPage = lazy(() => import("../Marketing/SaleEvents/SaleEventAnalytics"));
+const PromotionsOverviewPage = lazy(() => import("../Marketing/PromotionsOverview"));
+const MarketingSummaryPage = lazy(() => import("../Marketing/Summary/MarketingSummary"));
+const MarketingLayout = lazy(() => import("../Marketing/MarketingLayout"));
+const CreateOrderDiscountPage = lazy(() => import("../Marketing/OrderDiscount/CreateOrderDiscount"));
 const OverviewPage = lazy(() => import("../Overview/OverviewPage"));
+const OffersManagementPage = lazy(() => import("../Marketing/Offers/OffersManagementPage"));
+const BidsManagementPage = lazy(() => import("../Marketing/Bids/BidsManagementPage"));
 const ResearchLayout = lazy(() => import("../Research/ResearchLayout"));
 const ProductResearchPage = lazy(() => import("../Research/ProductResearchPage"));
 const SourcingInsightsPage = lazy(() => import("../Research/SourcingInsightsPage"));
@@ -82,6 +90,7 @@ const SubscriptionPage = lazy(() => import("../Store/SubscriptionPage"));
 const CreateDisputePage = lazy(() => import("../Disputes/CreateDispute"));
 const DisputeDetailPage = lazy(() => import("../Disputes/DisputeDetail"));
 const DisputeActionPage = lazy(() => import("../Disputes/DisputeAction"));
+const ProductDetailPage = lazy(() => import("../Public/ProductDetailPage"));
 
 // 🔹 Khởi tạo router
 const router = createBrowserRouter([
@@ -325,26 +334,52 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "marketing",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <MarketingLayout />
+          </Suspense>
+        ),
+        children: [
+          { 
+            index: true, 
+            element: (
+              <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+                <PromotionsOverviewPage />
+              </Suspense>
+            )
+          },
+          {
+            path: "summary",
+            element: (
+              <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+                <MarketingSummaryPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "coupons",
+            element: (
+              <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+                <CouponsSummaryPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "sale-events",
+            element: (
+              <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+                <SaleEventsSummaryPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      {
         path: "marketing/coupons/create",
         element: (
           <Suspense fallback={<LoadingScreen isOverlay={true} />}>
             <CreateSellerCouponPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "marketing/coupons",
-        element: (
-          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
-            <CouponsSummaryPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "marketing/sale-events",
-        element: (
-          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
-            <SaleEventsSummaryPage />
           </Suspense>
         ),
       },
@@ -357,10 +392,50 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "marketing",
-        element: <Navigate to="/marketing/sale-events" replace />
+        path: "marketing/offers",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <OffersManagementPage />
+          </Suspense>
+        ),
       },
-      
+      {
+        path: "marketing/sale-events/:saleEventId/edit",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <EditSaleEventPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "marketing/bids",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <BidsManagementPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "marketing/sale-events/:saleEventId/analytics",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <SaleEventAnalyticsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "marketing",
+        element: <Navigate to="/marketing/sale-events" replace />,
+      },
+      {
+        path: "marketing/order-discounts/create",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <CreateOrderDiscountPage />
+          </Suspense>
+        ),
+      },
+
       // ================================
       // Store Module
       // ================================
@@ -387,6 +462,15 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+
+  {
+    path: "/p/:id",
+    element: (
+      <Suspense fallback={<LoadingScreen />}>
+        <ProductDetailPage />
+      </Suspense>
+    ),
   },
 
   {
