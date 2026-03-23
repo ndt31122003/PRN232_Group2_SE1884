@@ -27,6 +27,7 @@ public abstract class Listing(Guid id) : AggregateRoot<Guid>(id)
 
     protected readonly HashSet<ListingImage> _images = [];
     public IReadOnlyCollection<ListingImage> Images => _images;
+    public DateTime? LastPriceChangeDate { get; protected set; }
     public abstract decimal GetEstimatedValue();
 
     public Result UpdateCommon(

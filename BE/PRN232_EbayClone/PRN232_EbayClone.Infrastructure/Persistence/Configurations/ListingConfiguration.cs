@@ -72,5 +72,8 @@ public class ListingConfiguration : IEntityTypeConfiguration<Listing>
             .HasDatabaseName("idx_listing_sku_trgm")
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops");
+
+        builder.Property(l => l.LastPriceChangeDate)
+            .IsRequired(false);
     }
 }

@@ -104,6 +104,60 @@ const getEligibleListings = async (query = {}) => {
   return normalizePaging(response?.data, fallback);
 };
 
+const activateSaleEvent = async (saleEventId) => {
+  const response = await axios.post(`${resource}/${saleEventId}/activate`, {}, { suppressErrorNotice: true });
+  return response?.data ?? null;
+};
+
+const deactivateSaleEvent = async (saleEventId) => {
+  const response = await axios.post(`${resource}/${saleEventId}/deactivate`, {}, { suppressErrorNotice: true });
+  return response?.data ?? null;
+};
+
+const addTier = async (saleEventId, payload) => {
+  const response = await axios.post(`${resource}/${saleEventId}/tiers`, payload, { suppressErrorNotice: true });
+  return response?.data ?? null;
+};
+
+const removeTier = async (saleEventId, tierId) => {
+  await axios.delete(`${resource}/${saleEventId}/tiers/${tierId}`, { suppressErrorNotice: true });
+};
+
+const updateTierPriority = async (saleEventId, tierId, priority) => {
+  const response = await axios.put(`${resource}/${saleEventId}/tiers/${tierId}/priority`, { priority }, { suppressErrorNotice: true });
+  return response?.data ?? null;
+};
+
+const assignListingsToTier = async (saleEventId, payload) => {
+  const response = await axios.post(`${resource}/${saleEventId}/listings`, payload, { suppressErrorNotice: true });
+  return response?.data ?? null;
+};
+
+const removeListingAssignment = async (saleEventId, listingId) => {
+  await axios.delete(`${resource}/${saleEventId}/listings/${listingId}`, { suppressErrorNotice: true });
+};
+
+const reassignListing = async (saleEventId, listingId, newTierId) => {
+  const response = await axios.put(`${resource}/${saleEventId}/listings/${listingId}/reassign`, { newTierId }, { suppressErrorNotice: true });
+  return response?.data ?? null;
+};
+
+const getPerformanceMetrics = async (saleEventId, query = {}) => {
+  const params = Object.fromEntries(
+    Object.entries({
+      startDate: query?.startDate ?? query?.StartDate,
+      endDate: query?.endDate ?? query?.EndDate
+    }).filter(([, value]) => value !== undefined && value !== null && value !== "")
+  );
+
+  const response = await axios.get(`${resource}/${saleEventId}/performance`, {
+    params,
+    suppressErrorNotice: true
+  });
+
+  return response?.data ?? null;
+};
+
 const SaleEventService = {
   getSaleEvents,
   getSaleEventById,
@@ -111,7 +165,16 @@ const SaleEventService = {
   createSaleEvent,
   updateSaleEvent,
   updateSaleEventStatus,
-  deleteSaleEvent
+  deleteSaleEvent,
+  activateSaleEvent,
+  deactivateSaleEvent,
+  addTier,
+  removeTier,
+  updateTierPriority,
+  assignListingsToTier,
+  removeListingAssignment,
+  reassignListing,
+  getPerformanceMetrics
 };
 
 export default SaleEventService;

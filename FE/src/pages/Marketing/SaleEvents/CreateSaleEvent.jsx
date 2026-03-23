@@ -684,17 +684,18 @@ const CreateSaleEvent = () => {
             </div>
           </div>
 
-          <form className="sale-event-create__search" onSubmit={handleSearchSubmit}>
+          <div className="sale-event-create__search">
             <input
               type="text"
               value={listingSearchTerm}
               onChange={(event) => setListingSearchTerm(event.target.value)}
+              onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); handleSearchSubmit(event); } }}
               placeholder="Search by title, SKU, or category"
             />
-            <button type="submit" className="btn-secondary" disabled={loadingListings}>
+            <button type="button" className="btn-secondary" disabled={loadingListings} onClick={handleSearchSubmit}>
               {loadingListings ? "Searching…" : "Search"}
             </button>
-          </form>
+          </div>
 
           <div className="sale-event-create__listings">
             {loadingListings ? (
