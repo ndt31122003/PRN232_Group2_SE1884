@@ -104,6 +104,13 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
         {
             return Error.Failure("Listing.InvalidOperation", "Cannot update pricing for multi-variation listings.");
         }
+        
+        // Track price changes
+        if (Pricing != null && Pricing.Price != price)
+        {
+            LastPriceChangeDate = DateTime.UtcNow;
+        }
+        
         Pricing = new FixedPricePricing(price, quantity);
         return Result.Success();
     }

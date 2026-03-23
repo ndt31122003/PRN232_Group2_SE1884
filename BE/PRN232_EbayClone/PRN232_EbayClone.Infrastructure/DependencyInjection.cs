@@ -119,6 +119,8 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();
         services.AddScoped<ISellerPreferenceRepository, SellerPreferenceRepository>();
+        services.AddScoped<IOrderDiscountRepository, OrderDiscountRepository>();
+        services.AddScoped<ISaleEventRepository, SaleEventRepository>();
 
 
         return services;

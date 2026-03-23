@@ -1,59 +1,66 @@
-using PRN232_EbayClone.Application.Abstractions.Authentication;
-using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.SaleEvents.Dtos;
-using PRN232_EbayClone.Domain.SaleEvents.Errors;
 
 namespace PRN232_EbayClone.Application.SaleEvents.Queries;
 
-public sealed record GetSaleEventByIdQuery(Guid Id) : IQuery<SaleEventDetailDto?>;
+public sealed record GetSaleEventByIdQuery(Guid SaleEventId) : IQuery<SaleEventDto>;
 
-public sealed class GetSaleEventByIdQueryHandler : IQueryHandler<GetSaleEventByIdQuery, SaleEventDetailDto?>
+public sealed class GetSaleEventByIdQueryValidator : AbstractValidator<GetSaleEventByIdQuery>
+{
+    public GetSaleEventByIdQueryValidator()
+    {
+        RuleFor(x => x.SaleEventId)
+            .NotEmpty()
+            .WithMessage("Sale event ID is required");
+    }
+}
+
+public sealed class GetSaleEventByIdQueryHandler : IQueryHandler<GetSaleEventByIdQuery, SaleEventDto>
 {
     private readonly ISaleEventRepository _saleEventRepository;
-    private readonly IUserContext _userContext;
 
-    public GetSaleEventByIdQueryHandler(ISaleEventRepository saleEventRepository, IUserContext userContext)
+    public GetSaleEventByIdQueryHandler(ISaleEventRepository saleEventRepository)
     {
         _saleEventRepository = saleEventRepository;
-        _userContext = userContext;
     }
 
-    public async Task<Result<SaleEventDetailDto?>> Handle(GetSaleEventByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<SaleEventDto>> Handle(GetSaleEventByIdQuery request, CancellationToken cancellationToken)
     {
-        if (!Guid.TryParse(_userContext.UserId, out var sellerGuid))
+        var saleEvent = await _saleEventRepository.GetByIdAsync(request.SaleEventId, cancellationToken);
+        
+        if (saleEvent == null)
         {
-            return Result.Failure<SaleEventDetailDto?>(SaleEventErrors.Unauthorized);
+            return new Error("SaleEvent.NotFound", "Sale event not found");
         }
 
-        var sellerId = sellerGuid.ToString();
-        var saleEvent = await _saleEventRepository.GetByIdForSellerAsync(request.Id, sellerId, cancellationToken);
-        if (saleEvent is null)
-        {
-            return Result.Success<SaleEventDetailDto?>(null);
-        }
+        var tierDtos = saleEvent.DiscountTiers
+            .Select(t => new SaleEventDiscountTierDto(
+                t.Id,
+                t.DiscountType,
+                t.DiscountValue,
+                t.Priority,
+                t.Label,
+                t.Listings.Count))
+            .OrderBy(t => t.Priority)
+            .ToList();
 
-        var tiers = saleEvent.DiscountTiers.Select(t => new SaleEventTierDto(
-            t.Id,
-            t.Priority,
-            t.DiscountType,
-            t.DiscountValue,
-            t.Label,
-            t.Listings.Select(l => l.ListingId).ToList().AsReadOnly())).ToList().AsReadOnly();
-
-        var dto = new SaleEventDetailDto(
+        var dto = new SaleEventDto(
             saleEvent.Id,
             saleEvent.Name,
             saleEvent.Description,
+            saleEvent.BuyerMessageLabel,
             saleEvent.Mode,
             saleEvent.Status,
             saleEvent.StartDate,
             saleEvent.EndDate,
             saleEvent.OfferFreeShipping,
-            saleEvent.IncludeSkippedItems,
             saleEvent.BlockPriceIncreaseRevisions,
+            saleEvent.IncludeSkippedItems,
             saleEvent.HighlightPercentage,
-            tiers);
+            tierDtos,
+            saleEvent.Listings.Count,
+            saleEvent.CreatedAt,
+            saleEvent.UpdatedAt);
 
-    return Result.Success<SaleEventDetailDto?>(dto);
+        return Result.Success(dto);
     }
 }

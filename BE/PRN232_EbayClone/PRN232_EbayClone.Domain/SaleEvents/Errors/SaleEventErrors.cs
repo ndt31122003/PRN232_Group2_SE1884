@@ -79,4 +79,8 @@ public static class SaleEventErrors
     public static readonly Error NotFound = Error.Failure(
         "SaleEvent.NotFound",
         "Sale event was not found.");
+
+    public static Error PriceIncreaseBlocked(string saleEventName, decimal snapshotPrice) => Error.Validation(
+        "SaleEvent.PriceIncreaseBlocked",
+        $"Price increase is blocked by active sale event '{saleEventName}'. Original price was {snapshotPrice:C}. Price decreases are allowed.");
 }

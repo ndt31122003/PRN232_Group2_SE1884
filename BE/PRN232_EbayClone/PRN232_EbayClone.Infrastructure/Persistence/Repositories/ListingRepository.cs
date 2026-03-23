@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Dtos;
 using PRN232_EbayClone.Application.Listings.Queries;
@@ -6,7 +6,7 @@ using PRN232_EbayClone.Application.Research.Dtos;
 using PRN232_EbayClone.Application.SaleEvents.Dtos;
 using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.Enums;
-using PRN232_EbayClone.Domain.SaleEvents.Enums;
+using PRN232_EbayClone.Domain.Discounts.Enums;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
 using System.Data;
 using System.Globalization;
@@ -642,7 +642,7 @@ public sealed class ListingRepository :
                 join tier in DbContext.SaleEventDiscountTiers.AsNoTracking() on listing.DiscountTierId equals tier.Id
                 join saleEvent in DbContext.SaleEvents.AsNoTracking() on listing.SaleEventId equals saleEvent.Id
                 where listingIds.Contains(listing.ListingId)
-                      && saleEvent.SellerId == sellerId
+                      && saleEvent.SellerId == sellerId.Value
                       && saleEvent.Mode == SaleEventMode.DiscountAndSaleEvent
                       && (saleEvent.Status == SaleEventStatus.Active || saleEvent.Status == SaleEventStatus.Scheduled)
                 select new
@@ -676,8 +676,10 @@ public sealed class ListingRepository :
 
         var result = new Dictionary<Guid, string>(chosenAssignments.Count);
 
-        foreach (var (listingId, assignment) in chosenAssignments)
+        foreach (var kvp in chosenAssignments)
         {
+            var listingId = kvp.Key;
+            var assignment = kvp.Value;
             var discountText = assignment.DiscountType switch
             {
                 SaleEventDiscountType.Percent => $"{assignment.DiscountValue:0.##}% off",
@@ -927,7 +929,7 @@ SELECT jsonb_build_object(
             var assignedListingIds = await (from saleEventListing in DbContext.SaleEventListings.AsNoTracking()
                                              join saleEvent in DbContext.SaleEvents.AsNoTracking()
                                                  on saleEventListing.SaleEventId equals saleEvent.Id
-                                             where saleEvent.SellerId == sellerId &&
+                                             where saleEvent.SellerId == sellerId.Value &&
                                                    (saleEvent.Status == SaleEventStatus.Scheduled ||
                                                     saleEvent.Status == SaleEventStatus.Active)
                                              select saleEventListing.ListingId)
