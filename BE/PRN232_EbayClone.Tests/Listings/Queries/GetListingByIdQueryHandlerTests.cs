@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
+using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Queries;
 using PRN232_EbayClone.Domain.Listings.Entities;
@@ -16,17 +17,20 @@ namespace PRN232_EbayClone.Tests.Listings.Queries;
 public sealed class GetListingByIdQueryHandlerTests
 {
     private readonly IListingRepository _listingRepository = Substitute.For<IListingRepository>();
+    private readonly IUserContext _userContext = Substitute.For<IUserContext>();
     private readonly GetListingByIdQueryHandler _handler;
 
     public GetListingByIdQueryHandlerTests()
     {
-        _handler = new GetListingByIdQueryHandler(_listingRepository, null);
+        _userContext.UserId.Returns("user-123");
+        _handler = new GetListingByIdQueryHandler(_listingRepository, _userContext);
     }
 
     [Fact]
     public async Task Handle_ShouldReturnDetails_ForFixedPriceSingle()
     {
         var listing = ListingTestData.CreateDraftSingleListing();
+        listing.CreatedBy = "user-123";
         _listingRepository.GetByIdAsync(listing.Id, Arg.Any<CancellationToken>())
             .Returns(listing);
 
@@ -44,6 +48,7 @@ public sealed class GetListingByIdQueryHandlerTests
     public async Task Handle_ShouldReturnDetails_ForFixedPriceMultiVariation()
     {
         var listing = ListingTestData.CreateDraftMultiVariationListing();
+        listing.CreatedBy = "user-123";
         _listingRepository.GetByIdAsync(listing.Id, Arg.Any<CancellationToken>())
             .Returns(listing);
 
@@ -61,6 +66,7 @@ public sealed class GetListingByIdQueryHandlerTests
     public async Task Handle_ShouldReturnDetails_ForAuction()
     {
         var listing = ListingTestData.CreateDraftAuctionListing();
+        listing.CreatedBy = "user-123";
         _listingRepository.GetByIdAsync(listing.Id, Arg.Any<CancellationToken>())
             .Returns(listing);
 

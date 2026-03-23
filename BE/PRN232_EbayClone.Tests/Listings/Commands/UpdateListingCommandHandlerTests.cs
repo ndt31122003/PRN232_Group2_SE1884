@@ -8,12 +8,14 @@ using NSubstitute;
 using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Commands;
+using PRN232_EbayClone.Application.SaleEvents.Services;
 using PRN232_EbayClone.Domain.Categories.Entities;
 using PRN232_EbayClone.Domain.Categories.Errors;
 using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.Enums;
 using PRN232_EbayClone.Domain.Listings.Errors;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
+using PRN232_EbayClone.Domain.Shared.Results;
 using Xunit;
 
 namespace PRN232_EbayClone.Tests.Listings.Commands;
@@ -24,13 +26,16 @@ public sealed class UpdateListingCommandHandlerTests
     private readonly ICategoryRepository _categoryRepository = Substitute.For<ICategoryRepository>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
     private readonly IUserContext _userContext = Substitute.For<IUserContext>();
+    private readonly IPriceIncreaseValidator _priceIncreaseValidator = Substitute.For<IPriceIncreaseValidator>();
     private readonly UpdateListingCommandHandler _handler;
     private readonly Category _category;
 
     public UpdateListingCommandHandlerTests()
     {
         _userContext.UserId.Returns("user-123");
-        _handler = new UpdateListingCommandHandler(_unitOfWork, _categoryRepository, _listingRepository, _userContext);
+        _priceIncreaseValidator.ValidatePriceChange(Arg.Any<Guid>(), Arg.Any<decimal>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Result.Success(true)));
+        _handler = new UpdateListingCommandHandler(_unitOfWork, _categoryRepository, _listingRepository, _userContext, _priceIncreaseValidator);
         _category = ListingTestData.CreateLeafCategory(
             ListingTestData.CreateSpecific("Color", required: true),
             ListingTestData.CreateSpecific("Size"));

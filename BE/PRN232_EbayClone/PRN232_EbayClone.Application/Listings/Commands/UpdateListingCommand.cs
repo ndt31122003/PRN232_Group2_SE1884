@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.SaleEvents.Services;
 using PRN232_EbayClone.Domain.Categories.Entities;
 using PRN232_EbayClone.Domain.Categories.Errors;
 using PRN232_EbayClone.Domain.Listings.Entities;
@@ -68,17 +69,20 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
     private readonly IUserContext _userContext;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPriceIncreaseValidator _priceIncreaseValidator;
 
     public UpdateListingCommandHandler(
         IUnitOfWork unitOfWork,
         ICategoryRepository categoryRepository,
         IListingRepository listingRepository,
-        IUserContext userContext)
+        IUserContext userContext,
+        IPriceIncreaseValidator priceIncreaseValidator)
     {
         _unitOfWork = unitOfWork;
         _categoryRepository = categoryRepository;
         _listingRepository = listingRepository;
         _userContext = userContext;
+        _priceIncreaseValidator = priceIncreaseValidator;
     }
 
     public async Task<Result> Handle(UpdateListingCommand request, CancellationToken cancellationToken)
@@ -156,6 +160,17 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
                 {
                     var validateResult = Category.ValidateSpecifics(request.ItemSpecifics, category.CategorySpecifics);
                     if (validateResult.IsFailure) return validateResult.Error;
+                    
+                    // Validate price increase if price is changing
+                    if (request.Price.HasValue && request.Price.Value != fixedPrice.Pricing.Price)
+                    {
+                        var priceValidation = await _priceIncreaseValidator.ValidatePriceChange(
+                            listing.Id, 
+                            request.Price.Value, 
+                            cancellationToken);
+                        if (priceValidation.IsFailure) return priceValidation.Error;
+                    }
+                    
                     var pricingResult = fixedPrice.UpdatePricing(request.Price!.Value, request.Quantity!.Value);
                     if (pricingResult.IsFailure) return pricingResult.Error;
                     break;
@@ -168,6 +183,13 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
                     {
                         var variationSpecificsValidation = Category.ValidateSpecifics(v.VariationSpecifics, category.CategorySpecifics);
                         if (variationSpecificsValidation.IsFailure) return variationSpecificsValidation.Error;
+
+                        // Validate price increase for each variation
+                        var priceValidation = await _priceIncreaseValidator.ValidatePriceChange(
+                            listing.Id, 
+                            v.Price, 
+                            cancellationToken);
+                        if (priceValidation.IsFailure) return priceValidation.Error;
 
                         var variationOrError = Variation.Create(
                             v.Sku,

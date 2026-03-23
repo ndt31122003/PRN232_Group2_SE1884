@@ -145,3 +145,44 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+.sale-events-summary__filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.sale-events-summary__search {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.sale-events-summary__filter {
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: white;
+  cursor: pointer;
+}
+
+.sale-events-summary__performance {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.sale-events-summary__action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.sale-events-summary .btn-link--danger {
+  color: #dc2626;
+}

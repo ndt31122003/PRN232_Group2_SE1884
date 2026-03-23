@@ -1,9 +1,12 @@
-﻿using PRN232_EbayClone.Application.Abstractions.Messaging;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using PRN232_EbayClone.Application.Abstractions.Messaging;
 using PRN232_EbayClone.Domain.Shared.Results;
 
 namespace PRN232_EbayClone.Api.Abstractions;
 
 [ApiController]
+[Route("api/[controller]")]
 public abstract class ApiController : ControllerBase
 {
     protected readonly ISender Sender;

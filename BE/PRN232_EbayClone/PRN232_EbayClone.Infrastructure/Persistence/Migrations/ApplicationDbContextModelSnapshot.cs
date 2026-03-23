@@ -3484,6 +3484,519 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.AppliedSaleEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AppliedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("applied_at");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("discount_amount");
+
+                    b.Property<Guid?>("DiscountTierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("discount_tier_id");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_applied_sale_events");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_applied_sale_events_order_id");
+
+                    b.HasIndex("SaleEventId")
+                        .HasDatabaseName("ix_applied_sale_events_sale_event_id");
+
+                    b.ToTable("applied_sale_events", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("ApplyToAllItems")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("apply_to_all_items");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<int>("DiscountUnit")
+                        .HasColumnType("integer")
+                        .HasColumnName("discount_unit");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("discount_value");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<decimal?>("MaxDiscount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("max_discount");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<decimal?>("ThresholdAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("threshold_amount");
+
+                    b.Property<int?>("ThresholdQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("threshold_quantity");
+
+                    b.Property<int>("ThresholdType")
+                        .HasColumnType("integer")
+                        .HasColumnName("threshold_type");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discounts");
+
+                    b.HasIndex("SellerId")
+                        .HasDatabaseName("ix_order_discounts_seller_id");
+
+                    b.HasIndex("IsActive", "StartDate", "EndDate")
+                        .HasDatabaseName("ix_order_discounts_active");
+
+                    b.ToTable("order_discounts", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountCategoryRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<bool>("IsExclusion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_exclusion");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_category_rules");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_order_discount_category_rules_order_discount_id");
+
+                    b.ToTable("order_discount_category_rules", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountItemRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsExclusion")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_exclusion");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_item_rules");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_order_discount_item_rules_listing_id");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_order_discount_item_rules_order_discount_id");
+
+                    b.ToTable("order_discount_item_rules", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountPerformanceMetrics", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_updated");
+
+                    b.Property<int>("OrderCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("order_count");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.Property<decimal>("TotalDiscountAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("total_discount_amount");
+
+                    b.Property<int>("TotalItemsSold")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("total_items_sold");
+
+                    b.Property<decimal>("TotalSalesRevenue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("total_sales_revenue");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_performance_metrics");
+
+                    b.ToTable("order_discount_performance_metrics", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountTier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("discount_value");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.Property<decimal>("ThresholdValue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("threshold_value");
+
+                    b.Property<int>("TierOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("tier_order");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_discount_tiers");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_order_discount_tiers_order_discount_id");
+
+                    b.ToTable("order_discount_tiers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("BlockPriceIncreaseRevisions")
+                        .HasColumnType("boolean")
+                        .HasColumnName("block_price_increase_revisions");
+
+                    b.Property<string>("BuyerMessageLabel")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("buyer_message_label");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<decimal?>("HighlightPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("highlight_percentage");
+
+                    b.Property<bool>("IncludeSkippedItems")
+                        .HasColumnType("boolean")
+                        .HasColumnName("include_skipped_items");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("integer")
+                        .HasColumnName("mode");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<bool>("OfferFreeShipping")
+                        .HasColumnType("boolean")
+                        .HasColumnName("offer_free_shipping");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_events");
+
+                    b.HasIndex("SellerId")
+                        .HasDatabaseName("ix_sale_events_seller_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_sale_events_status");
+
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("ix_sale_events_start_date_end_date");
+
+                    b.ToTable("sale_events", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("integer")
+                        .HasColumnName("discount_type");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("discount_value");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("label");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_discount_tiers");
+
+                    b.HasIndex("SaleEventId", "Priority")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_discount_tiers_sale_event_id_priority");
+
+                    b.ToTable("sale_event_discount_tiers", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventListing", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("assigned_at");
+
+                    b.Property<Guid>("DiscountTierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("discount_tier_id");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_listings");
+
+                    b.HasIndex("DiscountTierId")
+                        .HasDatabaseName("ix_sale_event_listings_discount_tier_id");
+
+                    b.HasIndex("ListingId")
+                        .HasDatabaseName("ix_sale_event_listings_listing_id");
+
+                    b.HasIndex("SaleEventId", "ListingId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_listings_sale_event_id_listing_id");
+
+                    b.ToTable("sale_event_listings", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventPerformanceMetrics", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_updated");
+
+                    b.Property<int>("OrderCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("order_count");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.Property<decimal>("TotalDiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("total_discount_amount");
+
+                    b.Property<int>("TotalItemsSold")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_items_sold");
+
+                    b.Property<decimal>("TotalSalesRevenue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("total_sales_revenue");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_performance_metrics");
+
+                    b.HasIndex("SaleEventId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_performance_metrics_sale_event_id");
+
+                    b.ToTable("sale_event_performance_metrics", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventPriceSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<decimal>("OriginalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("original_price");
+
+                    b.Property<Guid>("SaleEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_event_id");
+
+                    b.Property<DateTime>("SnapshotAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("snapshot_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sale_event_price_snapshots");
+
+                    b.HasIndex("SaleEventId", "ListingId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_sale_event_price_snapshots_sale_event_id_listing_id");
+
+                    b.ToTable("sale_event_price_snapshots", (string)null);
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Disputes.Entities.Dispute", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3912,6 +4425,10 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
+
+                    b.Property<DateTime?>("LastPriceChangeDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_price_change_date");
 
                     b.Property<string>("ListingDescription")
                         .IsRequired()
@@ -6851,161 +7368,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.ToTable("role", (string)null);
                 });
 
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<bool>("BlockPriceIncreaseRevisions")
-                        .HasColumnType("boolean")
-                        .HasColumnName("block_price_increase_revisions");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("description");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
-
-                    b.Property<decimal?>("HighlightPercentage")
-                        .HasColumnType("numeric(5,2)")
-                        .HasColumnName("highlight_percentage");
-
-                    b.Property<bool>("IncludeSkippedItems")
-                        .HasColumnType("boolean")
-                        .HasColumnName("include_skipped_items");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("Mode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("mode");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(90)
-                        .HasColumnType("character varying(90)")
-                        .HasColumnName("name");
-
-                    b.Property<bool>("OfferFreeShipping")
-                        .HasColumnType("boolean")
-                        .HasColumnName("offer_free_shipping");
-
-                    b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by");
-
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event");
-
-                    b.ToTable("sale_event", (string)null);
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("DiscountType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("discount_type");
-
-                    b.Property<decimal>("DiscountValue")
-                        .HasColumnType("numeric(10,2)")
-                        .HasColumnName("discount_value");
-
-                    b.Property<string>("Label")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("label");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("integer")
-                        .HasColumnName("priority");
-
-                    b.Property<Guid>("SaleEventId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sale_event_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event_discount_tier");
-
-                    b.HasIndex("SaleEventId")
-                        .HasDatabaseName("ix_sale_event_discount_tier_sale_event_id");
-
-                    b.ToTable("sale_event_discount_tier", (string)null);
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("DiscountTierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("discount_tier_id");
-
-                    b.Property<Guid>("ListingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("listing_id");
-
-                    b.Property<Guid>("SaleEventId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("sale_event_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_sale_event_listing");
-
-                    b.HasIndex("DiscountTierId")
-                        .HasDatabaseName("ix_sale_event_listing_discount_tier_id");
-
-                    b.HasIndex("SaleEventId", "ListingId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_sale_event_listing_sale_event_id_listing_id");
-
-                    b.ToTable("sale_event_listing", (string)null);
-                });
-
             modelBuilder.Entity("PRN232_EbayClone.Domain.SellingPreferences.Entities.SellerPreference", b =>
                 {
                     b.Property<Guid>("Id")
@@ -7535,6 +7897,45 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .HasName("pk_outbox_message");
 
                     b.ToTable("outbox_message", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Infrastructure.Persistence.Repositories.AppliedOrderDiscount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AppliedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("applied_at");
+
+                    b.Property<Guid?>("AppliedTierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("applied_tier_id");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("discount_amount");
+
+                    b.Property<Guid>("OrderDiscountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_discount_id");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_applied_order_discounts");
+
+                    b.HasIndex("OrderDiscountId")
+                        .HasDatabaseName("ix_applied_order_discounts_order_discount_id");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_applied_order_discounts_order_id");
+
+                    b.ToTable("applied_order_discounts", (string)null);
                 });
 
             modelBuilder.Entity("RoleUser", b =>
@@ -13374,6 +13775,63 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Navigation("Coupon");
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountCategoryRule", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", null)
+                        .WithMany("CategoryRules")
+                        .HasForeignKey("OrderDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_discount_category_rules_order_discounts_order_discoun");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountItemRule", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", null)
+                        .WithMany("ItemRules")
+                        .HasForeignKey("OrderDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_discount_item_rules_order_discounts_order_discount_id");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscountTier", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", null)
+                        .WithMany("Tiers")
+                        .HasForeignKey("OrderDiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_discount_tiers_order_discounts_order_discount_id");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", null)
+                        .WithMany("DiscountTiers")
+                        .HasForeignKey("SaleEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sale_event_discount_tiers_sale_events_sale_event_id");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventListing", b =>
+                {
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", null)
+                        .WithMany("Listings")
+                        .HasForeignKey("DiscountTierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sale_event_listings_sale_event_discount_tiers_discount_tier");
+
+                    b.HasOne("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", null)
+                        .WithMany("Listings")
+                        .HasForeignKey("SaleEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_sale_event_listings_sale_events_sale_event_id");
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Disputes.Entities.Dispute", b =>
                 {
                     b.HasOne("PRN232_EbayClone.Domain.Listings.Entities.Listing", "Listing")
@@ -17710,33 +18168,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         });
 
                     b.Navigation("Permissions");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", null)
-                        .WithMany("DiscountTiers")
-                        .HasForeignKey("SaleEventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_discount_tier_sale_event_sale_event_id");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing", b =>
-                {
-                    b.HasOne("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", null)
-                        .WithMany("Listings")
-                        .HasForeignKey("DiscountTierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_listing_sale_event_discount_tier_discount_tier_id");
-
-                    b.HasOne("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", null)
-                        .WithMany("Listings")
-                        .HasForeignKey("SaleEventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_sale_event_listing_sale_event_sale_event_id");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.SellingPreferences.Entities.SellerPreference", b =>
@@ -23276,6 +23707,27 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.Navigation("TargetAudiences");
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.OrderDiscount", b =>
+                {
+                    b.Navigation("CategoryRules");
+
+                    b.Navigation("ItemRules");
+
+                    b.Navigation("Tiers");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEvent", b =>
+                {
+                    b.Navigation("DiscountTiers");
+
+                    b.Navigation("Listings");
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Discounts.Entities.SaleEventDiscountTier", b =>
+                {
+                    b.Navigation("Listings");
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.Order", b =>
                 {
                     b.Navigation("CancellationRequests");
@@ -23294,18 +23746,6 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.OrderStatus", b =>
                 {
                     b.Navigation("AllowedTransitions");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent", b =>
-                {
-                    b.Navigation("DiscountTiers");
-
-                    b.Navigation("Listings");
-                });
-
-            modelBuilder.Entity("PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier", b =>
-                {
-                    b.Navigation("Listings");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Stores.Entities.Store", b =>
