@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../../../utils/axiosCustomize";
+import { getCurrentUserId } from "../../../utils/jwtUtils";
 import "./CreateOrderDiscount.scss";
 
 const CreateOrderDiscount = () => {
@@ -57,7 +58,7 @@ const CreateOrderDiscount = () => {
     
     // Prepare data for API
     const payload = {
-      sellerId: "00000000-0000-0000-0000-000000000000", // TODO: Get from auth context
+      sellerId: getCurrentUserId() ?? '00000000-0000-0000-0000-000000000000',
       name: formData.name,
       description: formData.description || null,
       discountValue: parseFloat(formData.discountValue),
