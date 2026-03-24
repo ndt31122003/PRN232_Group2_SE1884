@@ -20,4 +20,26 @@ public sealed class RealtimeNotifier : IRealtimeNotifier
             .Client(connectionId)
             .SendAsync(method, message, cancellationToken);
     }
+
+    public Task SendToUserAsync<T>(
+        string userId,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default)
+    {
+        return _hubContext.Clients
+            .User(userId)
+            .SendAsync(method, message, cancellationToken);
+    }
+
+    public Task SendToUsersAsync<T>(
+        IEnumerable<string> userIds,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default)
+    {
+        return _hubContext.Clients
+            .Users(userIds)
+            .SendAsync(method, message, cancellationToken);
+    }
 }

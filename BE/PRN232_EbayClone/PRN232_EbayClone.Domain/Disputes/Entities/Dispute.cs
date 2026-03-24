@@ -15,6 +15,8 @@ public class Dispute : AggregateRoot<Guid>
 
     // Navigation properties
     public Listing? Listing { get; private set; }
+    private readonly List<DisputeResponse> _responses = new();
+    public IReadOnlyCollection<DisputeResponse> Responses => _responses.AsReadOnly();
 
     private Dispute(Guid id) : base(id) { }
 
@@ -81,4 +83,9 @@ public class Dispute : AggregateRoot<Guid>
     }
 
     public bool IsClosed => Status == DisputeStatus.Closed.ToString() || Status == DisputeStatus.Resolved.ToString();
+
+    public void AddResponse(DisputeResponse response)
+    {
+        _responses.Add(response);
+    }
 }

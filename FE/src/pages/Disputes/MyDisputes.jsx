@@ -7,6 +7,7 @@ import STORAGE from '../../lib/storage';
 import { FaSpinner, FaExclamationCircle, FaClock, FaSearch, FaChevronDown, FaChevronUp, FaBan } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
+import { subscribeToEvent } from '../../utils/signalRConnection';
 
 const MyDisputes = () => {
   const [disputes, setDisputes] = useState([]);
@@ -24,18 +25,38 @@ const MyDisputes = () => {
   const [showRespondForm, setShowRespondForm] = useState({});
   const [respondMessage, setRespondMessage] = useState({});
 
-  // Get current user ID
-  const currentUserId = React.useMemo(() => {
+  // Get current user info & Role
+  const { currentUserId, userRoles, isSeller, isBuyer } = React.useMemo(() => {
     const userInfo = getStorage(STORAGE.USER_INFO);
+    let id = null;
+    let roles = [];
     if (userInfo) {
       try {
         const parsed = typeof userInfo === "string" ? JSON.parse(userInfo) : userInfo;
-        return parsed?.id ?? parsed?.Id ?? parsed?.userId ?? parsed?.UserId;
-      } catch {
-        return null;
+        id = parsed?.id ?? parsed?.Id ?? parsed?.userId ?? parsed?.UserId;
+        
+        // Roles can be a string or an array in user_info
+        const roleData = parsed?.role ?? parsed?.Role ?? parsed?.roles ?? parsed?.Roles;
+        if (Array.isArray(roleData)) {
+          roles = roleData.map(r => String(r).toLowerCase());
+        } else if (roleData) {
+          roles = [String(roleData).toLowerCase()];
+        }
+      } catch (e) {
+        console.error("Error parsing user info in MyDisputes:", e);
       }
     }
-    return null;
+    
+    const result = {
+      currentUserId: id,
+      userRoles: roles,
+      isSeller: roles.includes('seller'),
+      isBuyer: roles.includes('buyer')
+    };
+
+    console.log("[MyDisputes] User Context:", result);
+    console.log("[MyDisputes] isSeller:", result.isSeller, "isBuyer:", result.isBuyer);
+    return result;
   }, []);
 
   // Fetch disputes
@@ -50,32 +71,50 @@ const MyDisputes = () => {
     setLoading(true);
     try {
       const filterParams = {
-        sellerId: currentUserId,
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
+        status: statusFilter
       };
-      if (statusFilter) filterParams.status = statusFilter;
 
-      const result = await DisputeService.getDisputes
-        ? await DisputeService.getDisputes(filterParams, abortControllerRef.current.signal)
-        : null;
+      let result;
+      if (isSeller) {
+        console.log("[MyDisputes] Fetching as Seller for ID:", currentUserId);
+        result = await DisputeService.getSellerDisputes(filterParams, abortControllerRef.current.signal);
+      } else if (isBuyer) {
+        console.log("[MyDisputes] Fetching as Buyer for ID:", currentUserId);
+        result = await DisputeService.getBuyerDisputes(currentUserId, filterParams, abortControllerRef.current.signal);
+      } else {
+        // Fallback or Admin view - backend now automatically filters by current user
+        console.log("[MyDisputes] Fetching as Fallback/Admin for ID:", currentUserId);
+        result = await DisputeService.getDisputes(
+          filterParams, 
+          abortControllerRef.current.signal
+        );
+      }
 
       // support both shapes: { items: [], totalCount } or array []
       if (Array.isArray(result)) {
         setDisputes(result);
         setPagination(prev => ({ ...prev, totalCount: result.length || 0 }));
       } else if (result && typeof result === 'object') {
-        setDisputes(result.items || result.data || []);
-        setPagination(prev => ({ ...prev, totalCount: result.totalCount || result.total || (result.items ? result.items.length : 0) || 0 }));
+        const items = result.items || result.data || [];
+        setDisputes(items);
+        setPagination(prev => ({ 
+          ...prev, 
+          totalCount: result.totalCount ?? result.total ?? items.length ?? 0 
+        }));
       } else {
         setDisputes([]);
         setPagination(prev => ({ ...prev, totalCount: 0 }));
-        if (!DisputeService.getDisputes) {
-          Notice({ msg: 'Backend endpoint getDisputes not implemented', isSuccess: false });
-        }
       }
     } catch (error) {
-      const isAbort = error && (error.name === 'AbortError' || error.message === 'The user aborted a request.');
+      const isAbort = error && (
+        error.name === 'AbortError' || 
+        error.name === 'CanceledError' ||
+        error.message === 'The user aborted a request.' ||
+        (error.code === 'ERR_CANCELED')
+      );
+      
       if (!isAbort) {
         console.error('Error fetching disputes:', error);
         Notice({ msg: 'Failed to load disputes', isSuccess: false });
@@ -91,6 +130,53 @@ const MyDisputes = () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+    };
+  }, [fetchDisputes]);
+
+  // Setup SignalR realtime listeners
+  useEffect(() => {
+    let unsubscribeStatusChanged;
+    let unsubscribeNewResponse;
+
+    const setupRealtimeListeners = async () => {
+      try {
+        console.log('[MyDisputes] Setting up SignalR listeners...');
+        
+        // Listen for dispute status changes
+        unsubscribeStatusChanged = await subscribeToEvent('DisputeStatusChanged', (data) => {
+          console.log('[MyDisputes] ✅ Dispute status changed:', data);
+          Notice({ 
+            msg: data.Message || 'Dispute status has been updated', 
+            isSuccess: true 
+          });
+          // Refresh disputes list
+          fetchDisputes();
+        });
+
+        // Listen for new responses
+        unsubscribeNewResponse = await subscribeToEvent('DisputeNewResponse', (data) => {
+          console.log('[MyDisputes] ✅ New dispute response:', data);
+          Notice({ 
+            msg: 'New response received on dispute', 
+            isSuccess: true 
+          });
+          // Refresh disputes list to show new response
+          fetchDisputes();
+        });
+
+        console.log('[MyDisputes] ✅ SignalR listeners setup complete');
+      } catch (error) {
+        console.error('[MyDisputes] ❌ Error setting up SignalR listeners:', error);
+      }
+    };
+
+    setupRealtimeListeners();
+
+    // Cleanup on unmount
+    return () => {
+      console.log('[MyDisputes] Cleaning up SignalR listeners...');
+      if (unsubscribeStatusChanged) unsubscribeStatusChanged();
+      if (unsubscribeNewResponse) unsubscribeNewResponse();
     };
   }, [fetchDisputes]);
 
@@ -122,6 +208,10 @@ const MyDisputes = () => {
 
   // Helper: upload evidence file(s)
   const handleUploadEvidence = (disputeId) => {
+    const dispute = disputes.find(d => (d.id ?? d.Id) === disputeId);
+    const status = dispute?.status || dispute?.Status || '';
+    console.log(`[MyDisputes] Uploading evidence for dispute ${disputeId}, status: ${status}`);
+    
     const input = uploadInputRefs.current[disputeId];
     if (!input) {
       Notice({ msg: 'Upload input not available', isSuccess: false });
@@ -132,15 +222,15 @@ const MyDisputes = () => {
 
   const onFilesSelected = async (disputeId, files) => {
     if (!files || files.length === 0) return;
-    if (!DisputeService.uploadEvidence) {
-      Notice({ msg: 'uploadEvidence endpoint not implemented', isSuccess: false });
+    if (!DisputeService.sellerUploadEvidence) {
+      Notice({ msg: 'sellerUploadEvidence endpoint not implemented', isSuccess: false });
       return;
     }
     try {
       setLoading(true);
       const formData = new FormData();
       Array.from(files).forEach((f) => formData.append('files', f));
-      const result = await DisputeService.uploadEvidence(disputeId, formData);
+      const result = await DisputeService.sellerUploadEvidence(disputeId, formData);
       const fileCount = result?.fileUrls?.length || files.length;
       Notice({ 
         msg: `Successfully uploaded ${fileCount} evidence file(s)!`, 
@@ -149,7 +239,12 @@ const MyDisputes = () => {
       await fetchDisputes();
     } catch (err) {
       console.error('Upload evidence error', err);
-      const errorMsg = err?.response?.data?.detail || err?.message || 'Failed to upload evidence';
+      console.error('Error response:', err?.response?.data);
+      const errorMsg = err?.response?.data?.detail 
+        || err?.response?.data?.title
+        || err?.response?.data?.message
+        || err?.message 
+        || 'Failed to upload evidence';
       Notice({ msg: errorMsg, isSuccess: false });
     } finally {
       setLoading(false);
@@ -197,21 +292,92 @@ const MyDisputes = () => {
     }
   };
 
-  // Escalate to platform / mediation
-  const handleEscalate = async (disputeId) => {
-    if (!window.confirm('Are you sure you want to escalate this dispute to platform for review? This action will change the status to "Under Review".')) return;
-    if (!DisputeService.escalateDispute) {
-      Notice({ msg: 'escalateDispute endpoint not implemented', isSuccess: false });
+  // Seller: Accept refund
+  const handleAcceptRefund = async (disputeId) => {
+    if (!window.confirm('Are you sure you want to accept the refund request? This will resolve the dispute and issue a refund to the buyer.')) return;
+    if (!DisputeService.sellerAcceptRefund) {
+      Notice({ msg: 'sellerAcceptRefund endpoint not implemented', isSuccess: false });
       return;
     }
     try {
       setLoading(true);
-      await DisputeService.escalateDispute(disputeId);
+      await DisputeService.sellerAcceptRefund(disputeId);
+      Notice({ msg: 'Refund accepted and dispute resolved!', isSuccess: true });
+      await fetchDisputes();
+    } catch (err) {
+      console.error('Accept refund error', err);
+      const errorMsg = err?.response?.data?.detail || err?.message || 'Failed to accept refund';
+      Notice({ msg: errorMsg, isSuccess: false });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Escalate to platform / mediation
+  const handleEscalate = async (disputeId, userIsSeller) => {
+    if (!window.confirm('Are you sure you want to escalate this dispute to platform for review? This action will change the status to "Escalated".')) return;
+    
+    // Use appropriate escalate method based on role
+    const escalateMethod = userIsSeller 
+      ? DisputeService.sellerEscalateDispute 
+      : DisputeService.buyerEscalateDispute;
+    
+    if (!escalateMethod) {
+      Notice({ msg: 'Escalate endpoint not implemented', isSuccess: false });
+      return;
+    }
+    try {
+      setLoading(true);
+      await escalateMethod(disputeId);
       Notice({ msg: 'Dispute escalated successfully!', isSuccess: true });
       await fetchDisputes();
     } catch (err) {
       console.error('Escalate error', err);
       const errorMsg = err?.response?.data?.detail || err?.message || 'Failed to escalate dispute';
+      Notice({ msg: errorMsg, isSuccess: false });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Buyer: Accept seller's evidence
+  const handleAcceptEvidence = async (disputeId) => {
+    if (!window.confirm('Are you sure you want to accept the seller\'s evidence? This will resolve the dispute in favor of the seller.')) return;
+    if (!DisputeService.buyerAcceptEvidence) {
+      Notice({ msg: 'buyerAcceptEvidence endpoint not implemented', isSuccess: false });
+      return;
+    }
+    try {
+      setLoading(true);
+      await DisputeService.buyerAcceptEvidence(disputeId);
+      Notice({ msg: 'Evidence accepted! Dispute resolved.', isSuccess: true });
+      await fetchDisputes();
+    } catch (err) {
+      console.error('Accept evidence error', err);
+      const errorMsg = err?.response?.data?.detail || err?.message || 'Failed to accept evidence';
+      Notice({ msg: errorMsg, isSuccess: false });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Buyer: Request refund (Open → WaitingSeller)
+  const handleRequestRefund = async (disputeId) => {
+    const message = prompt('Optional: Enter a message explaining why you need a refund');
+    if (message === null) return; // User cancelled
+    
+    if (!DisputeService.buyerRequestRefund) {
+      Notice({ msg: 'buyerRequestRefund endpoint not implemented', isSuccess: false });
+      return;
+    }
+    try {
+      setLoading(true);
+      await DisputeService.buyerRequestRefund(disputeId, { message: message || undefined });
+      Notice({ msg: 'Refund request submitted! Waiting for seller response.', isSuccess: true });
+      await fetchDisputes();
+    } catch (err) {
+      console.error('Request refund error', err);
+      const errorMsg = err?.response?.data?.detail || err?.message || 'Failed to request refund';
       Notice({ msg: errorMsg, isSuccess: false });
     } finally {
       setLoading(false);
@@ -331,6 +497,17 @@ const MyDisputes = () => {
             const listingId = String(dispute.listingId || dispute.ListingId || "");
             const createdAt = dispute.createdAt || dispute.CreatedAt;
             
+            // Determine role based on dispute data
+            const isDisputeCreator = dispute.raisedById === currentUserId || dispute.RaisedById === currentUserId;
+            const listingCreatedBy = dispute.listingCreatedBy || dispute.ListingCreatedBy;
+            const isListingOwner = listingCreatedBy === currentUserId;
+            
+            // User is buyer if they created the dispute, seller if they own the listing
+            const userIsBuyer = isDisputeCreator;
+            const userIsSeller = isListingOwner;
+            
+            console.log(`[Dispute ${disputeId}] currentUserId: ${currentUserId}, raisedById: ${dispute.raisedById || dispute.RaisedById}, listingCreatedBy: ${listingCreatedBy}, userIsBuyer: ${userIsBuyer}, userIsSeller: ${userIsSeller}`);
+            
             return (
               <motion.div 
                 key={disputeId} 
@@ -394,6 +571,28 @@ const MyDisputes = () => {
                         {reason}
                       </p>
                     </div>
+
+                    {/* Conversation Section */}
+                    {dispute.responses && dispute.responses.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">💬 Conversation ({dispute.responses.length})</h4>
+                        <div className="space-y-2 max-h-64 overflow-y-auto bg-gray-50 p-3 rounded-lg">
+                          {dispute.responses.map((response) => (
+                            <div key={response.id} className="bg-white p-3 rounded border border-gray-200">
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-xs font-medium text-gray-600">
+                                  {response.responderUsername || `User ${response.responderId}`}
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                  {new Date(response.createdAt).toLocaleString()}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-800">{response.message}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="mb-4">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Listing ID:</h4>
@@ -403,96 +602,215 @@ const MyDisputes = () => {
                     </div>
                     
                     <div className="mt-4 space-y-3">
-                      <Link
-                        to={`/listings/${listingId}`}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-2 w-fit"
-                      >
-                        View Listing Details →
-                      </Link>
-                      
-                      {/* Seller actions - Primary action: Respond */}
-                      <div className="space-y-3">
-                        {!showRespondForm[disputeId] ? (
-                          <button
-                            onClick={() => toggleRespondForm(disputeId)}
-                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
-                          >
-                            💬 Respond
-                          </button>
-                        ) : (
-                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Enter your response:
-                              </label>
-                              <textarea
-                                value={respondMessage[disputeId] || ''}
-                                onChange={(e) => setRespondMessage(prev => ({
-                                  ...prev,
-                                  [disputeId]: e.target.value
-                                }))}
-                                placeholder="Enter your response to this dispute..."
-                                rows={4}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                                maxLength={2000}
-                              />
-                              <div className="text-xs text-gray-500 mt-1">
-                                {(respondMessage[disputeId]?.length || 0)} / 2000 characters
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleRespond(disputeId)}
-                                disabled={loading || !respondMessage[disputeId]?.trim()}
-                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-                              >
-                                {loading ? 'Sending...' : 'Send Response'}
-                              </button>
-                              <button
-                                onClick={() => toggleRespondForm(disputeId)}
-                                disabled={loading}
-                                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium disabled:bg-gray-100 disabled:cursor-not-allowed"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        )}
+                      <div className="flex gap-3">
+                        <Link
+                          to={`/listings/${listingId}`}
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-2"
+                        >
+                          View Listing Details →
+                        </Link>
                       </div>
                       
-                      {/* Other actions */}
-                      <div className="flex flex-wrap gap-2">
-                        
-                        {/* Secondary actions - only show for Open/UnderReview disputes */}
-                        {(statusLower === 'open' || statusLower === 'underreview' || statusLower === 'under_review') && (
-                          <>
+                      {/* Seller actions - Primary actions */}
+                      {userIsSeller && (
+                        <div className="flex flex-wrap gap-2">
+                          {!showRespondForm[disputeId] ? (
+                            <>
+                              <button
+                                onClick={() => toggleRespondForm(disputeId)}
+                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                              >
+                                💬 Respond
+                              </button>
+                              
+                              {(statusLower === 'waiting_seller' || statusLower === 'waitingseller') && (
+                                <button
+                                  onClick={() => handleAcceptRefund(disputeId)}
+                                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
+                                >
+                                  ✅ Accept Refund
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <div className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Enter your response:
+                                </label>
+                                <textarea
+                                  value={respondMessage[disputeId] || ''}
+                                  onChange={(e) => setRespondMessage(prev => ({
+                                    ...prev,
+                                    [disputeId]: e.target.value
+                                  }))}
+                                  placeholder="Enter your response to this dispute..."
+                                  rows={4}
+                                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                                  maxLength={2000}
+                                />
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {(respondMessage[disputeId]?.length || 0)} / 2000 characters
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleRespond(disputeId)}
+                                  disabled={loading || !respondMessage[disputeId]?.trim()}
+                                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                >
+                                  {loading ? 'Sending...' : 'Send Response'}
+                                </button>
+                                <button
+                                  onClick={() => toggleRespondForm(disputeId)}
+                                  disabled={loading}
+                                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Buyer actions */}
+                      {userIsBuyer && (
+                        <div className="flex flex-wrap gap-2">
+                          {!showRespondForm[disputeId] ? (
+                            <>
+                              <button
+                                onClick={() => toggleRespondForm(disputeId)}
+                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                              >
+                                💬 Respond
+                              </button>
+                              
+                              {statusLower === 'open' && (
+                                <button
+                                  onClick={() => handleRequestRefund(disputeId)}
+                                  className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                                >
+                                  💰 Request Refund
+                                </button>
+                              )}
+                              
+                              {(statusLower === 'waitingbuyer' || statusLower === 'waiting_buyer') && (
+                                <>
+                                  <button
+                                    onClick={() => handleAcceptEvidence(disputeId)}
+                                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
+                                  >
+                                    ✅ Accept Evidence
+                                  </button>
+                                  <button
+                                    onClick={() => handleEscalate(disputeId, userIsSeller)}
+                                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium"
+                                  >
+                                    ⚠️ Escalate to Platform
+                                  </button>
+                                </>
+                              )}
+                            </>
+                          ) : (
+                            <div className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Enter your response:
+                                </label>
+                                <textarea
+                                  value={respondMessage[disputeId] || ''}
+                                  onChange={(e) => setRespondMessage(prev => ({
+                                    ...prev,
+                                    [disputeId]: e.target.value
+                                  }))}
+                                  placeholder="Enter your response to this dispute..."
+                                  rows={4}
+                                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                                  maxLength={2000}
+                                />
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {(respondMessage[disputeId]?.length || 0)} / 2000 characters
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleRespond(disputeId)}
+                                  disabled={loading || !respondMessage[disputeId]?.trim()}
+                                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                >
+                                  {loading ? 'Sending...' : 'Send Response'}
+                                </button>
+                                <button
+                                  onClick={() => toggleRespondForm(disputeId)}
+                                  disabled={loading}
+                                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Seller secondary actions */}
+                      {userIsSeller && (
+                        <div className="flex flex-wrap gap-2">
+                          {/* Upload Evidence & Escalate for WaitingSeller only */}
+                          {(statusLower === 'waiting_seller' || statusLower === 'waitingseller') && (
+                            <>
+                              <button
+                                onClick={() => handleUploadEvidence(disputeId)}
+                                className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                                title="Upload evidence (product photos, tracking, invoices...)"
+                              >
+                                📎 Upload Evidence
+                              </button>
+                              
+                              <button
+                                onClick={() => handleEscalate(disputeId, userIsSeller)}
+                                className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm"
+                                title="Escalate to platform when you think the buyer is wrong"
+                              >
+                                ⚠️ Escalate
+                              </button>
+                            </>
+                          )}
+                          
+                          {/* Escalate only for WaitingBuyer (seller can still escalate if not satisfied) */}
+                          {(statusLower === 'waitingbuyer' || statusLower === 'waiting_buyer') && (
                             <button
-                              onClick={() => handleUploadEvidence(disputeId)}
-                              className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                              title="Upload evidence (product photos, tracking, invoices...)"
-                            >
-                              📎 Upload Evidence
-                            </button>
-                            
-                            <button
-                              onClick={() => handleEscalate(disputeId)}
+                              onClick={() => handleEscalate(disputeId, userIsSeller)}
                               className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm"
-                              title="Escalate to platform when you think the buyer is wrong"
+                              title="Escalate to platform for review"
                             >
                               ⚠️ Escalate
                             </button>
-                          </>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      )}
                       
                       {/* Help text for seller */}
-                      {(statusLower === 'open' || statusLower === 'underreview' || statusLower === 'under_review') && (
+                      {userIsSeller && (statusLower === 'waiting_seller' || statusLower === 'waitingseller') && (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
                           <strong>💡 Tips for Sellers:</strong>
                           <ul className="mt-1 ml-4 list-disc space-y-1">
                             <li><strong>Respond:</strong> Explain and communicate with the buyer about the issue</li>
                             <li><strong>Upload Evidence:</strong> Upload photos of shipped products, tracking numbers, shipping invoices to prove your case</li>
                             <li><strong>Escalate:</strong> When you think the buyer is wrong and need platform intervention</li>
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Help text for buyer */}
+                      {userIsBuyer && (statusLower === 'waitingbuyer' || statusLower === 'waiting_buyer') && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
+                          <strong>💡 Tips for Buyers:</strong>
+                          <ul className="mt-1 ml-4 list-disc space-y-1">
+                            <li><strong>Accept Evidence:</strong> If the seller's evidence proves they fulfilled their obligations, accept it to resolve the dispute</li>
+                            <li><strong>Escalate:</strong> If you're not satisfied with the seller's evidence, escalate to platform for review</li>
+                            <li><strong>Respond:</strong> Continue the conversation if you need clarification</li>
                           </ul>
                         </div>
                       )}

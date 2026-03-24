@@ -24,4 +24,10 @@ public record Error
 
     public static Error Validation(string code, string description) =>
         new(code, description);
+
+    public static Error NotFound(string code, string description) =>
+        new(code, description);
+
+    public static Error Unauthorized(string description) =>
+        new("General.Unauthorized", description);
 }

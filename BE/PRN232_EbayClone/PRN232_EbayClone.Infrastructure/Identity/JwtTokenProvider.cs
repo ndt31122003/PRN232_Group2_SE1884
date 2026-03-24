@@ -35,6 +35,11 @@ public sealed class JwtTokenProvider : ITokenProvider
 
         if (user.Roles is not null && user.Roles.Any())
         {
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
+
             var distinctPermissions = user.Roles
                 .Where(r => r.Permissions is not null && r.Permissions.Any())
                 .SelectMany(role => role.Permissions)

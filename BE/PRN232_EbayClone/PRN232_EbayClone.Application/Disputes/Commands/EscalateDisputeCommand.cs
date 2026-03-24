@@ -52,8 +52,8 @@ public sealed class EscalateDisputeCommandHandler : ICommandHandler<EscalateDisp
             return DisputeErrors.CannotUpdate;
         }
 
-        // Update status to UnderReview when escalated to platform
-        var statusResult = dispute.UpdateStatus(DisputeStatus.UnderReview.ToString());
+        // Update status to Escalated when escalated to platform
+        var statusResult = dispute.UpdateStatus(DisputeStatus.Escalated.ToString());
         if (statusResult.IsFailure)
         {
             return statusResult.Error;

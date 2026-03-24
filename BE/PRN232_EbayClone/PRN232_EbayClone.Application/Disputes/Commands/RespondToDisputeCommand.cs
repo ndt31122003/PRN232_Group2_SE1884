@@ -1,5 +1,7 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
+using PRN232_EbayClone.Application.Abstractions.Realtime;
+using PRN232_EbayClone.Domain.Disputes.Entities;
 using PRN232_EbayClone.Domain.Disputes.Enums;
 using PRN232_EbayClone.Domain.Disputes.Errors;
 
@@ -26,15 +28,18 @@ public sealed class RespondToDisputeCommandHandler : ICommandHandler<RespondToDi
     private readonly IDisputeRepository _disputeRepository;
     private readonly IUserContext _userContext;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IRealtimeNotifier _realtimeNotifier;
 
     public RespondToDisputeCommandHandler(
         IDisputeRepository disputeRepository,
         IUserContext userContext,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IRealtimeNotifier realtimeNotifier)
     {
         _disputeRepository = disputeRepository;
         _userContext = userContext;
         _unitOfWork = unitOfWork;
+        _realtimeNotifier = realtimeNotifier;
     }
 
     public async Task<Result> Handle(RespondToDisputeCommand request, CancellationToken cancellationToken)
@@ -42,6 +47,11 @@ public sealed class RespondToDisputeCommandHandler : ICommandHandler<RespondToDi
         if (string.IsNullOrWhiteSpace(_userContext.UserId))
         {
             return DisputeErrors.Unauthorized;
+        }
+
+        if (!Guid.TryParse(_userContext.UserId, out var responderId))
+        {
+            return Error.Validation("RespondToDispute.InvalidUserId", "User ID không hợp lệ");
         }
 
         var dispute = await _disputeRepository.GetByIdAsync(request.DisputeId, cancellationToken);
@@ -56,8 +66,16 @@ public sealed class RespondToDisputeCommandHandler : ICommandHandler<RespondToDi
             return DisputeErrors.CannotUpdate;
         }
 
-        // Update status to UnderReview when someone responds
-        var statusResult = dispute.UpdateStatus(DisputeStatus.UnderReview.ToString());
+        // Create and add response
+        var response = DisputeResponse.Create(
+            request.DisputeId,
+            responderId,
+            request.Message);
+
+        dispute.AddResponse(response);
+
+        // Update status to WaitingSeller when someone responds
+        var statusResult = dispute.UpdateStatus(DisputeStatus.WaitingSeller.ToString());
         if (statusResult.IsFailure)
         {
             return statusResult.Error;
@@ -65,6 +83,30 @@ public sealed class RespondToDisputeCommandHandler : ICommandHandler<RespondToDi
 
         _disputeRepository.Update(dispute);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Send realtime notification to both parties
+        var listing = dispute.Listing;
+        var sellerId = listing?.CreatedBy;
+        var buyerId = dispute.RaisedById;
+        
+        var userIds = new List<string> { buyerId };
+        if (!string.IsNullOrEmpty(sellerId))
+        {
+            userIds.Add(sellerId);
+        }
+
+        await _realtimeNotifier.SendToUsersAsync(
+            userIds,
+            "DisputeNewResponse",
+            new
+            {
+                DisputeId = dispute.Id,
+                ResponseId = response.Id,
+                ResponderId = responderId,
+                Message = request.Message,
+                Timestamp = response.CreatedAt
+            },
+            cancellationToken);
 
         return Result.Success();
     }

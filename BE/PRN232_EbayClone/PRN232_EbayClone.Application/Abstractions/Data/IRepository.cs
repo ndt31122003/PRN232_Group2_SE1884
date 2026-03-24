@@ -7,6 +7,7 @@ public interface IRepository<TEntity, TId>
     where TId : notnull
 {
     Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
+    IQueryable<TEntity> GetQueryable();
     void Add(TEntity entity);
     void Update(TEntity entity);
     void Remove(TEntity entity);

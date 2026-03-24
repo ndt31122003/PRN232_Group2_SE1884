@@ -16,6 +16,11 @@ public abstract class Repository<TEntity, TId>
 
     public abstract Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
 
+    public IQueryable<TEntity> GetQueryable()
+    {
+        return DbContext.Set<TEntity>();
+    }
+
     public void Add(TEntity entity)
     {
         DbContext.Set<TEntity>().Add(entity);

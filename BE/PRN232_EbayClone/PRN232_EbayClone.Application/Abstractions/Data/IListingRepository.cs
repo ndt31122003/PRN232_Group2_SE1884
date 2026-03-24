@@ -9,6 +9,7 @@ namespace PRN232_EbayClone.Application.Abstractions.Data;
 
 public interface IListingRepository : IRepository<Listing, Guid>
 {
+    Task<List<Listing>> GetBySellerIdAsync(string sellerId, CancellationToken cancellationToken = default);
     Task<List<Listing>> GetListingsToActivateAsync(DateTime now, int batchSize = 100, CancellationToken cancellationToken = default);
     Task<List<Listing>> GetListingsToEndAsync(DateTime now, int batchSize = 100, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<ActiveListingDto> Items, int TotalCount)> GetActiveListingsAsync(string ownerId, string? searchTerm, int pageNumber, int pageSize, CancellationToken cancellationToken = default);

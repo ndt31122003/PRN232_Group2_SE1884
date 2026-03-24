@@ -7,15 +7,25 @@ internal static class DisputeMappingExtensions
 {
     public static DisputeDto ToDto(this Dispute dispute)
     {
-        // Note: RaisedByUsername and RaisedByFullName would need to be loaded from User table
+        var responses = dispute.Responses?
+            .Select(r => new DisputeResponseDto(
+                r.Id,
+                r.ResponderId,
+                string.Empty, // Would need to load from User
+                r.Message,
+                r.CreatedAt))
+            .ToList() ?? new List<DisputeResponseDto>();
+
         return new DisputeDto(
             dispute.Id,
             dispute.ListingId,
+            dispute.Listing?.CreatedBy ?? string.Empty,
             dispute.RaisedById,
             string.Empty, // Would need to load from User
             string.Empty, // Would need to load from User
             dispute.Reason,
             dispute.Status,
-            dispute.CreatedAt);
+            dispute.CreatedAt,
+            responses);
     }
 }

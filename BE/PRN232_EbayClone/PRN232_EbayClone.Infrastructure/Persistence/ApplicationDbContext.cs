@@ -16,6 +16,7 @@ using PRN232_EbayClone.Domain.Coupons.Entities;
 using PRN232_EbayClone.Domain.Vouchers.Entities;
 using PRN232_EbayClone.Domain.Reviews.Entities;
 using PRN232_EbayClone.Domain.Disputes.Entities;
+using PRN232_EbayClone.Domain.BuyerFeedback.Entities;
 using PRN232_EbayClone.Infrastructure.Outbox;
 using System.Reflection;
 
@@ -54,7 +55,8 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing> SaleEventListings => Set<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing>();
     public DbSet<ShippingLabel> ShippingLabels => Set<ShippingLabel>();
     public DbSet<OrderItemShipment> OrderItemShipments => Set<OrderItemShipment>();
-    public DbSet<BuyerFeedback> BuyerFeedbacks => Set<BuyerFeedback>();
+    public DbSet<Domain.BuyerFeedback.Entities.BuyerFeedbackEntity> BuyerFeedbacks => Set<Domain.BuyerFeedback.Entities.BuyerFeedbackEntity>();
+    public DbSet<SellerBlacklist> SellerBlacklists => Set<SellerBlacklist>();
     public DbSet<ShippingService> ShippingServices => Set<ShippingService>();
     public DbSet<CancellationRequest> CancellationRequests => Set<CancellationRequest>();
     public DbSet<ReturnRequest> ReturnRequests => Set<ReturnRequest>();
@@ -66,6 +68,7 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<ReturnPolicy> ReturnPolicies => Set<ReturnPolicy>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Dispute> Disputes => Set<Dispute>();
+    public DbSet<DisputeResponse> DisputeResponses => Set<DisputeResponse>();
     public DbSet<SellerPreference> SellerPreferences => Set<SellerPreference>();
     public DbSet<ListingIdMapping> ListingIdMappings => Set<ListingIdMapping>();
 

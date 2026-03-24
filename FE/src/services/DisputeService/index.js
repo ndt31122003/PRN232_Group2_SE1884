@@ -44,6 +44,46 @@ const getDisputes = (params = {}, signal) => {
 };
 
 /**
+ * Seller: Get disputes (filtered by sellerId on backend)
+ * @param {Object} params - Filter parameters
+ * @param {string} params.status - Filter by status
+ * @param {boolean} params.deadlineSoon - Filter by deadline
+ * @param {number} params.pageNumber - Page number
+ * @param {number} params.pageSize - Page size
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} Normalized paging result
+ */
+const getSellerDisputes = (params = {}, signal) => {
+    const fallback = {
+        pageNumber: params?.pageNumber ?? 1,
+        pageSize: params?.pageSize ?? 20
+    };
+
+    // Seller API uses "Page" instead of "PageNumber"
+    const queryParams = {
+        Status: params.status,
+        DeadlineSoon: params.deadlineSoon,
+        Page: params.pageNumber ?? 1,
+        PageSize: params.pageSize ?? 20
+    };
+
+    return axios
+        .get(`seller/${resource}`, { params: queryParams, signal })
+        .then((response) => normalizePaging(response?.data ?? response, fallback));
+};
+
+/**
+ * Buyer: Get disputes (filtered by raisedById)
+ * @param {string} buyerId - Buyer ID
+ * @param {Object} params - Filter parameters
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} Normalized paging result
+ */
+const getBuyerDisputes = (buyerId, params = {}, signal) => {
+    return getDisputes({ ...params, raisedById: buyerId }, signal);
+};
+
+/**
  * Create a new dispute
  * @param {Object} payload - Dispute data
  * @param {string} payload.listingId - Listing ID
@@ -140,8 +180,82 @@ const uploadEvidence = (disputeId, formData, signal) =>
         },
     }).then((response) => response?.data ?? response);
 
+/**
+ * Seller: Accept refund and resolve dispute
+ * @param {string} disputeId - Dispute ID
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} API response
+ */
+const sellerAcceptRefund = (disputeId, signal) =>
+    axios.post(`seller/${resource}/${disputeId}/accept-refund`, {}, {
+        signal,
+    }).then((response) => response?.data ?? response);
+
+/**
+ * Seller: Upload evidence (using seller endpoint)
+ * @param {string} disputeId - Dispute ID
+ * @param {FormData} formData - FormData containing files
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} API response
+ */
+const sellerUploadEvidence = (disputeId, formData, signal) =>
+    axios.post(`seller/${resource}/${disputeId}/provide-evidence`, formData, {
+        signal,
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }).then((response) => response?.data ?? response);
+
+/**
+ * Seller: Escalate dispute (using seller endpoint)
+ * @param {string} disputeId - Dispute ID
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} API response
+ */
+const sellerEscalateDispute = (disputeId, signal) =>
+    axios.post(`seller/${resource}/${disputeId}/escalate`, {}, {
+        signal,
+    }).then((response) => response?.data ?? response);
+
+/**
+ * Buyer: Accept seller's evidence and resolve dispute
+ * @param {string} disputeId - Dispute ID
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} API response
+ */
+const buyerAcceptEvidence = (disputeId, signal) =>
+    axios.post(`${resource}/${disputeId}/accept-evidence`, {}, {
+        signal,
+    }).then((response) => response?.data ?? response);
+
+/**
+ * Buyer: Request refund (changes status from Open to WaitingSeller)
+ * @param {string} disputeId - Dispute ID
+ * @param {Object} payload - Request data
+ * @param {string} payload.message - Optional message explaining refund request
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} API response
+ */
+const buyerRequestRefund = (disputeId, payload, signal) =>
+    axios.post(`${resource}/${disputeId}/request-refund`, payload, {
+        signal,
+    }).then((response) => response?.data ?? response);
+
+/**
+ * Buyer: Escalate dispute (using general endpoint)
+ * @param {string} disputeId - Dispute ID
+ * @param {AbortSignal} signal - Abort signal for cancellation
+ * @returns {Promise} API response
+ */
+const buyerEscalateDispute = (disputeId, signal) =>
+    axios.post(`${resource}/${disputeId}/escalate`, {}, {
+        signal,
+    }).then((response) => response?.data ?? response);
+
 const DisputeService = {
     getDisputes,
+    getSellerDisputes,
+    getBuyerDisputes,
     getDisputeById,
     createDispute,
     updateDisputeStatus,
@@ -150,6 +264,14 @@ const DisputeService = {
     respondToDispute,
     escalateDispute,
     uploadEvidence,
+    // Seller specific
+    sellerAcceptRefund,
+    sellerUploadEvidence,
+    sellerEscalateDispute,
+    // Buyer specific
+    buyerAcceptEvidence,
+    buyerRequestRefund,
+    buyerEscalateDispute,
 };
 
 export default DisputeService;

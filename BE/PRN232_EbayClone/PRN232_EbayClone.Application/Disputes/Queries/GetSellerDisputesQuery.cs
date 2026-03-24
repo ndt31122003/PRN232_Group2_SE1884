@@ -1,4 +1,3 @@
-using Dapper;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Common.Dtos;
 using PRN232_EbayClone.Application.Abstractions.Messaging;
@@ -6,7 +5,6 @@ using PRN232_EbayClone.Application.Disputes.Dtos;
 using PRN232_EbayClone.Application.Disputes.Services;
 using PRN232_EbayClone.Domain.Disputes.Enums;
 using PRN232_EbayClone.Domain.Shared.Results;
-using System.Data;
 
 namespace PRN232_EbayClone.Application.Disputes.Queries;
 
@@ -16,7 +14,10 @@ public sealed record GetSellerDisputesQuery(
 ) : IQuery<PagedResult<SellerDisputeDto>>;
 
 internal sealed class GetSellerDisputesQueryHandler(
-    IDbConnectionFactory dbConnectionFactory,
+    IDisputeRepository disputeRepository,
+    IListingRepository listingRepository,
+    IUserRepository userRepository,
+    IFileMetadataRepository fileMetadataRepository,
     IDisputeStateMachine stateMachine)
     : IQueryHandler<GetSellerDisputesQuery, PagedResult<SellerDisputeDto>>
 {
@@ -24,79 +25,70 @@ internal sealed class GetSellerDisputesQueryHandler(
         GetSellerDisputesQuery request,
         CancellationToken cancellationToken)
     {
-        using var connection = await dbConnectionFactory.OpenConnectionAsync();
+        // Get seller's listings
+        var sellerListings = await listingRepository.GetBySellerIdAsync(request.SellerId, cancellationToken);
+        var listingIds = sellerListings.Select(l => l.Id).ToList();
 
-        var whereConditions = new List<string> { "l.seller_id = @SellerId" };
-        var parameters = new { SellerId = request.SellerId };
-
-        if (!string.IsNullOrEmpty(request.Filter.Status))
+        if (!listingIds.Any())
         {
-            whereConditions.Add("d.status = @Status");
-            parameters = new { parameters.SellerId, Status = request.Filter.Status };
+            return Result.Success(new PagedResult<SellerDisputeDto>(
+                new List<SellerDisputeDto>(),
+                request.Filter.Page,
+                request.Filter.PageSize,
+                0
+            ));
         }
 
-        var whereClause = string.Join(" AND ", whereConditions);
-        var offset = (request.Filter.Page - 1) * request.Filter.PageSize;
-
-        var sql = $@"
-            SELECT 
-                d.id,
-                d.listing_id,
-                l.title as listing_title,
-                d.raised_by_id,
-                u.full_name as buyer_name,
-                d.reason,
-                d.status,
-                d.created_at,
-                d.updated_at,
-                COUNT(fm.id) as evidence_count
-            FROM disputes d
-            INNER JOIN listings l ON d.listing_id = l.id
-            INNER JOIN users u ON d.raised_by_id = u.id
-            LEFT JOIN file_metadata fm ON fm.linked_entity_id = d.id
-            WHERE {whereClause}
-            GROUP BY d.id, d.listing_id, l.title, d.raised_by_id, u.full_name, d.reason, d.status, d.created_at, d.updated_at
-            ORDER BY d.created_at DESC
-            LIMIT @PageSize OFFSET @Offset";
-
-        var countSql = $@"
-            SELECT COUNT(DISTINCT d.id)
-            FROM disputes d
-            INNER JOIN listings l ON d.listing_id = l.id
-            WHERE {whereClause}";
-
-        var disputes = await connection.QueryAsync<dynamic>(sql, new
+        // Get all disputes for seller's listings
+        var allDisputes = new List<Domain.Disputes.Entities.Dispute>();
+        foreach (var listingId in listingIds)
         {
-            parameters.SellerId,
-            Status = request.Filter.Status,
-            PageSize = request.Filter.PageSize,
-            Offset = offset
-        });
+            var disputesForListing = await disputeRepository.GetDisputesByListingIdAsync(listingId, cancellationToken);
+            allDisputes.AddRange(disputesForListing);
+        }
 
-        var totalCount = await connection.QuerySingleAsync<int>(countSql, parameters);
-
-        var disputeDtos = disputes.Select(d =>
+        // Apply status filter
+        if (!string.IsNullOrEmpty(request.Filter.Status))
         {
-            var status = Enum.Parse<DisputeStatus>(d.status, ignoreCase: true);
-            var deadline = stateMachine.GetDeadline(status, d.updated_at ?? d.created_at);
+            allDisputes = allDisputes.Where(d => d.Status == request.Filter.Status).ToList();
+        }
+
+        var totalCount = allDisputes.Count;
+
+        var disputes = allDisputes
+            .OrderByDescending(d => d.CreatedAt)
+            .Skip((request.Filter.Page - 1) * request.Filter.PageSize)
+            .Take(request.Filter.PageSize)
+            .ToList();
+
+        var disputeDtos = new List<SellerDisputeDto>();
+
+        foreach (var dispute in disputes)
+        {
+            var listing = sellerListings.First(l => l.Id == dispute.ListingId);
+            var buyer = await userRepository.GetByIdAsync(new Domain.Users.ValueObjects.UserId(Guid.Parse(dispute.RaisedById)), cancellationToken);
+            var evidenceCount = await fileMetadataRepository.CountByLinkedEntityAsync(dispute.Id, cancellationToken);
+
+            var status = Enum.Parse<DisputeStatus>(dispute.Status, ignoreCase: true);
+            var deadline = stateMachine.GetDeadline(status, dispute.UpdatedAt ?? dispute.CreatedAt);
             var isDeadlineSoon = deadline.HasValue && 
-                stateMachine.IsDeadlineSoon(status, d.updated_at ?? d.created_at, TimeSpan.FromHours(12));
+                stateMachine.IsDeadlineSoon(status, dispute.UpdatedAt ?? dispute.CreatedAt, TimeSpan.FromHours(12));
 
-            return new SellerDisputeDto(
-                d.id,
-                d.listing_id,
-                d.listing_title,
-                d.raised_by_id,
-                d.buyer_name,
-                d.reason,
-                d.status,
-                d.created_at,
-                d.updated_at ?? d.created_at,
+            disputeDtos.Add(new SellerDisputeDto(
+                dispute.Id,
+                dispute.ListingId,
+                listing.Title,
+                dispute.RaisedById,
+                buyer?.FullName ?? "Unknown",
+                dispute.Reason,
+                dispute.Status,
+                dispute.CreatedAt,
+                dispute.UpdatedAt ?? dispute.CreatedAt,
                 deadline,
                 isDeadlineSoon,
-                d.evidence_count
-            );
-        }).ToList();
+                evidenceCount
+            ));
+        }
 
         // Apply deadline filter if requested
         if (request.Filter.DeadlineSoon == true)

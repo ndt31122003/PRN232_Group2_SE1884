@@ -251,6 +251,11 @@ const NavHeader = ({ setCurrentSession }) => {
           id: "summary",
           label: "Summary",
           onClick: () => goTo("feedback", "/feedback")
+        },
+        {
+          id: "disputes",
+          label: "Seller Disputes",
+          onClick: () => goTo("feedback", "/disputes")
         }
       ]
     },
@@ -720,11 +725,7 @@ const NavHeader = ({ setCurrentSession }) => {
                 placeholder="Search for anything"
                 className="search__input"
               />
-              <button className="search__category">
-                {/* <span className="search__category-text">All Categories</span>
-                <svg className="search__category-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg> */}
+              <div className="search__category">
                 <div className="dropdown dropdown-start">
                   <div tabIndex={0} role="button" className="search__category-text btn"><span className="search__category-text">All Categories </span>
                     <svg className="search__category-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -740,7 +741,7 @@ const NavHeader = ({ setCurrentSession }) => {
                     </li>
                   </ul>
                 </div>
-              </button>
+              </div>
             </div>
 
           </div>

@@ -421,6 +421,34 @@ const FeedbackPage = () => {
             ))}
           </select>
         </div>
+
+        <div className="feedback-page__action">
+          <a 
+            href="/support-tickets" 
+            className="feedback-page__support-link"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.625rem 1rem',
+              backgroundColor: '#2563eb',
+              color: 'white',
+              borderRadius: '0.5rem',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              transition: 'background-color 0.2s',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            Support Tickets
+          </a>
+        </div>
       </section>
 
       {/* --- FEEDBACK LIST --- */}

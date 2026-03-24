@@ -90,7 +90,7 @@ internal static class OrderMappingExtensions
             shipment.CreatedAt,
             shipment.UpdatedAt);
 
-    private static SellerFeedbackDto ToDto(this BuyerFeedback feedback) =>
+    private static SellerFeedbackDto ToDto(this Domain.Orders.Entities.BuyerFeedback feedback) =>
         new(
             feedback.Id,
             feedback.OrderId,

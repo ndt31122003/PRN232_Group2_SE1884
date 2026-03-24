@@ -60,7 +60,7 @@ public sealed class SellerDisputesController(ISender sender, ICurrentUser curren
     [RequestSizeLimit(50 * 1024 * 1024)] // 50MB limit
     public async Task<IActionResult> ProvideEvidence(
         Guid disputeId,
-        [FromForm] IFormFileCollection files,
+        [FromForm] List<IFormFile> files,
         CancellationToken cancellationToken)
     {
         var sellerId = currentUser.UserId;
@@ -79,7 +79,10 @@ public sealed class SellerDisputesController(ISender sender, ICurrentUser curren
             });
         }
 
-        var command = new ProvideEvidenceCommand(disputeId, sellerId, files);
+        var formFileCollection = new FormFileCollection();
+        formFileCollection.AddRange(files);
+
+        var command = new ProvideEvidenceCommand(disputeId, sellerId, formFileCollection);
         return await SendAsync(command, cancellationToken);
     }
 

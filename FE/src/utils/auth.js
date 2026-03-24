@@ -88,10 +88,16 @@ export const extractUserFromToken = (token) => {
   const isBusinessVerified = payload["is_business_verified"] === "true";
   const isSellerVerified = payload["is_seller_verified"] === "true";
 
+  const role = getClaimValue(payload, [
+    "role",
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+  ]);
+
   return {
     id: id ?? null,
     name: name ?? null,
     email: email ?? null,
+    role: role ?? null,
     isEmailVerified,
     isPhoneVerified,
     isBusinessVerified,
@@ -117,6 +123,7 @@ export const mapUserProfile = (source = {}, fallback = {}) => {
     id: normalizedId,
     name: source?.fullName ?? source?.FullName ?? fallback?.name ?? null,
     email: normalizedEmail,
+    role: source?.role ?? source?.Role ?? fallback?.role ?? null,
     isSellerVerified: Boolean(source?.isSellerVerified ?? source?.IsSellerVerified ?? fallback?.isSellerVerified),
     isEmailVerified: Boolean(source?.isEmailVerified ?? source?.IsEmailVerified ?? fallback?.isEmailVerified),
     isPaymentVerified: Boolean(source?.isPaymentVerified ?? source?.IsPaymentVerified ?? fallback?.isPaymentVerified),
@@ -138,6 +145,7 @@ export const storeUserInfo = (user, { notify = false } = {}) => {
     id: unwrapUserId(user?.id),
     name: user.name ?? null,
     email: user.email ?? null,
+    role: user.role ?? null,
     isSellerVerified: Boolean(user.isSellerVerified),
     isEmailVerified: Boolean(user.isEmailVerified),
     isPaymentVerified: Boolean(user.isPaymentVerified),

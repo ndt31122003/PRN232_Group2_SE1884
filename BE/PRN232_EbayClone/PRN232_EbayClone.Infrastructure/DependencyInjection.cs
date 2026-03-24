@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -118,7 +119,10 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IReturnPolicyRepository, ReturnPolicyRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();
+        services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
         services.AddScoped<ISellerPreferenceRepository, SellerPreferenceRepository>();
+        services.AddScoped<IBuyerFeedbackRepository, BuyerFeedbackRepository>();
+        services.AddScoped<ISellerBlacklistRepository, SellerBlacklistRepository>();
 
 
         return services;
@@ -171,6 +175,24 @@ services.AddScoped<ICouponRepository, CouponRepository>();
                     Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]!)
                 ),
                 ClockSkew = TimeSpan.Zero
+            };
+
+            // Allow SignalR to read token from query string
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    
+                    // If the request is for SignalR hub and token is in query string
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hub"))
+                    {
+                        context.Token = accessToken;
+                    }
+                    
+                    return Task.CompletedTask;
+                }
             };
         });
 
@@ -318,7 +340,10 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         IConfiguration configuration)
     {
         services.Configure<CloudinaryConfiguration>(configuration.GetSection("Cloudinary"));
-        services.AddTransient<IFileManager, CloudinaryFileManager>();
+        
+        // Use LocalFileManager instead of CloudinaryFileManager to avoid external dependency
+        services.AddTransient<IFileManager, LocalFileManager>();
+        
         return services;
     }
 
@@ -394,6 +419,9 @@ services.AddScoped<ICouponRepository, CouponRepository>();
 
         var redisConnection = configuration.GetConnectionString("Redis");
         var signalR = services.AddSignalR();
+
+        // Configure SignalR to use custom user ID provider
+        services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
         if (!string.IsNullOrWhiteSpace(redisConnection) && !redisConnection.Contains("your_redis"))
         {

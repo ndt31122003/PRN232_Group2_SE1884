@@ -7,4 +7,16 @@ public interface IRealtimeNotifier
         string method,
         T message,
         CancellationToken cancellationToken = default);
+
+    Task SendToUserAsync<T>(
+        string userId,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default);
+
+    Task SendToUsersAsync<T>(
+        IEnumerable<string> userIds,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default);
 }

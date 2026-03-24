@@ -19,17 +19,25 @@ public sealed class DisputeRepository : Repository<Dispute, Guid>, IDisputeRepos
     {
         return DbContext.Disputes
             .Include(d => d.Listing)
+            .Include(d => d.Responses)
             .SingleOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
     public async Task<(IReadOnlyList<Dispute> Disputes, int TotalCount)> GetDisputesAsync(
         DisputeFilterDto filter,
+        string currentUserId,
         CancellationToken cancellationToken = default)
     {
         var query = DbContext.Disputes
             .AsNoTracking()
             .Include(d => d.Listing)
+            .Include(d => d.Responses)
             .AsQueryable();
+
+        // Filter by current user: either disputes raised by user OR disputes on user's listings
+        query = query.Where(d => 
+            d.RaisedById == currentUserId || 
+            (d.Listing != null && d.Listing.CreatedBy == currentUserId));
 
         if (filter.ListingId.HasValue)
         {
@@ -39,6 +47,12 @@ public sealed class DisputeRepository : Repository<Dispute, Guid>, IDisputeRepos
         if (!string.IsNullOrWhiteSpace(filter.RaisedById))
         {
             query = query.Where(d => d.RaisedById == filter.RaisedById);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.SellerId))
+        {
+            // Filter by listings created by this seller
+            query = query.Where(d => d.Listing != null && d.Listing.CreatedBy == filter.SellerId);
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Status))

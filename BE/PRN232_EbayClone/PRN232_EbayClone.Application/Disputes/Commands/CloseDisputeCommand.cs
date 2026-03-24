@@ -1,5 +1,6 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
+using PRN232_EbayClone.Application.Abstractions.Realtime;
 using PRN232_EbayClone.Domain.Disputes.Enums;
 using PRN232_EbayClone.Domain.Disputes.Errors;
 
@@ -22,15 +23,18 @@ public sealed class CloseDisputeCommandHandler : ICommandHandler<CloseDisputeCom
     private readonly IDisputeRepository _disputeRepository;
     private readonly IUserContext _userContext;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IRealtimeNotifier _realtimeNotifier;
 
     public CloseDisputeCommandHandler(
         IDisputeRepository disputeRepository,
         IUserContext userContext,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IRealtimeNotifier realtimeNotifier)
     {
         _disputeRepository = disputeRepository;
         _userContext = userContext;
         _unitOfWork = unitOfWork;
+        _realtimeNotifier = realtimeNotifier;
     }
 
     public async Task<Result> Handle(CloseDisputeCommand request, CancellationToken cancellationToken)
@@ -54,6 +58,29 @@ public sealed class CloseDisputeCommandHandler : ICommandHandler<CloseDisputeCom
 
         _disputeRepository.Update(dispute);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Send realtime notification to both parties
+        var listing = dispute.Listing;
+        var sellerId = listing?.CreatedBy;
+        var buyerId = dispute.RaisedById;
+        
+        var userIds = new List<string> { buyerId };
+        if (!string.IsNullOrEmpty(sellerId))
+        {
+            userIds.Add(sellerId);
+        }
+
+        await _realtimeNotifier.SendToUsersAsync(
+            userIds,
+            "DisputeStatusChanged",
+            new
+            {
+                DisputeId = dispute.Id,
+                Status = dispute.Status,
+                Message = "Dispute has been closed.",
+                Timestamp = DateTime.UtcNow
+            },
+            cancellationToken);
 
         return Result.Success();
     }

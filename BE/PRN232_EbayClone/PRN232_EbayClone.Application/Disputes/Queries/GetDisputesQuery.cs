@@ -6,7 +6,8 @@ using PRN232_EbayClone.Application.Disputes.Mappings;
 namespace PRN232_EbayClone.Application.Disputes.Queries;
 
 public sealed record GetDisputesQuery(
-    DisputeFilterDto Filter
+    DisputeFilterDto Filter,
+    string CurrentUserId
 ) : IQuery<PagingResult<DisputeDto>>;
 
 public sealed class GetDisputesQueryValidator : AbstractValidator<GetDisputesQuery>
@@ -34,6 +35,7 @@ public sealed class GetDisputesQueryHandler : IQueryHandler<GetDisputesQuery, Pa
     {
         var (disputes, totalCount) = await _disputeRepository.GetDisputesAsync(
             request.Filter,
+            request.CurrentUserId,
             cancellationToken);
 
         var disputeDtos = disputes.Select(d => d.ToDto()).ToList();

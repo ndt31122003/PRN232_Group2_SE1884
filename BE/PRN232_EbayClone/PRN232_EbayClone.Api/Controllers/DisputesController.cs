@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRN232_EbayClone.Api.Services;
 using PRN232_EbayClone.Application.Disputes.Commands;
 using PRN232_EbayClone.Application.Disputes.Dtos;
 using PRN232_EbayClone.Application.Disputes.Queries;
@@ -9,12 +10,19 @@ namespace PRN232_EbayClone.Api.Controllers;
 
 [Authorize]
 [Route("api/disputes")]
-public sealed class DisputesController(ISender sender) : ApiController(sender)
+public sealed class DisputesController : ApiController
 {
+    private readonly ICurrentUser _currentUser;
+
+    public DisputesController(ISender sender, ICurrentUser currentUser) : base(sender)
+    {
+        _currentUser = currentUser;
+    }
+
     [HttpGet]
     public Task<IActionResult> GetDisputes([FromQuery] DisputeFilterDto filter, CancellationToken cancellationToken)
     {
-        var query = new GetDisputesQuery(filter);
+        var query = new GetDisputesQuery(filter, _currentUser.UserId!);
         return SendAsync(query, cancellationToken);
     }
 
@@ -103,6 +111,37 @@ public sealed class DisputesController(ISender sender) : ApiController(sender)
         var command = new UploadDisputeEvidenceCommand(disputeId, files);
         return await SendAsync(command, cancellationToken);
     }
+
+    [HttpPost("{disputeId}/accept-evidence")]
+    public async Task<IActionResult> BuyerAcceptEvidence(
+        Guid disputeId,
+        CancellationToken cancellationToken)
+    {
+        var buyerId = _currentUser.UserId;
+        if (string.IsNullOrEmpty(buyerId))
+        {
+            return Unauthorized();
+        }
+
+        var command = new BuyerAcceptEvidenceCommand(disputeId, buyerId);
+        return await SendAsync(command, cancellationToken);
+    }
+
+    [HttpPost("{disputeId}/request-refund")]
+    public async Task<IActionResult> BuyerRequestRefund(
+        Guid disputeId,
+        [FromBody] BuyerRequestRefundRequest? request,
+        CancellationToken cancellationToken)
+    {
+        var buyerId = _currentUser.UserId;
+        if (string.IsNullOrEmpty(buyerId))
+        {
+            return Unauthorized();
+        }
+
+        var command = new BuyerRequestRefundCommand(disputeId, buyerId, request?.Message);
+        return await SendAsync(command, cancellationToken);
+    }
 }
 
 public sealed record CreateDisputeRequest(
@@ -116,4 +155,8 @@ public sealed record UpdateDisputeStatusRequest(
 
 public sealed record RespondToDisputeRequest(
     string Message
+);
+
+public sealed record BuyerRequestRefundRequest(
+    string? Message
 );

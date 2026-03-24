@@ -37,8 +37,8 @@ public sealed class BulkLeaveBuyerFeedbackCommandValidator : AbstractValidator<B
 
         RuleFor(x => x.Comment)
             .NotEmpty().WithMessage("Feedback comment is required.")
-            .MaximumLength(BuyerFeedback.MaxCommentLength)
-            .WithMessage($"Feedback comment cannot exceed {BuyerFeedback.MaxCommentLength} characters.");
+            .MaximumLength(PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback.MaxCommentLength)
+            .WithMessage($"Feedback comment cannot exceed {PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback.MaxCommentLength} characters.");
 
         When(x => x.UseStoredFeedback, () =>
         {

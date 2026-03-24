@@ -29,6 +29,8 @@ const PayoutsPage = lazy(() => import("../Payments/PayoutsPage"));
 const ReportsPage = lazy(() => import("../Payments/ReportsPage"));
 const FeedbackPage = lazy(() => import("../Feedback/FeedbackPage"));
 const MyDisputes = lazy(() => import("../Disputes/MyDisputes"));
+const MySupportTickets = lazy(() => import("../SupportTickets/MySupportTickets"));
+const CreateSupportTicket = lazy(() => import("../SupportTickets/CreateSupportTicket"));
 const SellerReportsLayout = lazy(() => import("../Reports/ReportLayout"));
 const ReportsDownloadsPage = lazy(() => import("../Reports/DownloadsPage"));
 const ReportsUploadsPage = lazy(() => import("../Reports/UploadsPage"));
@@ -257,6 +259,22 @@ const router = createBrowserRouter([
             ),
           },
         ],
+      },
+      {
+        path: "support-tickets",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <MySupportTickets />
+          </Suspense>
+        ),
+      },
+      {
+        path: "support-tickets/create",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <CreateSupportTicket />
+          </Suspense>
+        ),
       },
       {
         path: "research",

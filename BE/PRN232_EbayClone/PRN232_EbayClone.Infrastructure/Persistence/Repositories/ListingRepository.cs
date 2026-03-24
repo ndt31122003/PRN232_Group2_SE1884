@@ -53,6 +53,14 @@ public sealed class ListingRepository :
         return auctionListing;
     }
 
+    public Task<List<Listing>> GetBySellerIdAsync(string sellerId, CancellationToken cancellationToken)
+    {
+        return DbContext.Listings
+            .AsNoTracking()
+            .Where(l => l.CreatedBy == sellerId)
+            .ToListAsync(cancellationToken);
+    }
+
 
     public Task<List<Listing>> GetListingsToActivateAsync(DateTime now, int batchSize, CancellationToken cancellationToken)
     {
