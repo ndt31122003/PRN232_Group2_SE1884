@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.SaleEvents.Services;
 using PRN232_EbayClone.Domain.Categories.Entities;
 using PRN232_EbayClone.Domain.Categories.Errors;
 using PRN232_EbayClone.Domain.Listings.Entities;
@@ -31,6 +32,8 @@ public sealed record UpdateListingCommand(
     bool AllowOffers,
     decimal? MinimumOffer,
     decimal? AutoAcceptOffer,
+    Guid? ShippingPolicyId,
+    Guid? ReturnPolicyId,
     bool IsDraft,
     DateTime? ScheduledStartTime = null
 ) : ICommand;
@@ -43,7 +46,7 @@ public sealed class UpdateListingCommandValidator : AbstractValidator<UpdateList
             .NotEmpty().WithMessage("Listing ID is required.");
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")
-            .MaximumLength(100).WithMessage("Title must not exceed 100 characters.");
+            .MaximumLength(80).WithMessage("Title must not exceed 80 characters.");
         RuleFor(x => x.Sku)
             .NotEmpty().WithMessage("SKU is required.")
             .MaximumLength(50).WithMessage("SKU must not exceed 50 characters.");
@@ -66,17 +69,20 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
     private readonly IUserContext _userContext;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPriceIncreaseValidator _priceIncreaseValidator;
 
     public UpdateListingCommandHandler(
         IUnitOfWork unitOfWork,
         ICategoryRepository categoryRepository,
         IListingRepository listingRepository,
-        IUserContext userContext)
+        IUserContext userContext,
+        IPriceIncreaseValidator priceIncreaseValidator)
     {
         _unitOfWork = unitOfWork;
         _categoryRepository = categoryRepository;
         _listingRepository = listingRepository;
         _userContext = userContext;
+        _priceIncreaseValidator = priceIncreaseValidator;
     }
 
     public async Task<Result> Handle(UpdateListingCommand request, CancellationToken cancellationToken)
@@ -94,6 +100,18 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
         if (!string.Equals(listing.CreatedBy, userId, StringComparison.OrdinalIgnoreCase))
         {
             return ListingErrors.Unauthorized;
+        }
+
+        if (listing is AuctionListing auctionListingForCheck && auctionListingForCheck.BidsCount > 0)
+        {
+            if (request.Title != auctionListingForCheck.Title || 
+                request.CategoryId != auctionListingForCheck.CategoryId || 
+                request.Format != auctionListingForCheck.Format)
+            {
+                return Error.Failure(
+                    "Listing.ReviseNotAllowed", 
+                    "Cannot change title, category, or format once an auction has bids.");
+            }
         }
 
         var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
@@ -131,7 +149,9 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
             request.ConditionId,
             request.ConditionDescription,
             request.ItemSpecifics,
-            request.ListingImages ?? []);
+            request.ListingImages ?? [],
+            request.ShippingPolicyId,
+            request.ReturnPolicyId);
         if (updateCommonResult.IsFailure) return updateCommonResult.Error;
 
         switch (listing)
@@ -140,6 +160,17 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
                 {
                     var validateResult = Category.ValidateSpecifics(request.ItemSpecifics, category.CategorySpecifics);
                     if (validateResult.IsFailure) return validateResult.Error;
+                    
+                    // Validate price increase if price is changing
+                    if (request.Price.HasValue && request.Price.Value != fixedPrice.Pricing.Price)
+                    {
+                        var priceValidation = await _priceIncreaseValidator.ValidatePriceChange(
+                            listing.Id, 
+                            request.Price.Value, 
+                            cancellationToken);
+                        if (priceValidation.IsFailure) return priceValidation.Error;
+                    }
+                    
                     var pricingResult = fixedPrice.UpdatePricing(request.Price!.Value, request.Quantity!.Value);
                     if (pricingResult.IsFailure) return pricingResult.Error;
                     break;
@@ -152,6 +183,13 @@ public sealed class UpdateListingCommandHandler : ICommandHandler<UpdateListingC
                     {
                         var variationSpecificsValidation = Category.ValidateSpecifics(v.VariationSpecifics, category.CategorySpecifics);
                         if (variationSpecificsValidation.IsFailure) return variationSpecificsValidation.Error;
+
+                        // Validate price increase for each variation
+                        var priceValidation = await _priceIncreaseValidator.ValidatePriceChange(
+                            listing.Id, 
+                            v.Price, 
+                            cancellationToken);
+                        if (priceValidation.IsFailure) return priceValidation.Error;
 
                         var variationOrError = Variation.Create(
                             v.Sku,

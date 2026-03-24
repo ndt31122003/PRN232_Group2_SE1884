@@ -16,17 +16,21 @@ public abstract class Listing(Guid id) : AggregateRoot<Guid>(id)
     public Guid CategoryId { get; protected set; }
     public Guid? ConditionId { get; protected set; }
     public string ConditionDescription { get; protected set; } = null!;
-
-    protected readonly HashSet<ItemSpecific> _itemSpecifics = [];
-    public IReadOnlyCollection<ItemSpecific> ItemSpecifics => _itemSpecifics;
     public DateTime? ScheduledStartTime { get; protected set; }
     public DateTime? DraftExpiredAt { get; protected set; }
     public DateTime? StartDate { get; protected set; }
     public DateTime? EndDate { get; protected set; }
+
+    protected readonly HashSet<ItemSpecific> _itemSpecifics = [];
+    public IReadOnlyCollection<ItemSpecific> ItemSpecifics => _itemSpecifics;
+    public Guid? ShippingPolicyId { get; protected set; }
+    public Guid? ReturnPolicyId { get; protected set; }
+    public int WatchersCount { get; protected set; }
     public Duration Duration { get; protected set; }
 
     protected readonly HashSet<ListingImage> _images = [];
     public IReadOnlyCollection<ListingImage> Images => _images;
+    public DateTime? LastPriceChangeDate { get; protected set; }
     public abstract decimal GetEstimatedValue();
 
     public Result UpdateCommon(
@@ -37,7 +41,9 @@ public abstract class Listing(Guid id) : AggregateRoot<Guid>(id)
         Guid? conditionId,
         string conditionDescription,
         IEnumerable<ItemSpecific> itemSpecifics,
-        IEnumerable<ListingImage> listingImages)
+        IEnumerable<ListingImage> listingImages,
+        Guid? shippingPolicyId,
+        Guid? returnPolicyId)
     {
         Title = title;
         Sku = sku;
@@ -45,6 +51,8 @@ public abstract class Listing(Guid id) : AggregateRoot<Guid>(id)
         CategoryId = categoryId;
         ConditionId = conditionId;
         ConditionDescription = conditionDescription;
+        ShippingPolicyId = shippingPolicyId;
+        ReturnPolicyId = returnPolicyId;
         _itemSpecifics.Clear();
         _itemSpecifics.UnionWith(itemSpecifics);
 

@@ -7,6 +7,7 @@ namespace PRN232_EbayClone.Domain.Listings.Entities;
 public sealed class AuctionListing(Guid id) : Listing(id)
 {
     public AuctionPricing Pricing { get; private set; } = null!;
+    public int BidsCount { get; private set; }
 
     public static Result<AuctionListing> Create(
         string title,
@@ -21,6 +22,8 @@ public sealed class AuctionListing(Guid id) : Listing(id)
         decimal? buyItNowPrice,
         Duration duration,
         IEnumerable<ListingImage> listingImages,
+        Guid? shippingPolicyId = null,
+        Guid? returnPolicyId = null,
         ListingStatus status = ListingStatus.Draft)
     {
         if (duration == Duration.Gtc)
@@ -45,6 +48,8 @@ public sealed class AuctionListing(Guid id) : Listing(id)
             ConditionDescription = conditionDescription,
             Pricing = new AuctionPricing(startPrice, reservePrice, buyItNowPrice),
             Duration = duration,
+            ShippingPolicyId = shippingPolicyId,
+            ReturnPolicyId = returnPolicyId,
             Status = status
         };
         auctionListing._itemSpecifics.UnionWith(itemSpecifics);

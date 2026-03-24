@@ -17,7 +17,9 @@ using PRN232_EbayClone.Domain.Vouchers.Entities;
 using PRN232_EbayClone.Domain.Reviews.Entities;
 using PRN232_EbayClone.Domain.Disputes.Entities;
 using PRN232_EbayClone.Domain.BuyerFeedback.Entities;
+using PRN232_EbayClone.Domain.Discounts.Entities;
 using PRN232_EbayClone.Infrastructure.Outbox;
+using PRN232_EbayClone.Infrastructure.Persistence.Repositories;
 using System.Reflection;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence;
@@ -50,9 +52,6 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<CouponTargetAudience> CouponTargetAudiences => Set<CouponTargetAudience>();
     public DbSet<Voucher> Vouchers => Set<Voucher>();
     public DbSet<VoucherTransaction> VoucherTransactions => Set<VoucherTransaction>();
-    public DbSet<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent> SaleEvents => Set<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEvent>();
-    public DbSet<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier> SaleEventDiscountTiers => Set<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventDiscountTier>();
-    public DbSet<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing> SaleEventListings => Set<PRN232_EbayClone.Domain.SaleEvents.Entities.SaleEventListing>();
     public DbSet<ShippingLabel> ShippingLabels => Set<ShippingLabel>();
     public DbSet<OrderItemShipment> OrderItemShipments => Set<OrderItemShipment>();
     public DbSet<Domain.BuyerFeedback.Entities.BuyerFeedbackEntity> BuyerFeedbacks => Set<Domain.BuyerFeedback.Entities.BuyerFeedbackEntity>();
@@ -71,6 +70,24 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<DisputeResponse> DisputeResponses => Set<DisputeResponse>();
     public DbSet<SellerPreference> SellerPreferences => Set<SellerPreference>();
     public DbSet<ListingIdMapping> ListingIdMappings => Set<ListingIdMapping>();
+    public DbSet<Offer> Offers => Set<Offer>();
+    public DbSet<Bid> Bids => Set<Bid>();
+    public DbSet<SellerPreference> SellerPreferences => Set<SellerPreference>();
+    public DbSet<OrderDiscount> OrderDiscounts => Set<OrderDiscount>();
+    public DbSet<OrderDiscountTier> OrderDiscountTiers => Set<OrderDiscountTier>();
+    public DbSet<OrderDiscountItemRule> OrderDiscountItemRules => Set<OrderDiscountItemRule>();
+    public DbSet<OrderDiscountCategoryRule> OrderDiscountCategoryRules => Set<OrderDiscountCategoryRule>();
+    public DbSet<OrderDiscountPerformanceMetrics> OrderDiscountPerformanceMetrics => Set<OrderDiscountPerformanceMetrics>();
+    public DbSet<AppliedOrderDiscount> AppliedOrderDiscounts => Set<AppliedOrderDiscount>();
+    public DbSet<ShippingDiscount> ShippingDiscounts => Set<ShippingDiscount>();
+    public DbSet<VolumePricing> VolumePricings => Set<VolumePricing>();
+    public DbSet<VolumePricingTier> VolumePricingTiers => Set<VolumePricingTier>();
+    public DbSet<SaleEvent> SaleEvents => Set<SaleEvent>();
+    public DbSet<SaleEventDiscountTier> SaleEventDiscountTiers => Set<SaleEventDiscountTier>();
+    public DbSet<SaleEventListing> SaleEventListings => Set<SaleEventListing>();
+    public DbSet<SaleEventPerformanceMetrics> SaleEventPerformanceMetrics => Set<SaleEventPerformanceMetrics>();
+    public DbSet<SaleEventPriceSnapshot> SaleEventPriceSnapshots => Set<SaleEventPriceSnapshot>();
+    public DbSet<AppliedSaleEvent> AppliedSaleEvents => Set<AppliedSaleEvent>();
 
 
 

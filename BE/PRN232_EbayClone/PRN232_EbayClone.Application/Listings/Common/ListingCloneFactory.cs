@@ -71,6 +71,8 @@ internal static class ListingCloneFactory
             listing.OfferSettings.AutoAcceptOffer,
             images,
             listing.Pricing.Quantity,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
         if (createResult.IsFailure)
         {
@@ -121,6 +123,9 @@ internal static class ListingCloneFactory
             listing.OfferSettings.MinimumOffer,
             listing.OfferSettings.AutoAcceptOffer,
             variations,
+            images,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
 
         if (createResult.IsFailure)
@@ -128,16 +133,7 @@ internal static class ListingCloneFactory
             return createResult.Error;
         }
 
-        var duplicate = createResult.Value;
-
-        foreach (var image in images)
-        {
-            var addImageResult = duplicate.AddImage(image.Url, image.IsPrimary);
-            if (addImageResult.IsFailure)
-                return addImageResult.Error;
-        }
-
-        return duplicate;
+        return createResult.Value;
     }
 
     private static Result<Listing> CloneAuction(
@@ -162,6 +158,8 @@ internal static class ListingCloneFactory
             listing.Pricing.BuyItNowPrice,
             listing.Duration,
             images,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
         if (createResult.IsFailure)
         {
@@ -201,6 +199,8 @@ internal static class ListingCloneFactory
             null,
             images,
             1,
+            listing.ShippingPolicyId,
+            listing.ReturnPolicyId,
             status);
 
         if (createResult.IsFailure)

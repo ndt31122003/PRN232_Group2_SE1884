@@ -1,72 +1,76 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PRN232_EbayClone.Domain.SaleEvents.Entities;
-using PRN232_EbayClone.Domain.SaleEvents.Enums;
-using PRN232_EbayClone.Domain.Users.ValueObjects;
+using PRN232_EbayClone.Domain.Discounts.Entities;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence.Configurations;
 
-public sealed class SaleEventConfiguration : IEntityTypeConfiguration<SaleEvent>
+internal sealed class SaleEventConfiguration : IEntityTypeConfiguration<SaleEvent>
 {
     public void Configure(EntityTypeBuilder<SaleEvent> builder)
     {
-        builder.ToTable("sale_event");
+        builder.ToTable("sale_events");
 
         builder.HasKey(se => se.Id);
-        builder.Property(se => se.Id).HasColumnName("id");
-
-        var modeConverter = new EnumToStringConverter<SaleEventMode>();
-        var statusConverter = new EnumToStringConverter<SaleEventStatus>();
-
-        builder.Property(se => se.SellerId)
-            .HasColumnName("seller_id")
-            .HasConversion(id => id.Value, value => new UserId(value))
-            .IsRequired();
 
         builder.Property(se => se.Name)
-            .HasColumnName("name")
-            .HasMaxLength(90)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(200);
 
         builder.Property(se => se.Description)
-            .HasColumnName("description")
-            .HasMaxLength(255);
+            .HasMaxLength(1000);
+
+        builder.Property(se => se.SellerId)
+            .IsRequired();
+
+        builder.Property(se => se.StartDate)
+            .IsRequired();
+
+        builder.Property(se => se.EndDate)
+            .IsRequired();
 
         builder.Property(se => se.Mode)
-            .HasColumnName("mode")
-            .HasConversion(modeConverter)
-            .HasMaxLength(50)
+            .IsRequired()
+            .HasConversion<int>();
+
+        builder.Property(se => se.HighlightPercentage)
+            .HasPrecision(5, 2);
+
+        builder.Property(se => se.OfferFreeShipping)
             .IsRequired();
+
+        builder.Property(se => se.BlockPriceIncreaseRevisions)
+            .IsRequired();
+
+        builder.Property(se => se.IncludeSkippedItems)
+            .IsRequired();
+
+        builder.Property(se => se.BuyerMessageLabel)
+            .HasMaxLength(200);
+
+        builder.Ignore(se => se.Type);
+        builder.Ignore(se => se.IsActive);
 
         builder.Property(se => se.Status)
-            .HasColumnName("status")
-            .HasConversion(statusConverter)
-            .HasMaxLength(50)
+            .IsRequired()
+            .HasConversion<int>();
+
+        builder.Property(se => se.CreatedAt)
             .IsRequired();
 
-        builder.Property(se => se.StartDate).HasColumnName("start_date").IsRequired();
-        builder.Property(se => se.EndDate).HasColumnName("end_date").IsRequired();
-
-        builder.Property(se => se.OfferFreeShipping).HasColumnName("offer_free_shipping");
-        builder.Property(se => se.IncludeSkippedItems).HasColumnName("include_skipped_items");
-        builder.Property(se => se.BlockPriceIncreaseRevisions).HasColumnName("block_price_increase_revisions");
-        builder.Property(se => se.HighlightPercentage).HasColumnName("highlight_percentage").HasColumnType("numeric(5,2)");
-
-        builder.Property(se => se.CreatedAt).HasColumnName("created_at");
-        builder.Property(se => se.CreatedBy).HasColumnName("created_by");
-        builder.Property(se => se.UpdatedAt).HasColumnName("updated_at");
-        builder.Property(se => se.UpdatedBy).HasColumnName("updated_by");
-        builder.Property(se => se.IsDeleted).HasColumnName("is_deleted");
+        builder.Property(se => se.UpdatedAt);
 
         builder.HasMany(se => se.DiscountTiers)
             .WithOne()
-            .HasForeignKey(dt => dt.SaleEventId)
+            .HasForeignKey("SaleEventId")
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(se => se.Listings)
             .WithOne()
-            .HasForeignKey(l => l.SaleEventId)
+            .HasForeignKey("SaleEventId")
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(se => se.SellerId);
+        builder.HasIndex(se => se.Status);
+        builder.HasIndex(se => new { se.StartDate, se.EndDate });
     }
 }
