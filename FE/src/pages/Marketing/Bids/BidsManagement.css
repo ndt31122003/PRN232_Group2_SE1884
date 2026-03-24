@@ -201,3 +201,28 @@
     border-left: 4px solid #0041b2;
     padding-left: 2px;
 }
+
+/* =========================================================
+   Blue-flash animation for newly arriving bid rows
+   ========================================================= */
+@keyframes bidFlash {
+    0%   { background-color: #d0e4ff; box-shadow: 0 0 8px #3665f3; }
+    50%  { background-color: #9fc5ff; box-shadow: 0 0 16px #0041b2; }
+    100% { background-color: transparent; box-shadow: none; }
+}
+
+.bid-row--flash {
+    animation: bidFlash 1.5s ease-out 2; /* flashes twice */
+}
+
+/* Countdown display */
+.countdown {
+    font-weight: 600;
+    color: #d9363e;
+    font-variant-numeric: tabular-nums;
+}
+.countdown.expired {
+    color: #888;
+    font-weight: 400;
+}
+
