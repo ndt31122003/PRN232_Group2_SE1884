@@ -22,11 +22,17 @@ public sealed class CloudinaryFileManager : IFileManager
     {
         _config = config.Value;
 
-        _cloudinary = new Cloudinary(new Account(
-            _config.CloudName,
-            _config.ApiKey,
-            _config.ApiSecret
-        ));
+        var cloudName = (Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME") ?? _config.CloudName)?.Trim();
+        var apiKey = (Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? _config.ApiKey)?.Trim();
+        var apiSecret = (Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? _config.ApiSecret)?.Trim();
+
+        if (string.IsNullOrEmpty(cloudName) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret))
+        {
+            throw new InvalidOperationException("Cloudinary credentials are missing in .env or appsettings.json.");
+        }
+
+        _cloudinary = new Cloudinary(new Account(cloudName, apiKey, apiSecret));
+        _cloudinary.Api.Secure = true;
     }
 
     public async Task<Result<string>> UploadFileAsync(IFormFile file)

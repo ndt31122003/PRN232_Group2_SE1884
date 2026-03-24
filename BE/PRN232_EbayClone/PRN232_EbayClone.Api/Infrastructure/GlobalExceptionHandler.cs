@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace PRN232_EbayClone.Api.Infrastructure;
 
@@ -19,7 +19,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
             Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
             Title = "Server Error",
             Status = StatusCodes.Status500InternalServerError,
-            Detail = $"[#{logId}] An unhandled exception occurred."
+            Detail = $"[#{logId}] {exception.GetType().Name}: {exception.Message}"
         };
 
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;

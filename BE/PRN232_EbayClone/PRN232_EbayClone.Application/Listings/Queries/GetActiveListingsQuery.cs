@@ -1,4 +1,4 @@
-﻿using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Common.Dtos;
 using PRN232_EbayClone.Domain.Listings.Enums;
@@ -8,6 +8,8 @@ namespace PRN232_EbayClone.Application.Listings.Queries;
 
 public sealed record GetActiveListingsQuery(
     string? SearchTerm = null,
+    ListingFormat? Format = null,
+    bool? OutOfStock = null,
     int PageNumber = 1,
     int PageSize = 20
 ) : IQuery<PagingResult<ActiveListingDto>>;
@@ -23,11 +25,16 @@ public sealed record ActiveListingDto(
     Duration Duration,
     decimal CurrentPrice,
     string? Discounts,
-    decimal StartPrice,
-    decimal ReservePrice,
-    decimal ShippingCost,
+    decimal? StartPrice,
+    decimal? ReservePrice,
+    decimal? ShippingCost,
     DateTime? StartDate,
-    DateTime? EndDate
+    DateTime? EndDate,
+    int WatchersCount,
+    int BidsCount,
+    int OffersCount,
+    decimal? BestOfferAmount,
+    decimal? BuyItNowPrice
 );
 
 public sealed class GetActiveListingsQueryHandler : IQueryHandler<GetActiveListingsQuery, PagingResult<ActiveListingDto>>
@@ -55,6 +62,8 @@ public sealed class GetActiveListingsQueryHandler : IQueryHandler<GetActiveListi
         var (items, totalCount) = await _listingRepository.GetActiveListingsAsync(
             userId,
             request.SearchTerm,
+            request.Format,
+            request.OutOfStock,
             pageNumber,
             pageSize,
             cancellationToken);

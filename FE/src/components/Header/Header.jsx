@@ -194,29 +194,21 @@ const NavHeader = ({ setCurrentSession }) => {
       active: activeNav === "marketing",
       items: [
         {
-          id: "marketing-sale-events",
-          label: "Sale events",
+          id: "marketing-summary",
+          label: "Summary",
           onClick: () => {
             setActiveNav("marketing");
             setPromotionMenuOpen(false);
-            navigate("/marketing/sale-events");
+            navigate("/marketing");
           }
         },
         {
-          id: "marketing-coupons",
-          label: "Coupons",
+          id: "marketing-promotions",
+          label: "Promotions",
           onClick: () => {
             setActiveNav("marketing");
             setPromotionMenuOpen(false);
-            navigate("/marketing/coupons");
-          }
-        },
-        {
-          id: "marketing-discounts",
-          label: "Discounts",
-          onClick: () => {
-            setActiveNav("marketing");
-            showComingSoon("Discounts");
+            navigate("/marketing");
           }
         },
         {
@@ -229,7 +221,30 @@ const NavHeader = ({ setCurrentSession }) => {
           ),
           onClick: () => {
             setActiveNav("marketing");
-            showComingSoon("Offers");
+            setPromotionMenuOpen(false);
+            navigate("/marketing/offers");
+          }
+        },
+        {
+          id: "marketing-bids",
+          label: (
+            <span className="marketing-menu__label">
+              Bids
+              <span className="marketing-menu__badge">NEW</span>
+            </span>
+          ),
+          onClick: () => {
+            setActiveNav("marketing");
+            setPromotionMenuOpen(false);
+            navigate("/marketing/bids");
+          }
+        },
+        {
+          id: "marketing-buyer-groups",
+          label: "Buyer groups",
+          onClick: () => {
+            setActiveNav("marketing");
+            showComingSoon("Buyer groups");
           }
         },
         {
@@ -400,7 +415,7 @@ const NavHeader = ({ setCurrentSession }) => {
       label: "Order discount",
       onClick: () => {
         setPromotionMenuOpen(false);
-        showComingSoon("Order discount");
+        navigate("/marketing/order-discounts/create");
       }
     },
     {
@@ -416,7 +431,7 @@ const NavHeader = ({ setCurrentSession }) => {
       label: "Shipping discount",
       onClick: () => {
         setPromotionMenuOpen(false);
-        showComingSoon("Shipping discount");
+        navigate("/marketing/shipping-discounts/create");
       }
     },
     {
@@ -424,7 +439,7 @@ const NavHeader = ({ setCurrentSession }) => {
       label: "Volume pricing",
       onClick: () => {
         setPromotionMenuOpen(false);
-        showComingSoon("Volume pricing");
+        navigate("/marketing/volume-pricing/create");
       }
     }
   ];
@@ -720,7 +735,7 @@ const NavHeader = ({ setCurrentSession }) => {
                 placeholder="Search for anything"
                 className="search__input"
               />
-              <button className="search__category">
+              <div className="search__category">
                 {/* <span className="search__category-text">All Categories</span>
                 <svg className="search__category-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -740,7 +755,7 @@ const NavHeader = ({ setCurrentSession }) => {
                     </li>
                   </ul>
                 </div>
-              </button>
+              </div>
             </div>
 
           </div>

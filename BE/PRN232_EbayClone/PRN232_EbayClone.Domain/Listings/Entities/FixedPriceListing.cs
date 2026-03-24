@@ -1,4 +1,4 @@
-﻿
+
 using PRN232_EbayClone.Domain.Listings.Enums;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
 using PRN232_EbayClone.Domain.Shared.Results;
@@ -28,6 +28,8 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
         decimal? autoAcceptOffer,
         IEnumerable<ListingImage> listingImages,
         int quantity = 1,
+        Guid? shippingPolicyId = null,
+        Guid? returnPolicyId = null,
         ListingStatus status = ListingStatus.Draft)
     {
         var offerSettingsResult = OfferSettings.Create(allowOffers, minimumOffer, autoAcceptOffer);
@@ -46,6 +48,8 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
             Pricing = new FixedPricePricing(price, quantity),
             Status = status,
             Duration = Duration.Gtc,
+            ShippingPolicyId = shippingPolicyId,
+            ReturnPolicyId = returnPolicyId,
             OfferSettings = offerSettingsResult.Value
         };
         listing._itemSpecifics.UnionWith(itemSpecifics);
@@ -70,6 +74,9 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
         decimal? minimumOffer,
         decimal? autoAcceptOffer,
         IEnumerable<Variation> variations,
+        IEnumerable<ListingImage> listingImages,
+        Guid? shippingPolicyId = null,
+        Guid? returnPolicyId = null,
         ListingStatus status = ListingStatus.Draft)
     {
         if (variations.Count() < 2)
@@ -92,9 +99,18 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
             ConditionDescription = conditionDescription,
             Status = status,
             Duration = Duration.Gtc,
+            ShippingPolicyId = shippingPolicyId,
+            ReturnPolicyId = returnPolicyId,
             OfferSettings = offerSettingsResult.Value
         };
         listing._variations.UnionWith(variations);
+
+        foreach (var img in listingImages)
+        {
+            var addImageResult = listing.AddImage(img.Url, img.IsPrimary);
+            if (addImageResult.IsFailure) return addImageResult.Error;
+        }
+
         return listing;
     }
 
@@ -104,6 +120,13 @@ public sealed class FixedPriceListing(Guid id) : Listing(id)
         {
             return Error.Failure("Listing.InvalidOperation", "Cannot update pricing for multi-variation listings.");
         }
+        
+        // Track price changes
+        if (Pricing != null && Pricing.Price != price)
+        {
+            LastPriceChangeDate = DateTime.UtcNow;
+        }
+        
         Pricing = new FixedPricePricing(price, quantity);
         return Result.Success();
     }

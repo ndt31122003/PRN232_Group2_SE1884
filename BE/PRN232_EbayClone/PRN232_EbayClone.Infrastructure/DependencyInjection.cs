@@ -25,6 +25,7 @@ using PRN232_EbayClone.Domain.Shared.Constants;
 using PRN232_EbayClone.Domain.Users.Services;
 using PRN232_EbayClone.Infrastructure.BackgroundJobs;
 using PRN232_EbayClone.Infrastructure.FileStorage;
+using PRN232_EbayClone.Application.Abstractions.Storage;
 using PRN232_EbayClone.Infrastructure.Identity;
 using PRN232_EbayClone.Infrastructure.Mail;
 using PRN232_EbayClone.Infrastructure.Outbox;
@@ -124,6 +125,12 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();
         services.AddScoped<ISellerPreferenceRepository, SellerPreferenceRepository>();
+        services.AddScoped<IOfferRepository, OfferRepository>();
+        services.AddScoped<IBidRepository, BidRepository>();
+        services.AddScoped<IOrderDiscountRepository, OrderDiscountRepository>();
+        services.AddScoped<IShippingDiscountRepository, ShippingDiscountRepository>();
+        services.AddScoped<IVolumePricingRepository, VolumePricingRepository>();
+        services.AddScoped<ISaleEventRepository, SaleEventRepository>();
 
 
         return services;
@@ -324,6 +331,7 @@ services.AddScoped<ICouponRepository, CouponRepository>();
     {
         services.Configure<CloudinaryConfiguration>(configuration.GetSection("Cloudinary"));
         services.AddTransient<IFileManager, CloudinaryFileManager>();
+        services.AddTransient<ICloudinaryService, CloudinaryService>();
         return services;
     }
 

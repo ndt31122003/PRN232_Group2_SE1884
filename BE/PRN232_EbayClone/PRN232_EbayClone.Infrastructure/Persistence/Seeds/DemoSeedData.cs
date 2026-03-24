@@ -112,7 +112,8 @@ internal static class DemoSeedData
                     ScheduledStartTime = (DateTime?)null,
                     DraftExpiredAt = (DateTime?)null,
                     StartDate = createdAt,
-                    EndDate = (DateTime?)null
+                    EndDate = (DateTime?)null,
+                    WatchersCount = 0
                 });
 
                 pricing.Add(new

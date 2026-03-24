@@ -23,6 +23,8 @@ try
 {
     Log.Information("Starting web host");
 
+    DotNetEnv.Env.Load();
+
     var builder = WebApplication.CreateBuilder(args);
 
     const string CorsPolicyName = "FrontendCors";
