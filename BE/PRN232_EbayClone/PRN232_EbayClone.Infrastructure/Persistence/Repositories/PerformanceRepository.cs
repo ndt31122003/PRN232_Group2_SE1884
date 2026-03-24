@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using PRN232_EbayClone.Application.Performance.Abstractions;
 using PRN232_EbayClone.Application.Performance.Records;
 using PRN232_EbayClone.Application.Performance.Helpers; // ✅ THÊM DÒNG NÀY
@@ -23,6 +24,7 @@ public sealed class PerformanceRepository : IPerformanceRepository
     private readonly ApplicationDbContext _context;
     private readonly IDbConnectionFactory _connectionFactory;
     private readonly IDistributedCache _cache;
+    private readonly ILogger<PerformanceRepository> _logger;
     // ❌ XÓA DÒNG NÀY:
     // private const int DefaultHandlingTimeHours = 48;
     
@@ -32,11 +34,13 @@ public sealed class PerformanceRepository : IPerformanceRepository
     public PerformanceRepository(
         ApplicationDbContext context,
         IDbConnectionFactory connectionFactory,
-        IDistributedCache cache)
+        IDistributedCache cache,
+        ILogger<PerformanceRepository> logger)
     {
         _context = context;
         _connectionFactory = connectionFactory;
         _cache = cache;
+        _logger = logger;
     }
 
     public async Task<IReadOnlyList<PerformanceOverviewRecord>> GetOverviewRecordsAsync(
@@ -202,14 +206,21 @@ public sealed class PerformanceRepository : IPerformanceRepository
         CancellationToken cancellationToken = default)
     {
         var cacheKey = $"inventory:dashboard:{sellerId}";
-        var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
-        if (!string.IsNullOrWhiteSpace(cached))
+        try
         {
-            var cachedPayload = JsonSerializer.Deserialize<InventoryDashboardRecord>(cached);
-            if (cachedPayload is not null)
+            var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(cached))
             {
-                return cachedPayload;
+                var cachedPayload = JsonSerializer.Deserialize<InventoryDashboardRecord>(cached);
+                if (cachedPayload is not null)
+                {
+                    return cachedPayload;
+                }
             }
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning(exception, "Inventory dashboard cache read failed for seller {SellerId}. Falling back to database.", sellerId);
         }
 
         using var connection = await _connectionFactory.CreateConnectionAsync();
@@ -236,7 +247,7 @@ SELECT
     i.threshold_quantity AS ThresholdQuantity,
     i.last_updated_at AS LastUpdatedAt
 FROM inventory i
-LEFT JOIN listings l ON l.id = i.listing_id
+LEFT JOIN listing l ON l.id = i.listing_id
 WHERE i.seller_id = @SellerId
   AND (i.available_quantity <= 0 OR i.is_low_stock)
 ORDER BY i.available_quantity ASC, i.last_updated_at DESC
@@ -258,14 +269,21 @@ LIMIT 10;";
             summary.OutOfStockListings,
             criticalListings);
 
-        await _cache.SetStringAsync(
-            cacheKey,
-            JsonSerializer.Serialize(payload),
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15)
-            },
-            cancellationToken);
+        try
+        {
+            await _cache.SetStringAsync(
+                cacheKey,
+                JsonSerializer.Serialize(payload),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15)
+                },
+                cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning(exception, "Inventory dashboard cache write failed for seller {SellerId}. Returning fresh database result without cache.", sellerId);
+        }
 
         return payload;
     }

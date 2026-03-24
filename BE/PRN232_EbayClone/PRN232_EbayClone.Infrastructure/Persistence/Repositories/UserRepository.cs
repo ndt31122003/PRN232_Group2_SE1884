@@ -2,7 +2,6 @@ using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
 using PRN232_EbayClone.Domain.Users.Entities;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
-using System.Linq;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence.Repositories;
 
@@ -48,15 +47,26 @@ public sealed class UserRepository :
             .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
     }
 
-    public Task<User?> GetByUsernameOrEmailAsync(string identifier, CancellationToken cancellationToken)
+    public async Task<User?> GetByUsernameOrEmailAsync(string identifier, CancellationToken cancellationToken)
     {
         var normalizedIdentifier = identifier.Trim();
 
-        return DbContext.Users
+        var user = await DbContext.Users
             .Include(u => u.Roles)
-            .FirstOrDefaultAsync(
-                u => u.Username == normalizedIdentifier || u.Email.Value == normalizedIdentifier,
-                cancellationToken);
+            .FirstOrDefaultAsync(u => u.Username == normalizedIdentifier, cancellationToken);
+
+        if (user is not null)
+        {
+            return user;
+        }
+
+        var emailOrError = Email.Create(normalizedIdentifier);
+        if (emailOrError.IsFailure)
+        {
+            return null;
+        }
+
+        return await GetByEmailAsync(emailOrError.Value, cancellationToken);
     }
 
     // Add this method

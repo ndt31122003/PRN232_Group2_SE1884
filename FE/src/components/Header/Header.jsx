@@ -325,6 +325,11 @@ const NavHeader = ({ setCurrentSession }) => {
           id: "service-metrics",
           label: "Service metrics",
           onClick: () => console.log("Service metrics")
+        },
+        {
+          id: "performance-stock",
+          label: "Stock",
+          onClick: () => goTo("performance", "/performance/stock")
         }
       ]
     },
