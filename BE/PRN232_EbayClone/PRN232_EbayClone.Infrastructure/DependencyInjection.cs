@@ -127,6 +127,7 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IShippingDiscountRepository, ShippingDiscountRepository>();
         services.AddScoped<IVolumePricingRepository, VolumePricingRepository>();
         services.AddScoped<ISaleEventRepository, SaleEventRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
         return services;
@@ -180,7 +181,27 @@ services.AddScoped<ICouponRepository, CouponRepository>();
                 ),
                 ClockSkew = TimeSpan.Zero
             };
+
+            // ✅ Required for SignalR WebSocket authentication
+            // The SignalR client sends the JWT as ?access_token= in query string (not in header)
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        path.StartsWithSegments("/hub"))
+                    {
+                        context.Token = accessToken;
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
         });
+
 
         services.AddAuthorization(options =>
         {

@@ -1,7 +1,11 @@
 import axios from "axios";
 
 // const BASE_URL = "https://prn232.mnhduc.site/api/";
-const BASE_URL = "http://localhost:8080/api/";
+// const BASE_URL = "http://localhost:8080/api/";
+// const BASE_URL = "https://propval.io.vn/api/";
+// const BASE_URL = "https://localhost:7046/api/";
+const isDev = process.env.NODE_ENV !== "production";
+const BASE_URL = isDev ? "http://localhost:5149/api/" : "https://propval.io.vn/api/";
 
 // Hàm hiển thị thông báo lỗi (có thể thay bằng Toast Notification)
 const showError = (message) => {

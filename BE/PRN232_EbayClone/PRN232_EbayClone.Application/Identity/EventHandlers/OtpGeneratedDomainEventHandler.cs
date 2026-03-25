@@ -54,7 +54,8 @@ public sealed class OtpGeneratedDomainEventHandler : INotificationHandler<OtpGen
                         AppName = "PRN232_EbayClone",
                         UserName = user?.FullName ?? notification.Email,
                         Code = notification.Code,
-                        ExpiresMinutes = notification.ExpiresInMinutes
+                        ExpiresMinutes = notification.ExpiresInMinutes,
+                        ReferenceId = Guid.NewGuid().ToString("N")[..24]
                     },
                     cancellationToken);
 
