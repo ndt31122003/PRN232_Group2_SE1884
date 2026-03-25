@@ -1,22 +1,24 @@
 services:
   redis:
     image: redis:alpine
-    restart: unless-stopped
     volumes:
       - redis_data:/data
     networks:
       - internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
 
   api:
+    image: ${REGISTRY:-localhost:5000}/ebay-api:${TAG:-latest}
     build:
       context: ./BE
       dockerfile: PRN232_EbayClone/PRN232_EbayClone.Api/Dockerfile
-    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__Redis=redis:6379
-    depends_on:
-      - redis
     networks:
       - internal
     healthcheck:
@@ -26,17 +28,24 @@ services:
       retries: 3
       start_period: 20s
     deploy:
-      replicas: 1
+      replicas: 2
+      restart_policy:
+        condition: any
+        delay: 5s
       update_config:
+        parallelism: 1
         order: start-first
         failure_action: rollback
-        delay: 5s
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
 
   frontend:
+    image: ${REGISTRY:-localhost:5000}/ebay-frontend:${TAG:-latest}
     build:
       context: ./FE
       dockerfile: Dockerfile
-    restart: unless-stopped
     networks:
       - internal
     healthcheck:
@@ -47,27 +56,37 @@ services:
       start_period: 10s
     deploy:
       replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
       update_config:
+        parallelism: 1
         order: start-first
         failure_action: rollback
         delay: 5s
 
   nginx:
     image: nginx:alpine
-    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - api
-      - frontend
     networks:
       - internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 5s
 
 volumes:
   redis_data:
 
 networks:
   internal:
-    driver: bridge
+    driver: overlay
+    attachable: true
