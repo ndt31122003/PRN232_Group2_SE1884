@@ -71,11 +71,11 @@ internal static class DemoSeedData
         };
 
         var listingGlobalIndex = 0;
+        var productProfiles = BuildProductProfiles();
 
         for (var sellerIndex = 0; sellerIndex < Sellers.Length; sellerIndex++)
         {
             var seller = Sellers[sellerIndex];
-            var sellerShortName = seller.FullName.Split(' ')[0];
             decimal totalValue = 0m;
 
             for (var i = 0; i < ListingsPerSeller; i++)
@@ -89,6 +89,7 @@ internal static class DemoSeedData
                 var allowOffers = i % 3 == 0;
                 decimal? minimumOffer = allowOffers ? Math.Round(price * 0.90m, 2) : null;
                 decimal? autoAccept = allowOffers ? Math.Round(price, 2) : null;
+                var profile = BuildProductProfile(productProfiles, sellerIndex, i);
 
                 listings.Add(new
                 {
@@ -96,9 +97,9 @@ internal static class DemoSeedData
                     Format = ListingFormat.FixedPrice,
                     Type = ListingType.Single,
                     Status = ListingStatus.Active,
-                    Title = $"{sellerShortName}'s Item #{i + 1}",
-                    Sku = $"DEMO-{sellerIndex + 1:D1}-{i + 1:D4}",
-                    ListingDescription = $"Curated demo listing #{i + 1} for {seller.FullName}.",
+                    Title = $"{profile.Brand} {profile.Name} {profile.Variant}",
+                    Sku = $"{profile.CategoryCode}-{sellerIndex + 1:D1}-{i + 1:D4}",
+                    ListingDescription = $"{profile.Brand} {profile.Name} {profile.Variant} curated for {seller.FullName}'s demo storefront.",
                     CategoryId = categories[categoryIdx],
                     ConditionId = conditions[conditionIdx],
                     ConditionDescription = conditionDescriptions[conditionIdx],
@@ -183,7 +184,7 @@ internal static class DemoSeedData
             templates.Add(new
             {
                 Id = CreateTemplateId(sellerIndex),
-                Name = $"{sellerShortName}'s Starter Template",
+                Name = $"{seller.FullName.Split(' ')[0]}'s Starter Template",
                 Description = "Reusable template seeded for demo purposes.",
                 PayloadJson = templatePayload,
                 FormatLabel = "Fixed Price",
@@ -232,5 +233,39 @@ internal static class DemoSeedData
         return Guid.Parse($"{prefix}-0000-0000-0000-000000000001");
     }
 
+    private static ProductProfile[] BuildProductProfiles()
+    {
+        return
+        [
+            new ProductProfile("MBL", ["Astra", "Nova", "Pulse", "Orbit", "Zenith"], ["Smartphone", "5G Phone", "Pocket Camera Phone"], ["128GB", "256GB", "Pro Edition", "Travel Bundle"]),
+            new ProductProfile("LTP", ["Northpeak", "Vertex", "Skyline", "Atlas", "Summit"], ["Laptop", "Ultrabook", "Creator Laptop"], ["13-inch", "15-inch", "RTX Ready", "Workstation"]),
+            new ProductProfile("CAM", ["Lumina", "ShutterLab", "FramePro", "Optix", "Aerial"], ["Mirrorless Camera", "Action Camera", "Vlog Camera"], ["Starter Kit", "Dual Lens", "4K Edition", "Travel Pack"]),
+            new ProductProfile("SHO", ["TrailCore", "Aerofit", "PulseRun", "StreetFlex", "MotionLab"], ["Running Shoes", "Training Shoes", "Athletic Sneakers"], ["Men's", "Women's", "Lite", "All-Terrain"]),
+            new ProductProfile("HOM", ["KitchenForge", "HomeNest", "DailyCraft", "Warmtable", "SteamWorks"], ["Air Fryer", "Espresso Machine", "Blender", "Rice Cooker"], ["Compact", "Family Size", "Premium", "Stainless"])
+        ];
+    }
+
+    private static ProductProfile BuildProductProfile(ProductProfile[] profiles, int sellerIndex, int listingIndex)
+    {
+        var category = profiles[(sellerIndex + listingIndex) % profiles.Length];
+        return category with
+        {
+            Brand = category.Brands[(sellerIndex + listingIndex) % category.Brands.Length],
+            Name = category.Names[(listingIndex + sellerIndex * 2) % category.Names.Length],
+            Variant = category.Variants[(listingIndex * 2 + sellerIndex) % category.Variants.Length]
+        };
+    }
+
     private sealed record DemoSeller(int Index, Guid Id, string FullName, string Email);
+
+    private sealed record ProductProfile(
+        string CategoryCode,
+        string[] Brands,
+        string[] Names,
+        string[] Variants)
+    {
+        public string Brand { get; init; } = string.Empty;
+        public string Name { get; init; } = string.Empty;
+        public string Variant { get; init; } = string.Empty;
+    }
 }

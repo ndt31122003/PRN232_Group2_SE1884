@@ -60,6 +60,24 @@ public sealed class ListingRepository :
             .Where(l => l.CreatedBy == sellerId)
             .ToListAsync(cancellationToken);
     }
+    public async Task<Listing?> GetByOwnerAndSkuAsync(string ownerId, string sku, CancellationToken cancellationToken = default)
+    {
+        var normalizedSku = sku.Trim();
+
+        var fixedPriceListing = await FilterByOwner(DbContext.Listings.OfType<FixedPriceListing>(), ownerId)
+            .Include(l => l.Images)
+            .Include(l => l.Variations)
+            .FirstOrDefaultAsync(l => l.Sku == normalizedSku, cancellationToken);
+
+        if (fixedPriceListing is not null)
+        {
+            return fixedPriceListing;
+        }
+
+        return await FilterByOwner(DbContext.Listings.OfType<AuctionListing>(), ownerId)
+            .Include(l => l.Images)
+            .FirstOrDefaultAsync(l => l.Sku == normalizedSku, cancellationToken);
+    }
 
 
     public Task<List<Listing>> GetListingsToActivateAsync(DateTime now, int batchSize, CancellationToken cancellationToken)

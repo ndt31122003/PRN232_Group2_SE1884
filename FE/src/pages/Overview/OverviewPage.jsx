@@ -51,95 +51,69 @@ const OverviewPage = () => {
 
   const { data, loading } = state;
   const header = data?.header;
-  const status = data?.status;
-  const listings = data?.listings;
-  const orders = data?.orders;
-  const sales = data?.sales;
+
+  const listings = {
+    title: "Listings",
+    items: [
+      { key: "drafts", label: "Drafts", count: 0 },
+      { key: "active", label: "Active listings", count: 0 },
+      { key: "questions", label: "With questions", count: 0 },
+      { key: "open_offers", label: "With open offers from buyers", count: 0 },
+      { key: "all_auctions", label: "All auctions", count: 0 },
+      { key: "reserve_met", label: "With reserve met", count: 0 },
+      { key: "ending_today", label: "Auctions ending today", count: 0 },
+      { key: "renewing_today", label: "Buy It Now renewing today", count: 0 },
+      { key: "scheduled", label: "Scheduled listings", count: 0 },
+      { key: "unsold", label: "Unsold and not relisted", count: 0 },
+    ]
+  };
+
+  const orders = {
+    title: "Orders",
+    items: [
+      { key: "awaiting_shipment", label: "Awaiting shipment - print shipping label", count: 0 },
+      { key: "returns", label: "All open returns/replacements", count: 0 },
+      { key: "cancellations", label: "Open cancellations", count: 0 },
+      { key: "awaiting_payment", label: "Awaiting payment", count: 0 },
+      { key: "shipped", label: "Shipped and awaiting your feedback", count: 0 },
+      { key: "eligible", label: "Orders eligible for combined purchases", count: 0 },
+    ]
+  };
 
   const heroMetrics = useMemo(() => {
-    if (!header) {
-      return [];
-    }
-
     return [
       {
         key: "views",
-        label: "Listing views (90d)",
-        value: header.listingViewsLast90Days?.toLocaleString() ?? "0"
+        icon: (
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4.5C6.5 4.5 1.73 8.31 0 12c1.73 3.69 6.5 7.5 12 7.5s10.27-3.81 12-7.5c-1.73-3.69-6.5-7.5-12-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+        ),
+        value: header?.listingViewsLast90Days?.toLocaleString() ?? "0",
+        label: "Listing views (90d)"
       },
       {
         key: "sales",
-        label: "Sales (90d)",
-        value: formatCurrency(header.salesLast90Days, header.salesCurrency)
+        icon: (
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-4h16v4zm0-6H4V8h16v4zM4 6h16v2H4V6zm8 7c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
+          </svg>
+        ),
+        value: formatCurrency(header?.salesLast90Days, header?.salesCurrency || "USD"),
+        label: "Sales (90d)"
       },
       {
         key: "orders",
-        label: "Orders (90d)",
-        value: header.ordersLast90Days?.toLocaleString() ?? "0"
+        icon: (
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zm-8-3h6v-2h-6v2zm-2 0H5v-2h5v2zm8-4h-6v-2h6v2zm-8 0H5v-2h5v2zm8-4h-6V5h6v2zm-8 0H5V5h5v2z"/>
+          </svg>
+        ),
+        value: header?.ordersLast90Days?.toLocaleString() ?? "0",
+        label: "Orders (90d)"
       }
     ];
   }, [header]);
-
-  const chartModel = useMemo(() => {
-    const points = sales?.chart ?? [];
-    if (!points || points.length === 0) {
-      return {
-        polyline: ""
-      };
-    }
-
-    const totals = points.map((point) => Number(point.total ?? 0));
-    const max = Math.max(...totals, 1);
-    const stepX = points.length > 1 ? 100 / (points.length - 1) : 100;
-    const polyline = points
-      .map((point, index) => {
-        const value = Number(point.total ?? 0);
-        const x = index * stepX;
-        const y = 100 - (value / max) * 100;
-        return `${x.toFixed(2)},${y.toFixed(2)}`;
-      })
-      .join(" ");
-
-    return { polyline };
-  }, [sales]);
-
-  const renderSection = (section) => {
-    if (!section) return null;
-
-    return (
-      <section className="overview-card">
-        <header className="overview-card__header">
-          <h2>{section.title}</h2>
-        </header>
-        <ul className="overview-card__list">
-          {section.items?.map((item) => {
-            const content = (
-              <>
-                <span className="overview-card__link-label">{item.label}</span>
-                {item.count !== null && item.count !== undefined && (
-                  <span className="overview-card__count">{item.count.toLocaleString()}</span>
-                )}
-              </>
-            );
-
-            if (item.navigationPath) {
-              return (
-                <li key={item.key} className="overview-card__row">
-                  <Link to={item.navigationPath}>{content}</Link>
-                </li>
-              );
-            }
-
-            return (
-              <li key={item.key} className="overview-card__row overview-card__row--disabled">
-                <span>{content}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-    );
-  };
 
   if (loading) {
     return (
@@ -154,84 +128,142 @@ const OverviewPage = () => {
     );
   }
 
-  if (!data) {
-    return (
-      <div className="overview">
-        <div className="overview__empty">
-          <h1>Seller Hub overview</h1>
-          <p>We couldn't load your overview right now. Please refresh to try again.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="overview">
+      <div className="overview-top-link">
+        <a href="#opt-out">Opt out of Seller Hub</a>
+      </div>
+
       <section className="overview-hero">
         <div className="overview-hero__identity">
           <div className="overview-hero__avatar" aria-hidden="true">
-            {header?.sellerName?.slice(0, 1)?.toUpperCase() ?? "?"}
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
+            </svg>
           </div>
-          <div>
-            <h1>{header?.sellerName ?? "Seller Hub"}</h1>
-            <p>{header?.sellerUsername}</p>
-          </div>
+          <h1>{header?.sellerName ?? "ng756543"}</h1>
         </div>
+
         <div className="overview-hero__metrics">
           {heroMetrics.map((metric) => (
             <div key={metric.key} className="overview-hero__metric">
+              <div className="overview-hero__metric-top">
+                <span className="overview-hero__metric-icon">{metric.icon}</span>
+                <span className="overview-hero__metric-value">{metric.value}</span>
+              </div>
               <span className="overview-hero__metric-label">{metric.label}</span>
-              <span className="overview-hero__metric-value">{metric.value}</span>
             </div>
           ))}
         </div>
+
         <Link to="/listing-form" className="overview-hero__cta">
           Create listing
         </Link>
       </section>
 
-      {status && (
-        <div className={`overview-status overview-status--${status.level ?? "info"}`}>
-          <span className="overview-status__icon" aria-hidden="true">●</span>
-          <div>
-            <strong>{status.message}</strong>
-            {status.outstandingTasks > 0 && (
-              <p>{status.outstandingTasks} outstanding {status.outstandingTasks === 1 ? "task" : "tasks"}.</p>
-            )}
-          </div>
+      <div className="overview-status overview-status--success">
+        <span className="overview-status__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </span>
+        <div>
+          <strong>You're all caught up!</strong>
+          <p>New tasks, like orders to ship or offers to review, will show up here.</p>
         </div>
-      )}
+      </div>
 
       <div className="overview__grid">
-        {renderSection(listings)}
-        {renderSection(orders)}
-        <section className="overview-card overview-card--sales">
+        <section className="overview-card">
           <header className="overview-card__header">
-            <h2>Sales</h2>
-            <span className="overview-card__currency">{sales?.currency ?? "USD"}</span>
+            <h2>{listings.title}</h2>
           </header>
-          <div className="overview-sales-chart">
-            {chartModel.polyline ? (
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-                <polyline
-                  points={chartModel.polyline}
-                  fill="rgba(49, 120, 198, 0.15)"
-                  stroke="rgba(49, 120, 198, 0.85)"
-                  strokeWidth="2"
-                />
-              </svg>
-            ) : (
-              <div className="overview-sales-chart__empty">No sales recorded for the selected period.</div>
-            )}
-          </div>
-          <ul className="overview-sales-summary">
-            {sales?.summary?.map((row) => (
-              <li key={row.key}>
-                <span>{row.label}</span>
-                <span>{formatCurrency(row.total, sales.currency)}</span>
+          <ul className="overview-card__list">
+            <li className="overview-card__row overview-card__row--link-only">
+              <Link to="/listing-form">Create listing</Link>
+            </li>
+            {listings.items?.map((item) => (
+              <li key={item.key} className="overview-card__row overview-card__row--disabled">
+                <span>
+                  <span className="overview-card__link-label">{item.label}</span>
+                  <span className="overview-card__count">{item.count}</span>
+                </span>
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="overview-card">
+          <header className="overview-card__header">
+            <h2>{orders.title}</h2>
+          </header>
+          <ul className="overview-card__list">
+            <li className="overview-card__row overview-card__row--link-only">
+              <a href="#see-all">See all orders</a>
+            </li>
+            {orders.items?.map((item) => (
+              <li key={item.key} className="overview-card__row overview-card__row--disabled">
+                <span>
+                  <span className="overview-card__link-label">{item.label}</span>
+                  <span className="overview-card__count">{item.count}</span>
+                </span>
+              </li>
+            ))}
+            <li className="overview-card__row overview-card__row--link-only" style={{ borderBottom: 'none' }}>
+              <a href="#show-more">Show more ⌄</a>
+            </li>
+          </ul>
+        </section>
+
+        <section className="overview-card overview-card--sales">
+          <header className="overview-card__header">
+            <h2>Sales</h2>
+          </header>
+
+          <div className="overview-sales-chart">
+            <div className="overview-sales-chart__title">
+              Chart for sales data across 31 days
+            </div>
+            
+            <div className="overview-sales-chart__layout">
+              <div className="overview-sales-chart__y-axis">$0</div>
+              <div className="overview-sales-chart__graph-container">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <line x1="0" y1="100" x2="100" y2="100" stroke="#cccccc" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                </svg>
+                <div className="overview-sales-chart__x-axis">
+                  <span>Feb 23</span>
+                  <span>Mar 2</span>
+                  <span>Mar 9</span>
+                  <span>Mar 18</span>
+                  <span>Mar 25</span>
+                </div>
+                <div className="overview-sales-chart__x-label">Month</div>
+              </div>
+            </div>
+          </div>
+
+          <ul className="overview-sales-summary">
+            <li>
+              <span><a href="#today">Today</a></span>
+              <span>$0.00</span>
+            </li>
+            <li>
+              <span><a href="#last7">Last 7 days</a></span>
+              <span>$0.00</span>
+            </li>
+            <li>
+              <span><a href="#last31">Last 31 days</a></span>
+              <span>$0.00</span>
+            </li>
+            <li>
+              <span><a href="#last90">Last 90 days</a></span>
+              <span>$0.00</span>
+            </li>
+          </ul>
+          <div className="overview-sales-footer">
+            Data for Feb 23 - Mar 25 at 11:33am PDT. Percentage change relative to prior period. Performance statistics are rounded to the nearest tenth. Data includes shipping and sales tax.
+          </div>
         </section>
       </div>
     </div>

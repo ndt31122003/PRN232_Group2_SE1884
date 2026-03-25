@@ -40,10 +40,15 @@ public sealed class UpdateOrderDeliveryStatusCommandValidator : AbstractValidato
 
 public sealed class UpdateOrderDeliveryStatusCommandHandler : ICommandHandler<UpdateOrderDeliveryStatusCommand, OrderStatusUpdateResult>
 {
-    private static readonly string[] ShippedStatuses =
+    private static readonly string[] DeliveredUpdatableStatuses =
     {
         OrderStatusCodes.PaidAndShipped,
-        OrderStatusCodes.ShippedAwaitingFeedback,
+        OrderStatusCodes.ShippedAwaitingFeedback
+    };
+
+    private static readonly string[] FailedUpdatableStatuses =
+    {
+        OrderStatusCodes.PaidAndShipped,
         OrderStatusCodes.DeliveryFailed
     };
 
@@ -69,12 +74,6 @@ public sealed class UpdateOrderDeliveryStatusCommandHandler : ICommandHandler<Up
         {
             return Result.Failure<OrderStatusUpdateResult>(
                 Error.Failure("Order.AccessDenied", "You do not have permission to modify this order."));
-        }
-
-        if (!ShippedStatuses.Contains(order.Status.Code, StringComparer.OrdinalIgnoreCase))
-        {
-            return Result.Failure<OrderStatusUpdateResult>(
-                Error.Failure("Order.InvalidStatus", "Delivery status can only be updated after shipment."));
         }
 
         Result outcomeResult = request.Outcome switch
@@ -106,16 +105,23 @@ public sealed class UpdateOrderDeliveryStatusCommandHandler : ICommandHandler<Up
 
     private async Task<Result> MarkDeliveredAsync(Domain.Orders.Entities.Order order, CancellationToken cancellationToken)
     {
-        if (!string.Equals(order.Status.Code, OrderStatusCodes.PaidAndShipped, StringComparison.OrdinalIgnoreCase))
+        if (!DeliveredUpdatableStatuses.Contains(order.Status.Code, StringComparer.OrdinalIgnoreCase))
         {
-            var deliveredStatus = await _orderRepository.GetStatusByCodeAsync(OrderStatusCodes.PaidAndShipped, cancellationToken)
-                ?? throw new InvalidOperationException("Delivered status was not seeded.");
+            return Result.Failure(Error.Failure("Order.InvalidStatus", "Delivered can only be marked for shipped orders."));
+        }
 
-            var changeResult = order.ChangeStatus(deliveredStatus, OrderRoles.Seller);
-            if (changeResult.IsFailure)
-            {
-                return changeResult;
-            }
+        if (string.Equals(order.Status.Code, OrderStatusCodes.ShippedAwaitingFeedback, StringComparison.OrdinalIgnoreCase))
+        {
+            return Result.Success();
+        }
+
+        var deliveredStatus = await _orderRepository.GetStatusByCodeAsync(OrderStatusCodes.ShippedAwaitingFeedback, cancellationToken)
+            ?? throw new InvalidOperationException("Delivered target status was not seeded.");
+
+        var changeResult = order.ChangeStatus(deliveredStatus, OrderRoles.Seller);
+        if (changeResult.IsFailure)
+        {
+            return changeResult;
         }
 
         return Result.Success();
@@ -123,6 +129,16 @@ public sealed class UpdateOrderDeliveryStatusCommandHandler : ICommandHandler<Up
 
     private async Task<Result> MarkDeliveryFailedAsync(Domain.Orders.Entities.Order order, CancellationToken cancellationToken)
     {
+        if (!FailedUpdatableStatuses.Contains(order.Status.Code, StringComparer.OrdinalIgnoreCase))
+        {
+            return Result.Failure(Error.Failure("Order.InvalidStatus", "Delivery failed can only be marked for shipped orders."));
+        }
+
+        if (string.Equals(order.Status.Code, OrderStatusCodes.DeliveryFailed, StringComparison.OrdinalIgnoreCase))
+        {
+            return Result.Success();
+        }
+
         var targetStatus = await _orderRepository.GetStatusByCodeAsync(OrderStatusCodes.DeliveryFailed, cancellationToken)
             ?? throw new InvalidOperationException("DeliveryFailed status was not seeded.");
 

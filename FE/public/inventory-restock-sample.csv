@@ -1,0 +1,5 @@
+ListingId,SKU,Quantity,Reason
+1,LTP-1-0002,20,Restock test for Laptop
+2,MBL-1-0006,15,Restock test for Mobile
+3,CAM-2-0002,10,Restock test for Camera
+4,SHO-3-0002,25,Restock test for Shoes

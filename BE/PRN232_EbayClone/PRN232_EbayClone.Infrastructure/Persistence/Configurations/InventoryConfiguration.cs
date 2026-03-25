@@ -63,6 +63,17 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
             .HasColumnName("is_low_stock")
             .IsRequired()
             .HasDefaultValue(false);
+
+        builder.Property(x => x.EmailNotificationsEnabled)
+            .HasColumnName("low_stock_email_enabled")
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(x => x.AdditionalNotificationEmails)
+            .HasColumnName("additional_low_stock_emails")
+            .HasMaxLength(1000)
+            .IsRequired()
+            .HasDefaultValue(string.Empty);
         
         builder.Property(x => x.LastLowStockNotificationAt)
             .HasColumnName("last_low_stock_notification_at")

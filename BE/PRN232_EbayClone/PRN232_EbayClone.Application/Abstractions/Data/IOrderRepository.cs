@@ -68,4 +68,12 @@ public interface IOrderRepository : IRepository<Order, Guid>
 
     Task<IReadOnlyList<Order>> GetAwaitingShipmentOrdersAsync(
         CancellationToken cancellationToken = default);
+
+    /// <summary>Inserts an order directly via Dapper to bypass EF Core owned-entity tracking issues.</summary>
+    Task InsertBuyItNowOrderAsync(
+        Guid orderId, string orderNumber, Guid buyerId, Guid sellerId,
+        Guid statusId, decimal amount, string currency,
+        Guid orderItemId, Guid listingId, Guid? categoryId, string imageUrl,
+        string title, string? sku, int quantity,
+        CancellationToken cancellationToken = default);
 }

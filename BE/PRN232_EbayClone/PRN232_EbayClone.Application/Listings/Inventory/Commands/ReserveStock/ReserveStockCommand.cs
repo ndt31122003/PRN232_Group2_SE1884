@@ -1,4 +1,5 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Inventory.Dtos;
 using PRN232_EbayClone.Domain.Listings.Inventory.Enums;
 using PRN232_EbayClone.Domain.Listings.Inventory.Errors;
@@ -78,6 +79,7 @@ public sealed class ReserveStockCommandHandler : ICommandHandler<ReserveStockCom
 
         _inventoryRepository.Update(inventory);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         await transaction.CommitAsync(cancellationToken);
 
         var reservation = inventory.Reservations

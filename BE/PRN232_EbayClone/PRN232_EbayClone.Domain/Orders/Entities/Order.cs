@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using PRN232_EbayClone.Domain.Orders.Constants;
@@ -288,7 +288,7 @@ public class Order : AggregateRoot<Guid>
     {
         if (_items.Count == 0)
         {
-            return false;
+            return true; // Treat as fully shipped if there are 0 items to prevent getting stuck with bad mock data
         }
 
         var shippedItemCount = _itemShipments
@@ -466,6 +466,15 @@ public class Order : AggregateRoot<Guid>
         }
 
         var firstShipmentDate = _itemShipments.Min(s => s.ShippedAt).UtcDateTime;
+
+        if (string.Equals(statusCode, OrderStatusCodes.ShippedAwaitingFeedback, StringComparison.OrdinalIgnoreCase))
+        {
+            ShippingStatus = ShippingStatus.Delivered;
+            ShippedAt = firstShipmentDate;
+            DeliveredAt ??= DateTime.UtcNow;
+            return;
+        }
+
         var shippedItemCount = _itemShipments
             .Select(s => s.OrderItemId)
             .Distinct()
@@ -512,6 +521,11 @@ public class Order : AggregateRoot<Guid>
         {
             PaidAt ??= DateTime.UtcNow;
             ShippedAt ??= DateTime.UtcNow;
+            DeliveredAt = null;
+        }
+
+        if (string.Equals(statusCode, OrderStatusCodes.ShippedAwaitingFeedback, StringComparison.OrdinalIgnoreCase))
+        {
             DeliveredAt ??= DateTime.UtcNow;
         }
 

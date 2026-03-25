@@ -5,13 +5,14 @@ using PRN232_EbayClone.Domain.Listings.ValueObjects;
 using PRN232_EbayClone.Domain.Shared.Abstractions;
 using PRN232_EbayClone.Domain.Shared.Results;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
+using System.Net.Mail;
 
 namespace PRN232_EbayClone.Domain.Listings.Inventory.Entities;
 
 public sealed class Inventory : AggregateRoot<InventoryId>
 {
     // Properties
-    public ListingId ListingId { get; private set; }
+    public ListingId ListingId { get; private set; } = null!;
     public UserId SellerId { get; private set; }
     
     public int TotalQuantity { get; private set; }
@@ -21,6 +22,8 @@ public sealed class Inventory : AggregateRoot<InventoryId>
     
     public int? ThresholdQuantity { get; private set; }
     public bool IsLowStock { get; private set; }
+    public bool EmailNotificationsEnabled { get; private set; }
+    public string AdditionalNotificationEmails { get; private set; } = string.Empty;
     public DateTime? LastLowStockNotificationAt { get; private set; }
     
     public DateTime LastUpdatedAt { get; private set; }
@@ -51,6 +54,8 @@ public sealed class Inventory : AggregateRoot<InventoryId>
             SoldQuantity = 0,
             ThresholdQuantity = null,
             IsLowStock = false,
+            EmailNotificationsEnabled = false,
+            AdditionalNotificationEmails = string.Empty,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = null,
             UpdatedAt = null,
@@ -101,21 +106,55 @@ public sealed class Inventory : AggregateRoot<InventoryId>
         
         return Result.Success();
     }
+
+    public Result ConfigureLowStockAlert(int? thresholdQuantity, bool emailNotificationsEnabled, string? additionalNotificationEmails = null)
+    {
+        if (thresholdQuantity.HasValue && thresholdQuantity.Value <= 0)
+            return InventoryErrors.InvalidThreshold;
+
+        if (emailNotificationsEnabled && !thresholdQuantity.HasValue)
+            return InventoryErrors.EmailAlertRequiresThreshold;
+
+        var normalizedAdditionalEmails = NormalizeAdditionalNotificationEmails(additionalNotificationEmails);
+        if (normalizedAdditionalEmails is null)
+            return InventoryErrors.InvalidAdditionalEmail;
+
+        ThresholdQuantity = thresholdQuantity;
+        EmailNotificationsEnabled = emailNotificationsEnabled;
+        AdditionalNotificationEmails = normalizedAdditionalEmails;
+        LastUpdatedAt = DateTime.UtcNow;
+
+        UpdateLowStockStatus();
+
+        return Result.Success();
+    }
     
     private void UpdateLowStockStatus()
     {
         if (ThresholdQuantity.HasValue && AvailableQuantity <= ThresholdQuantity.Value)
         {
             IsLowStock = true;
-            if (!LastLowStockNotificationAt.HasValue)
-            {
-                LastLowStockNotificationAt = DateTime.UtcNow;
-            }
         }
         else
         {
             IsLowStock = false;
+            LastLowStockNotificationAt = null;
         }
+    }
+
+    public void MarkLowStockNotificationSent(DateTime sentAtUtc)
+    {
+        LastLowStockNotificationAt = sentAtUtc;
+        LastUpdatedAt = sentAtUtc;
+    }
+
+    public IReadOnlyList<string> GetAdditionalNotificationEmailList()
+    {
+        return string.IsNullOrWhiteSpace(AdditionalNotificationEmails)
+            ? []
+            : AdditionalNotificationEmails
+                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .ToArray();
     }
     
     // UC2.2: Reserve Stock
@@ -209,5 +248,33 @@ public sealed class Inventory : AggregateRoot<InventoryId>
         UpdateLowStockStatus();
         
         return Result.Success();
+    }
+
+    private static string? NormalizeAdditionalNotificationEmails(string? additionalNotificationEmails)
+    {
+        if (string.IsNullOrWhiteSpace(additionalNotificationEmails))
+        {
+            return string.Empty;
+        }
+
+        var emails = additionalNotificationEmails
+            .Split([',', ';', '\n', '\r'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(email => email.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        foreach (var email in emails)
+        {
+            try
+            {
+                _ = new MailAddress(email);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        return string.Join(", ", emails);
     }
 }

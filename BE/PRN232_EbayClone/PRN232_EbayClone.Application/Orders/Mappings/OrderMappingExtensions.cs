@@ -72,8 +72,8 @@ internal static class OrderMappingExtensions
         => new(
             history.FromStatus?.Code ?? string.Empty,
             history.FromStatus?.Name ?? string.Empty,
-            history.ToStatus.Code,
-            history.ToStatus.Name,
+            history.ToStatus?.Code ?? string.Empty,
+            history.ToStatus?.Name ?? string.Empty,
             history.ChangedAt);
 
     private static MoneyDto ToDto(this Money money) =>
