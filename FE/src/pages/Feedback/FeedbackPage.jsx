@@ -423,6 +423,32 @@ const FeedbackPage = () => {
         </div>
 
         <div className="feedback-page__action">
+          <a
+            href="/disputes"
+            className="feedback-page__support-link"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.625rem 1rem',
+              backgroundColor: '#dc2626',
+              color: 'white',
+              borderRadius: '0.5rem',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              transition: 'background-color 0.2s',
+              whiteSpace: 'nowrap',
+              marginRight: '0.5rem'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#b91c1c'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#dc2626'}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h8v-2h-8c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8v1h2v-1c0-5.52-4.48-10-10-10zm1 5h-2v6h6v-2h-4z"/>
+            </svg>
+            Seller Disputes
+          </a>
           <a 
             href="/support-tickets" 
             className="feedback-page__support-link"

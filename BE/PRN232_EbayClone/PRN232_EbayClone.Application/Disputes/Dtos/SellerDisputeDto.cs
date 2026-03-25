@@ -12,7 +12,8 @@ public sealed record SellerDisputeDto(
     DateTime UpdatedAt,
     DateTime? Deadline,
     bool IsDeadlineSoon,
-    int EvidenceCount
+    int EvidenceCount,
+    List<SellerDisputeResponseDto> Responses
 );
 
 public sealed record SellerDisputeDetailDto(
@@ -37,6 +38,13 @@ public sealed record DisputeEvidenceDto(
     long Size,
     string Url,
     DateTime UploadedAt
+);
+
+public sealed record SellerDisputeResponseDto(
+    Guid Id,
+    string ResponderId,
+    string Message,
+    DateTime CreatedAt
 );
 
 public sealed record SellerDisputeFilterDto(

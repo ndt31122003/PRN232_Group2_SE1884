@@ -35,7 +35,9 @@ const createConnection = async () => {
       return null;
     }
 
-    const hubUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5149'}/hub`;
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5149/api';
+    const serverBaseUrl = apiBaseUrl.replace(/\/api\/?$/, '');
+    const hubUrl = `${serverBaseUrl}/hub`;
 
     connection = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl, {

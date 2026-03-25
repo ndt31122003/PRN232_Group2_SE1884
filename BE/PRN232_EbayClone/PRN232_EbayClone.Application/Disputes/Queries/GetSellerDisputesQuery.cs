@@ -15,7 +15,6 @@ public sealed record GetSellerDisputesQuery(
 
 internal sealed class GetSellerDisputesQueryHandler(
     IDisputeRepository disputeRepository,
-    IListingRepository listingRepository,
     IUserRepository userRepository,
     IFileMetadataRepository fileMetadataRepository,
     IDisputeStateMachine stateMachine)
@@ -25,47 +24,33 @@ internal sealed class GetSellerDisputesQueryHandler(
         GetSellerDisputesQuery request,
         CancellationToken cancellationToken)
     {
-        // Get seller's listings
-        var sellerListings = await listingRepository.GetBySellerIdAsync(request.SellerId, cancellationToken);
-        var listingIds = sellerListings.Select(l => l.Id).ToList();
+        // Use one paged query instead of loading all seller listings then looping per-listing
+        // to avoid N+1 queries and request timeout/cancellation.
+        var genericFilter = new DisputeFilterDto(
+            ListingId: null,
+            RaisedById: null,
+            SellerId: request.SellerId,
+            Status: request.Filter.Status,
+            FromDate: null,
+            ToDate: null,
+            PageNumber: request.Filter.Page,
+            PageSize: request.Filter.PageSize);
 
-        if (!listingIds.Any())
-        {
-            return Result.Success(new PagedResult<SellerDisputeDto>(
-                new List<SellerDisputeDto>(),
-                request.Filter.Page,
-                request.Filter.PageSize,
-                0
-            ));
-        }
-
-        // Get all disputes for seller's listings
-        var allDisputes = new List<Domain.Disputes.Entities.Dispute>();
-        foreach (var listingId in listingIds)
-        {
-            var disputesForListing = await disputeRepository.GetDisputesByListingIdAsync(listingId, cancellationToken);
-            allDisputes.AddRange(disputesForListing);
-        }
-
-        // Apply status filter
-        if (!string.IsNullOrEmpty(request.Filter.Status))
-        {
-            allDisputes = allDisputes.Where(d => d.Status == request.Filter.Status).ToList();
-        }
-
-        var totalCount = allDisputes.Count;
-
-        var disputes = allDisputes
-            .OrderByDescending(d => d.CreatedAt)
-            .Skip((request.Filter.Page - 1) * request.Filter.PageSize)
-            .Take(request.Filter.PageSize)
-            .ToList();
+        var (disputes, totalCount) = await disputeRepository.GetDisputesAsync(
+            genericFilter,
+            request.SellerId,
+            cancellationToken);
 
         var disputeDtos = new List<SellerDisputeDto>();
 
         foreach (var dispute in disputes)
         {
-            var listing = sellerListings.First(l => l.Id == dispute.ListingId);
+            var listing = dispute.Listing;
+            if (listing == null)
+            {
+                continue;
+            }
+
             var buyer = await userRepository.GetByIdAsync(new Domain.Users.ValueObjects.UserId(Guid.Parse(dispute.RaisedById)), cancellationToken);
             var evidenceCount = await fileMetadataRepository.CountByLinkedEntityAsync(dispute.Id, cancellationToken);
 
@@ -73,6 +58,14 @@ internal sealed class GetSellerDisputesQueryHandler(
             var deadline = stateMachine.GetDeadline(status, dispute.UpdatedAt ?? dispute.CreatedAt);
             var isDeadlineSoon = deadline.HasValue && 
                 stateMachine.IsDeadlineSoon(status, dispute.UpdatedAt ?? dispute.CreatedAt, TimeSpan.FromHours(12));
+            var responses = dispute.Responses
+                .OrderBy(r => r.CreatedAt)
+                .Select(r => new SellerDisputeResponseDto(
+                    r.Id,
+                    r.ResponderId.ToString(),
+                    r.Message,
+                    r.CreatedAt))
+                .ToList();
 
             disputeDtos.Add(new SellerDisputeDto(
                 dispute.Id,
@@ -86,7 +79,8 @@ internal sealed class GetSellerDisputesQueryHandler(
                 dispute.UpdatedAt ?? dispute.CreatedAt,
                 deadline,
                 isDeadlineSoon,
-                evidenceCount
+                evidenceCount,
+                responses
             ));
         }
 

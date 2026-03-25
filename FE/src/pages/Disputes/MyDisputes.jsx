@@ -20,53 +20,42 @@ const MyDisputes = () => {
     pageSize: 20,
     totalCount: 0,
   });
-  const abortControllerRef = useRef(null);
+  const requestSeqRef = useRef(0);
   const uploadInputRefs = useRef({});
   const [showRespondForm, setShowRespondForm] = useState({});
   const [respondMessage, setRespondMessage] = useState({});
 
-  // Get current user info & Role
-  const { currentUserId, userRoles, isSeller, isBuyer } = React.useMemo(() => {
+  // Seller-only page: only need current user id
+  const { currentUserId } = React.useMemo(() => {
     const userInfo = getStorage(STORAGE.USER_INFO);
     let id = null;
-    let roles = [];
     if (userInfo) {
       try {
         const parsed = typeof userInfo === "string" ? JSON.parse(userInfo) : userInfo;
-        id = parsed?.id ?? parsed?.Id ?? parsed?.userId ?? parsed?.UserId;
+        console.log("[MyDisputes] RAW user info:", parsed);
         
-        // Roles can be a string or an array in user_info
-        const roleData = parsed?.role ?? parsed?.Role ?? parsed?.roles ?? parsed?.Roles;
-        if (Array.isArray(roleData)) {
-          roles = roleData.map(r => String(r).toLowerCase());
-        } else if (roleData) {
-          roles = [String(roleData).toLowerCase()];
-        }
+        id = parsed?.id ?? parsed?.Id ?? parsed?.userId ?? parsed?.UserId;
+        console.log("[MyDisputes] Extracted id:", id);
       } catch (e) {
         console.error("Error parsing user info in MyDisputes:", e);
       }
     }
     
     const result = {
-      currentUserId: id,
-      userRoles: roles,
-      isSeller: roles.includes('seller'),
-      isBuyer: roles.includes('buyer')
+      currentUserId: id
     };
 
     console.log("[MyDisputes] User Context:", result);
-    console.log("[MyDisputes] isSeller:", result.isSeller, "isBuyer:", result.isBuyer);
     return result;
   }, []);
 
   // Fetch disputes
   const fetchDisputes = useCallback(async () => {
-    if (!currentUserId) return;
-
-    if (abortControllerRef.current) {
-      try { abortControllerRef.current.abort(); } catch {}
+    if (!currentUserId) {
+      console.warn('[MyDisputes] currentUserId missing in storage, fallback to token-based seller API');
     }
-    abortControllerRef.current = new AbortController();
+
+    const requestSeq = ++requestSeqRef.current;
 
     setLoading(true);
     try {
@@ -76,61 +65,91 @@ const MyDisputes = () => {
         status: statusFilter
       };
 
-      let result;
-      if (isSeller) {
-        console.log("[MyDisputes] Fetching as Seller for ID:", currentUserId);
-        result = await DisputeService.getSellerDisputes(filterParams, abortControllerRef.current.signal);
-      } else if (isBuyer) {
-        console.log("[MyDisputes] Fetching as Buyer for ID:", currentUserId);
-        result = await DisputeService.getBuyerDisputes(currentUserId, filterParams, abortControllerRef.current.signal);
-      } else {
-        // Fallback or Admin view - backend now automatically filters by current user
-        console.log("[MyDisputes] Fetching as Fallback/Admin for ID:", currentUserId);
-        result = await DisputeService.getDisputes(
-          filterParams, 
-          abortControllerRef.current.signal
-        );
+      console.log("[MyDisputes] Fetching mixed disputes (seller + buyer), user:", currentUserId);
+
+      const [sellerResult, buyerResult] = await Promise.all([
+        DisputeService.getSellerDisputes(filterParams).catch(() => ({ items: [], totalCount: 0 })),
+        currentUserId
+          ? DisputeService.getBuyerDisputes(currentUserId, filterParams).catch(() => ({ items: [], totalCount: 0 }))
+          : Promise.resolve({ items: [], totalCount: 0 })
+      ]);
+
+      // If a newer request has started, drop this stale response.
+      if (requestSeq !== requestSeqRef.current) {
+        return;
       }
 
-      // support both shapes: { items: [], totalCount } or array []
-      if (Array.isArray(result)) {
-        setDisputes(result);
-        setPagination(prev => ({ ...prev, totalCount: result.length || 0 }));
-      } else if (result && typeof result === 'object') {
-        const items = result.items || result.data || [];
-        setDisputes(items);
-        setPagination(prev => ({ 
-          ...prev, 
-          totalCount: result.totalCount ?? result.total ?? items.length ?? 0 
-        }));
-      } else {
-        setDisputes([]);
-        setPagination(prev => ({ ...prev, totalCount: 0 }));
-      }
+      const sellerItems = Array.isArray(sellerResult)
+        ? sellerResult
+        : (sellerResult?.items || sellerResult?.data || []);
+      const buyerItems = Array.isArray(buyerResult)
+        ? buyerResult
+        : (buyerResult?.items || buyerResult?.data || []);
+
+      // Merge + de-duplicate by dispute id
+      const mergedMap = new Map();
+      [...sellerItems, ...buyerItems].forEach((item) => {
+        const id = item?.id ?? item?.Id;
+        if (id) {
+          mergedMap.set(String(id), item);
+        }
+      });
+
+      const mergedItems = Array.from(mergedMap.values());
+      mergedItems.sort((a, b) => {
+        const aDate = new Date(a?.updatedAt || a?.UpdatedAt || a?.createdAt || a?.CreatedAt || 0).getTime();
+        const bDate = new Date(b?.updatedAt || b?.UpdatedAt || b?.createdAt || b?.CreatedAt || 0).getTime();
+        return bDate - aDate;
+      });
+
+      // Preserve existing conversation if incoming payload does not include responses.
+      // This avoids losing old chat history when one endpoint returns summary-only disputes.
+      setDisputes((prev) => {
+        const prevById = new Map(
+          (prev || []).map((item) => [String(item?.id ?? item?.Id), item])
+        );
+
+        return mergedItems.map((item) => {
+          const id = String(item?.id ?? item?.Id);
+          const oldItem = prevById.get(id);
+
+          const incomingResponses = item?.responses || item?.Responses;
+          if (Array.isArray(incomingResponses) && incomingResponses.length > 0) {
+            // If new payload has responses, merge + de-dup with old ones.
+            const oldResponses = oldItem?.responses || oldItem?.Responses || [];
+            const responseMap = new Map();
+            [...oldResponses, ...incomingResponses].forEach((r) => {
+              const rid = String(r?.id ?? r?.Id ?? r?.responseId ?? '');
+              if (rid) responseMap.set(rid, r);
+            });
+            return { ...oldItem, ...item, responses: Array.from(responseMap.values()) };
+          }
+
+          // If new payload has no responses, keep old responses (if any).
+          if (oldItem?.responses || oldItem?.Responses) {
+            return { ...oldItem, ...item, responses: oldItem.responses || oldItem.Responses || [] };
+          }
+
+          return item;
+        });
+      });
+
+      setPagination(prev => ({
+        ...prev,
+        totalCount: mergedItems.length
+      }));
     } catch (error) {
-      const isAbort = error && (
-        error.name === 'AbortError' || 
-        error.name === 'CanceledError' ||
-        error.message === 'The user aborted a request.' ||
-        (error.code === 'ERR_CANCELED')
-      );
-      
-      if (!isAbort) {
-        console.error('Error fetching disputes:', error);
-        Notice({ msg: 'Failed to load disputes', isSuccess: false });
-      }
+      console.error('Error fetching disputes:', error);
+      Notice({ msg: 'Failed to load disputes', isSuccess: false });
     } finally {
-      setLoading(false);
+      if (requestSeq === requestSeqRef.current) {
+        setLoading(false);
+      }
     }
   }, [currentUserId, statusFilter, pagination.pageNumber, pagination.pageSize]);
 
   useEffect(() => {
     fetchDisputes();
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
   }, [fetchDisputes]);
 
   // Setup SignalR realtime listeners
@@ -160,8 +179,40 @@ const MyDisputes = () => {
             msg: 'New response received on dispute', 
             isSuccess: true 
           });
-          // Refresh disputes list to show new response
-          fetchDisputes();
+
+          // Update the opened dispute conversation immediately without forcing a page/list reload.
+          setDisputes((prev) =>
+            prev.map((item) => {
+              const disputeId = String(item.id ?? item.Id ?? '');
+              const eventDisputeId = String(data?.DisputeId ?? data?.disputeId ?? '');
+              if (!disputeId || disputeId !== eventDisputeId) {
+                return item;
+              }
+
+              const existingResponses = item.responses || item.Responses || [];
+              const responseId = String(data?.ResponseId ?? data?.responseId ?? '');
+              const alreadyExists = existingResponses.some((r) => {
+                const rid = String(r?.id ?? r?.Id ?? r?.responseId ?? '');
+                return responseId && rid === responseId;
+              });
+              if (alreadyExists) {
+                return item;
+              }
+
+              const newResponse = {
+                id: responseId || crypto.randomUUID?.() || Date.now(),
+                responderId: data?.ResponderId ?? data?.responderId,
+                responderUsername: 'New message',
+                message: data?.Message ?? data?.message ?? '',
+                createdAt: data?.Timestamp ?? data?.timestamp ?? new Date().toISOString()
+              };
+
+              return {
+                ...item,
+                responses: [...existingResponses, newResponse]
+              };
+            })
+          );
         });
 
         console.log('[MyDisputes] ✅ SignalR listeners setup complete');
@@ -496,17 +547,14 @@ const MyDisputes = () => {
             const reason = String(dispute.reason || dispute.Reason || "");
             const listingId = String(dispute.listingId || dispute.ListingId || "");
             const createdAt = dispute.createdAt || dispute.CreatedAt;
+            const conversation = dispute.responses || dispute.Responses || [];
             
-            // Determine role based on dispute data
-            const isDisputeCreator = dispute.raisedById === currentUserId || dispute.RaisedById === currentUserId;
-            const listingCreatedBy = dispute.listingCreatedBy || dispute.ListingCreatedBy;
-            const isListingOwner = listingCreatedBy === currentUserId;
-            
-            // User is buyer if they created the dispute, seller if they own the listing
-            const userIsBuyer = isDisputeCreator;
-            const userIsSeller = isListingOwner;
-            
-            console.log(`[Dispute ${disputeId}] currentUserId: ${currentUserId}, raisedById: ${dispute.raisedById || dispute.RaisedById}, listingCreatedBy: ${listingCreatedBy}, userIsBuyer: ${userIsBuyer}, userIsSeller: ${userIsSeller}`);
+            // Rule nghiệp vụ: user tạo dispute => buyer, còn dispute nhận được => seller.
+            const raisedById = String(dispute.raisedById || dispute.RaisedById || "");
+            const isDisputeCreator = currentUserId && raisedById === String(currentUserId);
+            const userIsBuyer = Boolean(isDisputeCreator);
+            const userIsSeller = !userIsBuyer;
+            console.log(`[Dispute ${disputeId}] user=${currentUserId} raisedBy=${raisedById} => buyer=${userIsBuyer}, seller=${userIsSeller}`);
             
             return (
               <motion.div 
@@ -573,11 +621,11 @@ const MyDisputes = () => {
                     </div>
 
                     {/* Conversation Section */}
-                    {dispute.responses && dispute.responses.length > 0 && (
+                    {conversation.length > 0 && (
                       <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">💬 Conversation ({dispute.responses.length})</h4>
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">💬 Conversation ({conversation.length})</h4>
                         <div className="space-y-2 max-h-64 overflow-y-auto bg-gray-50 p-3 rounded-lg">
-                          {dispute.responses.map((response) => (
+                          {conversation.map((response) => (
                             <div key={response.id} className="bg-white p-3 rounded border border-gray-200">
                               <div className="flex justify-between items-start mb-1">
                                 <span className="text-xs font-medium text-gray-600">

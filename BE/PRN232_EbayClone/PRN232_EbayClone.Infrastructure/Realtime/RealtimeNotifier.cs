@@ -43,4 +43,24 @@ public sealed class RealtimeNotifier : IRealtimeNotifier
             .Group($"listing-{listingId}")
             .SendAsync(method, message, cancellationToken);
     }
+
+    public Task SendToUserAsync<T>(
+        string userId,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default)
+    {
+        return BroadcastToUserAsync(userId, method, message, cancellationToken);
+    }
+
+    public Task SendToUsersAsync<T>(
+        IEnumerable<string> userIds,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default)
+    {
+        return _hubContext.Clients
+            .Groups(userIds)
+            .SendAsync(method, message, cancellationToken);
+    }
 }

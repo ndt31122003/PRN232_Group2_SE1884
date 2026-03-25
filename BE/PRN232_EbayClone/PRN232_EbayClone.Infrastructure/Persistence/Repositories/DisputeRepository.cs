@@ -28,6 +28,8 @@ public sealed class DisputeRepository : Repository<Dispute, Guid>, IDisputeRepos
         string currentUserId,
         CancellationToken cancellationToken = default)
     {
+        Console.WriteLine($"[DisputeRepository] GetDisputesAsync called with currentUserId: {currentUserId}");
+        
         var query = DbContext.Disputes
             .AsNoTracking()
             .Include(d => d.Listing)
@@ -38,6 +40,8 @@ public sealed class DisputeRepository : Repository<Dispute, Guid>, IDisputeRepos
         query = query.Where(d => 
             d.RaisedById == currentUserId || 
             (d.Listing != null && d.Listing.CreatedBy == currentUserId));
+
+        Console.WriteLine($"[DisputeRepository] After user filter, query has been built");
 
         if (filter.ListingId.HasValue)
         {
@@ -71,6 +75,7 @@ public sealed class DisputeRepository : Repository<Dispute, Guid>, IDisputeRepos
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
+        Console.WriteLine($"[DisputeRepository] Total count after filters: {totalCount}");
 
         var disputes = await query
             .OrderByDescending(d => d.CreatedAt)
@@ -78,18 +83,73 @@ public sealed class DisputeRepository : Repository<Dispute, Guid>, IDisputeRepos
             .Take(filter.PageSize)
             .ToListAsync(cancellationToken);
 
+        Console.WriteLine($"[DisputeRepository] Returning {disputes.Count} disputes");
+        
         return (disputes, totalCount);
     }
 
-    public Task<IReadOnlyList<Dispute>> GetDisputesByListingIdAsync(
+    public async Task<IReadOnlyList<Dispute>> GetDisputesByListingIdAsync(
         Guid listingId,
         CancellationToken cancellationToken = default)
     {
-        return DbContext.Disputes
+        var disputes = await DbContext.Disputes
             .AsNoTracking()
-            .Where(d => d.ListingId == listingId && !d.IsClosed)
+            .Where(d =>
+                d.ListingId == listingId &&
+                d.Status != DisputeStatus.Resolved.ToString() &&
+                d.Status != DisputeStatus.Closed.ToString())
             .OrderByDescending(d => d.CreatedAt)
-            .ToListAsync(cancellationToken)
-            .ContinueWith(t => (IReadOnlyList<Dispute>)t.Result);
+            .ToListAsync(cancellationToken);
+
+        return disputes;
+    }
+
+    public async Task<(IReadOnlyList<Dispute> Disputes, int TotalCount)> GetDisputesByBuyerIdAsync(
+        string buyerId,
+        DisputeFilterDto filter,
+        CancellationToken cancellationToken = default)
+    {
+        Console.WriteLine($"[DisputeRepository] GetDisputesByBuyerIdAsync called with buyerId: {buyerId}");
+        
+        var query = DbContext.Disputes
+            .AsNoTracking()
+            .Include(d => d.Listing)
+            .Include(d => d.Responses)
+            .Where(d => d.RaisedById == buyerId); // Only disputes raised by this buyer
+
+        Console.WriteLine($"[DisputeRepository] Filtering disputes raised by buyer: {buyerId}");
+
+        if (filter.ListingId.HasValue)
+        {
+            query = query.Where(d => d.ListingId == filter.ListingId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Status))
+        {
+            query = query.Where(d => d.Status == filter.Status);
+        }
+
+        if (filter.FromDate.HasValue)
+        {
+            query = query.Where(d => d.CreatedAt >= filter.FromDate.Value);
+        }
+
+        if (filter.ToDate.HasValue)
+        {
+            query = query.Where(d => d.CreatedAt <= filter.ToDate.Value);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        Console.WriteLine($"[DisputeRepository] Total buyer disputes: {totalCount}");
+
+        var disputes = await query
+            .OrderByDescending(d => d.CreatedAt)
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(cancellationToken);
+
+        Console.WriteLine($"[DisputeRepository] Returning {disputes.Count} buyer disputes");
+        
+        return (disputes, totalCount);
     }
 }

@@ -33,10 +33,14 @@ public sealed class GetDisputesQueryHandler : IQueryHandler<GetDisputesQuery, Pa
         GetDisputesQuery request,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[GetDisputesQuery] CurrentUserId: {request.CurrentUserId}, Filter: Status={request.Filter.Status}, PageNumber={request.Filter.PageNumber}");
+        
         var (disputes, totalCount) = await _disputeRepository.GetDisputesAsync(
             request.Filter,
             request.CurrentUserId,
             cancellationToken);
+
+        Console.WriteLine($"[GetDisputesQuery] Found {disputes.Count} disputes out of {totalCount} total");
 
         var disputeDtos = disputes.Select(d => d.ToDto()).ToList();
 

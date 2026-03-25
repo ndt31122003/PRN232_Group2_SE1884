@@ -21,5 +21,19 @@ public interface IRealtimeNotifier
         string method,
         T message,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Sends to a specific user (userId group).</summary>
+    Task SendToUserAsync<T>(
+        string userId,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Sends to multiple users.</summary>
+    Task SendToUsersAsync<T>(
+        IEnumerable<string> userIds,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default);
 }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -83,7 +83,7 @@ public class SlidingWindowRateLimiter
 
     public IEnumerable<RateLimitRule> GetApplicableRules(HttpContext context)
     {
-        var limits = _rulesMonitor.CurrentValue;
+        var limits = _rulesMonitor.CurrentValue ?? [];
         return limits
             .Where(x => x.MatchPath(context.Request.Path))
             .OrderBy(x => x.MaxRequests)
@@ -128,8 +128,8 @@ public class SlidingWindowRateLimiter
             return;
         }
 
-        var applicableRules = GetApplicableRules(httpContext);
-        if (!applicableRules.Any())
+        var applicableRules = GetApplicableRules(httpContext).ToList();
+        if (applicableRules.Count == 0)
         {
             await _next(httpContext);
             return;

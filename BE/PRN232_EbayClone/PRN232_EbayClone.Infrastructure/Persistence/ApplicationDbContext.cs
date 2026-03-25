@@ -75,7 +75,6 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<ListingIdMapping> ListingIdMappings => Set<ListingIdMapping>();
     public DbSet<Offer> Offers => Set<Offer>();
     public DbSet<Bid> Bids => Set<Bid>();
-    public DbSet<SellerPreference> SellerPreferences => Set<SellerPreference>();
     public DbSet<OrderDiscount> OrderDiscounts => Set<OrderDiscount>();
     public DbSet<OrderDiscountTier> OrderDiscountTiers => Set<OrderDiscountTier>();
     public DbSet<OrderDiscountItemRule> OrderDiscountItemRules => Set<OrderDiscountItemRule>();

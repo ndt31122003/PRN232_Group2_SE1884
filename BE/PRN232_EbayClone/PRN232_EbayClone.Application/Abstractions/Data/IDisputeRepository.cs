@@ -13,5 +13,10 @@ public interface IDisputeRepository : IRepository<Dispute, Guid>
     Task<IReadOnlyList<Dispute>> GetDisputesByListingIdAsync(
         Guid listingId,
         CancellationToken cancellationToken = default);
+
+    Task<(IReadOnlyList<Dispute> Disputes, int TotalCount)> GetDisputesByBuyerIdAsync(
+        string buyerId,
+        DisputeFilterDto filter,
+        CancellationToken cancellationToken = default);
 }
 

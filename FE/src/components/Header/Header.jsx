@@ -64,7 +64,7 @@ const NavHeader = ({ setCurrentSession }) => {
       nextActiveNav = "listings";
     } else if (path.startsWith("/marketing")) {
       nextActiveNav = "marketing";
-    } else if (path.startsWith("/feedback")) {
+    } else if (path.startsWith("/feedback") || path.startsWith("/disputes")) {
       nextActiveNav = "feedback";
     } else if (path.startsWith("/payments")) {
       nextActiveNav = "payments";

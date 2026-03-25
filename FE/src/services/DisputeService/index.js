@@ -80,7 +80,20 @@ const getSellerDisputes = (params = {}, signal) => {
  * @returns {Promise} Normalized paging result
  */
 const getBuyerDisputes = (buyerId, params = {}, signal) => {
-    return getDisputes({ ...params, raisedById: buyerId }, signal);
+    const fallback = {
+        pageNumber: params?.pageNumber ?? 1,
+        pageSize: params?.pageSize ?? 20
+    };
+
+    const queryParams = {
+        Status: params.status,
+        PageNumber: params.pageNumber ?? 1,
+        PageSize: params.pageSize ?? 20
+    };
+
+    return axios
+        .get(`buyer/disputes`, { params: queryParams, signal })
+        .then((response) => normalizePaging(response?.data ?? response, fallback));
 };
 
 /**

@@ -22,7 +22,11 @@ public sealed class DisputesController : ApiController
     [HttpGet]
     public Task<IActionResult> GetDisputes([FromQuery] DisputeFilterDto filter, CancellationToken cancellationToken)
     {
-        var query = new GetDisputesQuery(filter, _currentUser.UserId!);
+        var currentUserId = _currentUser.UserId;
+        Console.WriteLine($"[DisputesController] GetDisputes called by user: {currentUserId}");
+        Console.WriteLine($"[DisputesController] Filter: Status={filter.Status}, PageNumber={filter.PageNumber}, PageSize={filter.PageSize}");
+        
+        var query = new GetDisputesQuery(filter, currentUserId!);
         return SendAsync(query, cancellationToken);
     }
 

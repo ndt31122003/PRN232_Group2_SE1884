@@ -16,10 +16,13 @@ internal static class DisputeMappingExtensions
                 r.CreatedAt))
             .ToList() ?? new List<DisputeResponseDto>();
 
+        var listingCreatedBy = dispute.Listing?.CreatedBy ?? string.Empty;
+        Console.WriteLine($"[DisputeMappingExtensions] Dispute {dispute.Id}: ListingId={dispute.ListingId}, Listing is null? {dispute.Listing == null}, ListingCreatedBy={listingCreatedBy}");
+
         return new DisputeDto(
             dispute.Id,
             dispute.ListingId,
-            dispute.Listing?.CreatedBy ?? string.Empty,
+            listingCreatedBy,
             dispute.RaisedById,
             string.Empty, // Would need to load from User
             string.Empty, // Would need to load from User
