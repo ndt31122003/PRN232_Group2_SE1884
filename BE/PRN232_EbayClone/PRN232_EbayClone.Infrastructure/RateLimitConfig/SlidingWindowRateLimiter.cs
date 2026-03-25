@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using PRN232_EbayClone.Api.Infrastructure.RateLimitConfig;
 using StackExchange.Redis;
@@ -34,14 +35,16 @@ public class SlidingWindowRateLimiter
             ";
     private readonly IDatabase? _db;
     private readonly IConfiguration _config;
+    private readonly IOptionsMonitor<List<RateLimitRule>> _rulesMonitor;
     private readonly ILogger<SlidingWindowRateLimiter> _logger;
     private readonly RequestDelegate _next;
     private readonly bool _redisAvailable;
 
-    public SlidingWindowRateLimiter(RequestDelegate next, IConfiguration config, IServiceProvider serviceProvider)
+    public SlidingWindowRateLimiter(RequestDelegate next, IConfiguration config, IServiceProvider serviceProvider, IOptionsMonitor<List<RateLimitRule>> rulesMonitor)
     {
         _next = next;
         _config = config;
+        _rulesMonitor = rulesMonitor;
         _logger = serviceProvider.GetRequiredService<ILogger<SlidingWindowRateLimiter>>();
         try
         {
@@ -80,7 +83,7 @@ public class SlidingWindowRateLimiter
 
     public IEnumerable<RateLimitRule> GetApplicableRules(HttpContext context)
     {
-        var limits = _config.GetSection("RedisRateLimits").Get<RateLimitRule[]>();
+        var limits = _rulesMonitor.CurrentValue;
         return limits
             .Where(x => x.MatchPath(context.Request.Path))
             .OrderBy(x => x.MaxRequests)
@@ -118,6 +121,7 @@ public class SlidingWindowRateLimiter
         }
 
         var apiKey = GetUserKey(httpContext);
+
         if (string.IsNullOrEmpty(apiKey))
         {
             httpContext.Response.StatusCode = 401;
@@ -134,6 +138,12 @@ public class SlidingWindowRateLimiter
         if (await IsLimited(applicableRules, apiKey))
         {
             httpContext.Response.StatusCode = 429;
+            httpContext.Response.ContentType = "application/json";
+
+            var maxWindow = applicableRules.Max(x => x.WindowSeconds);
+            httpContext.Response.Headers.Append("Retry-After", maxWindow.ToString());
+
+            await httpContext.Response.WriteAsync("Too many requests. Please try again later.");
             return;
         }
 
