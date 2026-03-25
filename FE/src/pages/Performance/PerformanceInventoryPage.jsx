@@ -104,6 +104,7 @@ const normalizeAlertSetting = (item) => ({
     thresholdQuantity: item?.thresholdQuantity ?? item?.ThresholdQuantity ?? null,
     isLowStock: Boolean(item?.isLowStock ?? item?.IsLowStock),
     emailNotificationsEnabled: Boolean(item?.emailNotificationsEnabled ?? item?.EmailNotificationsEnabled),
+    additionalNotificationEmails: item?.additionalNotificationEmails ?? item?.AdditionalNotificationEmails ?? '',
     lastLowStockNotificationAt: item?.lastLowStockNotificationAt ?? item?.LastLowStockNotificationAt ?? null,
     lastUpdatedAt: item?.lastUpdatedAt ?? item?.LastUpdatedAt ?? null
 });
@@ -126,6 +127,9 @@ const buildAlertDrafts = (items) => items.reduce((accumulator, item) => {
     accumulator[item.listingId] = {
         thresholdQuantity: toThresholdDraft(item.thresholdQuantity),
         emailNotificationsEnabled: item.emailNotificationsEnabled,
+        additionalNotificationEmails: item.additionalNotificationEmails,
+        restockQuantity: '',
+        restockReason: '',
     };
 
     return accumulator;
@@ -161,6 +165,10 @@ const PerformanceInventoryPage = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [savingListingId, setSavingListingId] = useState('');
+    const [restockingListingId, setRestockingListingId] = useState('');
+    const [importingExcel, setImportingExcel] = useState(false);
+    const [importFile, setImportFile] = useState(null);
+    const [importResult, setImportResult] = useState(null);
     const [error, setError] = useState('');
 
     const fetchDashboard = useCallback(async ({ silent = false } = {}) => {
@@ -276,6 +284,7 @@ const PerformanceInventoryPage = () => {
                 listingId,
                 thresholdQuantity,
                 emailNotificationsEnabled: draft.emailNotificationsEnabled,
+                additionalNotificationEmails: draft.additionalNotificationEmails,
             }, { suppressErrorNotice: true });
 
             Notice({ msg: 'Low-stock alert updated.', isSuccess: true });
@@ -290,6 +299,65 @@ const PerformanceInventoryPage = () => {
         }
     }, [alertDrafts, fetchDashboard]);
 
+    const handleRestockSave = useCallback(async (listingId) => {
+        const draft = alertDrafts[listingId];
+        if (!draft) {
+            return;
+        }
+
+        const quantity = Number(`${draft.restockQuantity ?? ''}`.trim());
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            Notice({ msg: 'Restock quantity must be a positive whole number.', isSuccess: false });
+            return;
+        }
+
+        setRestockingListingId(listingId);
+
+        try {
+            await InventoryService.restockInventory({
+                listingId,
+                quantity,
+                reason: draft.restockReason?.trim() || null,
+            }, { suppressErrorNotice: true });
+
+            Notice({ msg: 'Inventory restocked successfully.', isSuccess: true });
+            await fetchDashboard({ silent: true });
+        } catch (requestError) {
+            Notice({
+                msg: requestError?.response?.data?.detail || 'Unable to restock this listing right now.',
+                isSuccess: false,
+            });
+        } finally {
+            setRestockingListingId('');
+        }
+    }, [alertDrafts, fetchDashboard]);
+
+    const handleImportSubmit = useCallback(async () => {
+        if (!importFile) {
+            Notice({ msg: 'Select an Excel file before importing.', isSuccess: false });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', importFile);
+        setImportingExcel(true);
+
+        try {
+            const response = await InventoryService.importInventoryRestockExcel(formData, { suppressErrorNotice: true });
+            const payload = response?.data?.data ?? response?.data ?? null;
+            setImportResult(payload);
+            Notice({ msg: 'Inventory Excel import completed.', isSuccess: true });
+            await fetchDashboard({ silent: true });
+        } catch (requestError) {
+            Notice({
+                msg: requestError?.response?.data?.detail || 'Unable to import inventory Excel file.',
+                isSuccess: false,
+            });
+        } finally {
+            setImportingExcel(false);
+        }
+    }, [fetchDashboard, importFile]);
+
     if (loading) {
         return <LoadingScreen />;
     }
@@ -301,7 +369,7 @@ const PerformanceInventoryPage = () => {
                     <span className="performance-inventory__eyebrow">Performance / Stock</span>
                     <h1>Stock control dashboard</h1>
                     <p>
-                        Follow the stock flow already implemented in the backend and keep an eye on listings that need replenishment.
+                        Follow the stock flow already implemented in the backend, configure worker-based alerts, and replenish listings manually or by Excel.
                     </p>
                 </div>
 
@@ -344,9 +412,55 @@ const PerformanceInventoryPage = () => {
                     <div className="performance-inventory__panel-head">
                         <div>
                             <h2>Low-stock alert settings</h2>
-                            <p>Configure the threshold per listing and choose whether the system should send an email to your account when stock falls below it.</p>
+                            <p>Configure the threshold per listing, optional additional recipients, and restock actions. A worker scans every 5 minutes and sends only one alert until the stock recovers.</p>
                         </div>
                     </div>
+
+                    <div className="performance-inventory__import-card">
+                        <div>
+                            <h3>Bulk restock from Excel</h3>
+                            <p>Upload an Excel file with columns <strong>ListingId</strong> or <strong>SKU</strong>, <strong>Quantity</strong>, and optional <strong>Reason</strong>.</p>
+                        </div>
+
+                        <div className="performance-inventory__import-actions" style={{ gap: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                            <input
+                                type="file"
+                                accept=".xlsx,.xlsm,.csv"
+                                onChange={(event) => setImportFile(event.target.files?.[0] ?? null)}
+                            />
+                            <button
+                                type="button"
+                                className="performance-inventory__save-btn"
+                                onClick={handleImportSubmit}
+                                disabled={importingExcel}
+                            >
+                                {importingExcel ? 'Importing...' : 'Import Excel'}
+                            </button>
+                            <a
+                                href="/inventory-restock-sample.csv"
+                                download="inventory-restock-sample.csv"
+                                className="performance-inventory__link-btn"
+                                style={{ whiteSpace: 'nowrap' }}
+                            >
+                                Tải file Excel mẫu
+                            </a>
+                        </div>
+                    </div>
+
+                    {importResult && (
+                        <div className="performance-inventory__import-result">
+                            <strong>{toNumber(importResult.updatedCount ?? importResult.UpdatedCount).toLocaleString('en-US')} listing(s) updated</strong>
+                            {Array.isArray(importResult.failures ?? importResult.Failures) && (importResult.failures ?? importResult.Failures).length > 0 && (
+                                <ul className="performance-inventory__import-failures">
+                                    {(importResult.failures ?? importResult.Failures).slice(0, 8).map((failure, index) => (
+                                        <li key={`${failure.rowNumber ?? failure.RowNumber}-${index}`}>
+                                            Row {failure.rowNumber ?? failure.RowNumber}: {failure.message ?? failure.Message}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    )}
 
                     {alertSettings.length === 0 ? (
                         <div className="performance-inventory__empty-state">
@@ -364,8 +478,10 @@ const PerformanceInventoryPage = () => {
                                         <th>Sold</th>
                                         <th>Threshold</th>
                                         <th>Email alert</th>
+                                        <th>Additional emails</th>
                                         <th>Last email</th>
-                                        <th>Action</th>
+                                        <th>Save alert</th>
+                                        <th>Restock</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -373,6 +489,9 @@ const PerformanceInventoryPage = () => {
                                         const draft = alertDrafts[item.listingId] ?? {
                                             thresholdQuantity: toThresholdDraft(item.thresholdQuantity),
                                             emailNotificationsEnabled: item.emailNotificationsEnabled,
+                                            additionalNotificationEmails: item.additionalNotificationEmails,
+                                            restockQuantity: '',
+                                            restockReason: '',
                                         };
 
                                         return (
@@ -407,6 +526,15 @@ const PerformanceInventoryPage = () => {
                                                         <span>{draft.emailNotificationsEnabled ? 'Enabled' : 'Disabled'}</span>
                                                     </label>
                                                 </td>
+                                                <td>
+                                                    <textarea
+                                                        className="performance-inventory__textarea"
+                                                        value={draft.additionalNotificationEmails}
+                                                        onChange={(event) => handleAlertFieldChange(item.listingId, 'additionalNotificationEmails', event.target.value)}
+                                                        placeholder="ops@store.com, inventory@store.com"
+                                                        rows="2"
+                                                    />
+                                                </td>
                                                 <td>{formatDateTime(item.lastLowStockNotificationAt)}</td>
                                                 <td>
                                                     <button
@@ -417,6 +545,34 @@ const PerformanceInventoryPage = () => {
                                                     >
                                                         {savingListingId === item.listingId ? 'Saving...' : 'Save'}
                                                     </button>
+                                                </td>
+                                                <td>
+                                                    <div className="performance-inventory__restock-cell">
+                                                        <input
+                                                            type="number"
+                                                            min="1"
+                                                            inputMode="numeric"
+                                                            className="performance-inventory__input"
+                                                            value={draft.restockQuantity}
+                                                            onChange={(event) => handleAlertFieldChange(item.listingId, 'restockQuantity', event.target.value)}
+                                                            placeholder="Qty"
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            className="performance-inventory__input"
+                                                            value={draft.restockReason}
+                                                            onChange={(event) => handleAlertFieldChange(item.listingId, 'restockReason', event.target.value)}
+                                                            placeholder="Reason (optional)"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="performance-inventory__secondary-btn"
+                                                            onClick={() => handleRestockSave(item.listingId)}
+                                                            disabled={restockingListingId === item.listingId}
+                                                        >
+                                                            {restockingListingId === item.listingId ? 'Restocking...' : 'Restock'}
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );
@@ -472,7 +628,7 @@ const PerformanceInventoryPage = () => {
                         </li>
                         <li>
                             <strong>{alertSettings.filter((item) => item.emailNotificationsEnabled).length.toLocaleString('en-US')}</strong>
-                            <span>Listings have email alerts enabled and will notify your account when the threshold is reached.</span>
+                            <span>Listings have worker-based email alerts enabled and will notify the configured recipients once for each low-stock cycle.</span>
                         </li>
                     </ul>
 

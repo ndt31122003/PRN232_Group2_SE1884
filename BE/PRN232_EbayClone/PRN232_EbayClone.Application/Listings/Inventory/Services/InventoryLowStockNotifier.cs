@@ -27,7 +27,19 @@ public sealed class InventoryLowStockNotifier : IInventoryLowStockNotifier
         }
 
         var seller = await _userRepository.GetByIdAsync(inventory.SellerId, cancellationToken);
-        if (seller?.Email is null)
+        var recipients = inventory.GetAdditionalNotificationEmailList().ToList();
+
+        if (seller?.Email is not null)
+        {
+          recipients.Insert(0, seller.Email.Value);
+        }
+
+        recipients = recipients
+          .Where(static email => !string.IsNullOrWhiteSpace(email))
+          .Distinct(StringComparer.OrdinalIgnoreCase)
+          .ToList();
+
+        if (recipients.Count == 0)
         {
             return false;
         }
@@ -40,7 +52,7 @@ public sealed class InventoryLowStockNotifier : IInventoryLowStockNotifier
         var body = $"""
 <div style="font-family: Arial, sans-serif; color: #10263f; line-height: 1.6;">
   <h2 style="margin-bottom: 12px;">Low stock alert</h2>
-  <p>Hello {WebUtility.HtmlEncode(seller.FullName)},</p>
+  <p>Hello,</p>
   <p>Your listing <strong>{safeTitle}</strong> has reached the configured stock threshold.</p>
   <table style="border-collapse: collapse; margin: 16px 0; min-width: 320px;">
     <tr>
@@ -64,7 +76,11 @@ public sealed class InventoryLowStockNotifier : IInventoryLowStockNotifier
 </div>
 """;
 
-        await _emailSender.SendEmailAsync(seller.Email.Value, subject, body, cancellationToken);
+        foreach (var recipient in recipients)
+        {
+          await _emailSender.SendEmailAsync(recipient, subject, body, cancellationToken);
+        }
+
         inventory.MarkLowStockNotificationSent(DateTime.UtcNow);
 
         return true;

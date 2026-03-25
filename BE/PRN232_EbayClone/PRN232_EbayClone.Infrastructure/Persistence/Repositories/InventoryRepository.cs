@@ -54,6 +54,15 @@ public sealed class InventoryRepository : Repository<Inventory, InventoryId>, II
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Inventory>> GetPendingLowStockAlertsAsync(CancellationToken cancellationToken = default)
+    {
+        return await DbContext.Inventories
+            .Include(x => x.Reservations)
+            .Where(x => x.IsLowStock && x.EmailNotificationsEnabled && x.LastLowStockNotificationAt == null)
+            .OrderBy(x => x.LastUpdatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<bool> ExistsForListingAsync(ListingId listingId, CancellationToken cancellationToken = default)
     {
         return DbContext.Inventories.AnyAsync(x => x.ListingId == listingId, cancellationToken);

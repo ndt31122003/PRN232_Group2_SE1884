@@ -10,7 +10,8 @@ namespace PRN232_EbayClone.Application.Listings.Inventory.Commands.UpdateLowStoc
 public sealed record UpdateLowStockAlertCommand(
     Guid ListingId,
     int? ThresholdQuantity,
-    bool EmailNotificationsEnabled) : ICommand<InventoryDto>;
+    bool EmailNotificationsEnabled,
+    string? AdditionalNotificationEmails) : ICommand<InventoryDto>;
 
 public sealed class UpdateLowStockAlertCommandValidator : AbstractValidator<UpdateLowStockAlertCommand>
 {
@@ -27,27 +28,38 @@ public sealed class UpdateLowStockAlertCommandValidator : AbstractValidator<Upda
         RuleFor(x => x)
             .Must(x => !x.EmailNotificationsEnabled || x.ThresholdQuantity.HasValue)
             .WithMessage("Threshold quantity is required when email alerts are enabled.");
+
+        RuleFor(x => x.AdditionalNotificationEmails)
+            .Must(HaveValidAdditionalEmails)
+            .WithMessage("Additional alert emails must be valid email addresses separated by commas or semicolons.");
+    }
+
+    private static bool HaveValidAdditionalEmails(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return true;
+        }
+
+        var emails = value
+            .Split([',', ';', '\n', '\r'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        return emails.All(email => new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(email));
     }
 }
 
 public sealed class UpdateLowStockAlertCommandHandler : ICommandHandler<UpdateLowStockAlertCommand, InventoryDto>
 {
     private readonly IInventoryRepository _inventoryRepository;
-    private readonly IListingRepository _listingRepository;
-    private readonly IInventoryLowStockNotifier _inventoryLowStockNotifier;
     private readonly IUserContext _userContext;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateLowStockAlertCommandHandler(
         IInventoryRepository inventoryRepository,
-        IListingRepository listingRepository,
-        IInventoryLowStockNotifier inventoryLowStockNotifier,
         IUserContext userContext,
         IUnitOfWork unitOfWork)
     {
         _inventoryRepository = inventoryRepository;
-        _listingRepository = listingRepository;
-        _inventoryLowStockNotifier = inventoryLowStockNotifier;
         _userContext = userContext;
         _unitOfWork = unitOfWork;
     }
@@ -71,7 +83,7 @@ public sealed class UpdateLowStockAlertCommandHandler : ICommandHandler<UpdateLo
             return ListingErrors.Unauthorized;
         }
 
-        var updateResult = inventory.ConfigureLowStockAlert(request.ThresholdQuantity, request.EmailNotificationsEnabled);
+        var updateResult = inventory.ConfigureLowStockAlert(request.ThresholdQuantity, request.EmailNotificationsEnabled, request.AdditionalNotificationEmails);
         if (updateResult.IsFailure)
         {
             return updateResult.Error;
@@ -79,13 +91,6 @@ public sealed class UpdateLowStockAlertCommandHandler : ICommandHandler<UpdateLo
 
         _inventoryRepository.Update(inventory);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        var listing = await _listingRepository.GetByIdAsync(request.ListingId, cancellationToken);
-        if (listing is not null && await _inventoryLowStockNotifier.NotifyIfNeededAsync(inventory, listing.Title, listing.Sku, cancellationToken))
-        {
-            _inventoryRepository.Update(inventory);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-        }
 
         return inventory.ToDto();
     }

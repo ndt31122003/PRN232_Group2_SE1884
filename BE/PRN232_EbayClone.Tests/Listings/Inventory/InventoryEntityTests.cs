@@ -142,12 +142,14 @@ public class InventoryEntityTests
         var inventory = Domain.Listings.Inventory.Entities.Inventory.Create(ListingId, SellerId, 25).Value;
 
         // Act
-        var result = inventory.ConfigureLowStockAlert(20, true);
+        var result = inventory.ConfigureLowStockAlert(20, true, "ops@example.com, stock@example.com");
 
         // Assert
         result.IsSuccess.Should().BeTrue();
         inventory.ThresholdQuantity.Should().Be(20);
         inventory.EmailNotificationsEnabled.Should().BeTrue();
+        inventory.AdditionalNotificationEmails.Should().Be("ops@example.com, stock@example.com");
+        inventory.GetAdditionalNotificationEmailList().Should().HaveCount(2);
         inventory.IsLowStock.Should().BeFalse();
     }
 
@@ -179,6 +181,20 @@ public class InventoryEntityTests
         // Assert
         inventory.IsLowStock.Should().BeFalse();
         inventory.LastLowStockNotificationAt.Should().BeNull();
+    }
+
+    [Fact]
+    public void ConfigureLowStockAlert_WithInvalidAdditionalEmail_ShouldFail()
+    {
+        // Arrange
+        var inventory = Domain.Listings.Inventory.Entities.Inventory.Create(ListingId, SellerId, 25).Value;
+
+        // Act
+        var result = inventory.ConfigureLowStockAlert(10, true, "ops@example.com, invalid-email");
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(InventoryErrors.InvalidAdditionalEmail);
     }
     
     [Fact]

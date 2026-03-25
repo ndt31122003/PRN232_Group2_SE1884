@@ -56,6 +56,7 @@ public sealed class GetSellerInventoryAlertsQueryHandler : IQueryHandler<GetSell
                     inventory.ThresholdQuantity,
                     inventory.IsLowStock,
                     inventory.EmailNotificationsEnabled,
+                    inventory.AdditionalNotificationEmails,
                     inventory.LastLowStockNotificationAt,
                     inventory.LastUpdatedAt);
             })

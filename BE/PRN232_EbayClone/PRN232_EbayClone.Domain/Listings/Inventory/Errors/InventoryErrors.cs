@@ -23,6 +23,10 @@ public static class InventoryErrors
     public static readonly Error EmailAlertRequiresThreshold = Error.Failure(
         "Inventory.EmailAlertRequiresThreshold",
         "A low-stock threshold is required when email alerts are enabled.");
+
+    public static readonly Error InvalidAdditionalEmail = Error.Failure(
+        "Inventory.InvalidAdditionalEmail",
+        "One or more additional alert email addresses are invalid.");
     
     public static Error NotFound => Error.Failure(
         "Inventory.NotFound",

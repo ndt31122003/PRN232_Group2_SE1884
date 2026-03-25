@@ -11,5 +11,6 @@ public interface IInventoryRepository : IRepository<Inventory, InventoryId>
     Task<Inventory?> GetByListingIdForUpdateAsync(ListingId listingId, CancellationToken cancellationToken = default);
     Task<Inventory?> GetByReservationIdAsync(InventoryReservationId reservationId, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Inventory>> GetBySellerIdAsync(UserId sellerId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Inventory>> GetPendingLowStockAlertsAsync(CancellationToken cancellationToken = default);
     Task<bool> ExistsForListingAsync(ListingId listingId, CancellationToken cancellationToken = default);
 }

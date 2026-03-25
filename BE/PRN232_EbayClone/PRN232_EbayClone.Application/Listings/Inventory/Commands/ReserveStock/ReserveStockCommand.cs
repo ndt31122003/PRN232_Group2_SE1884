@@ -1,7 +1,6 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Inventory.Dtos;
-using PRN232_EbayClone.Application.Listings.Inventory.Services;
 using PRN232_EbayClone.Domain.Listings.Inventory.Enums;
 using PRN232_EbayClone.Domain.Listings.Inventory.Errors;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
@@ -40,21 +39,15 @@ public sealed class ReserveStockCommandValidator : AbstractValidator<ReserveStoc
 public sealed class ReserveStockCommandHandler : ICommandHandler<ReserveStockCommand, ReserveStockResult>
 {
     private readonly IInventoryRepository _inventoryRepository;
-    private readonly IListingRepository _listingRepository;
-    private readonly IInventoryLowStockNotifier _inventoryLowStockNotifier;
     private readonly IUserContext _userContext;
     private readonly IUnitOfWork _unitOfWork;
 
     public ReserveStockCommandHandler(
         IInventoryRepository inventoryRepository,
-        IListingRepository listingRepository,
-        IInventoryLowStockNotifier inventoryLowStockNotifier,
         IUserContext userContext,
         IUnitOfWork unitOfWork)
     {
         _inventoryRepository = inventoryRepository;
-        _listingRepository = listingRepository;
-        _inventoryLowStockNotifier = inventoryLowStockNotifier;
         _userContext = userContext;
         _unitOfWork = unitOfWork;
     }
@@ -86,13 +79,6 @@ public sealed class ReserveStockCommandHandler : ICommandHandler<ReserveStockCom
 
         _inventoryRepository.Update(inventory);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        var listing = await _listingRepository.GetByIdAsync(request.ListingId, cancellationToken);
-        if (listing is not null && await _inventoryLowStockNotifier.NotifyIfNeededAsync(inventory, listing.Title, listing.Sku, cancellationToken))
-        {
-            _inventoryRepository.Update(inventory);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-        }
 
         await transaction.CommitAsync(cancellationToken);
 

@@ -1,6 +1,6 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Inventory.Dtos;
-using PRN232_EbayClone.Application.Listings.Inventory.Services;
 using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.Errors;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
@@ -36,20 +36,17 @@ public sealed class InitializeInventoryCommandHandler : ICommandHandler<Initiali
 {
     private readonly IInventoryRepository _inventoryRepository;
     private readonly IListingRepository _listingRepository;
-    private readonly IInventoryLowStockNotifier _inventoryLowStockNotifier;
     private readonly IUserContext _userContext;
     private readonly IUnitOfWork _unitOfWork;
 
     public InitializeInventoryCommandHandler(
         IInventoryRepository inventoryRepository,
         IListingRepository listingRepository,
-        IInventoryLowStockNotifier inventoryLowStockNotifier,
         IUserContext userContext,
         IUnitOfWork unitOfWork)
     {
         _inventoryRepository = inventoryRepository;
         _listingRepository = listingRepository;
-        _inventoryLowStockNotifier = inventoryLowStockNotifier;
         _userContext = userContext;
         _unitOfWork = unitOfWork;
     }
@@ -102,12 +99,6 @@ public sealed class InitializeInventoryCommandHandler : ICommandHandler<Initiali
 
         _inventoryRepository.Add(inventory);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        if (await _inventoryLowStockNotifier.NotifyIfNeededAsync(inventory, listing.Title, listing.Sku, cancellationToken))
-        {
-            _inventoryRepository.Update(inventory);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-        }
 
         return inventory.ToDto();
     }

@@ -27,6 +27,7 @@ public sealed record InventoryDto(
     int? ThresholdQuantity,
     bool IsLowStock,
     bool EmailNotificationsEnabled,
+    string AdditionalNotificationEmails,
     DateTime? LastLowStockNotificationAt,
     DateTime LastUpdatedAt,
     IReadOnlyCollection<InventoryReservationDto> Reservations);
@@ -41,6 +42,7 @@ public sealed record InventoryAlertSettingsDto(
     int? ThresholdQuantity,
     bool IsLowStock,
     bool EmailNotificationsEnabled,
+    string AdditionalNotificationEmails,
     DateTime? LastLowStockNotificationAt,
     DateTime LastUpdatedAt);
 
@@ -59,6 +61,7 @@ public static class InventoryMappings
             entity.ThresholdQuantity,
             entity.IsLowStock,
             entity.EmailNotificationsEnabled,
+            entity.AdditionalNotificationEmails,
             entity.LastLowStockNotificationAt,
             entity.LastUpdatedAt,
             entity.Reservations
