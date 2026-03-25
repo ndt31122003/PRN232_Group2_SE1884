@@ -83,9 +83,6 @@ public class OrderRepository :
             .ThenInclude(o => o.AllowedTransitions)
             .ThenInclude(transition => transition.ToStatus)
             .Include(o => o.StatusHistory)
-            .ThenInclude(history => history.FromStatus)
-            .Include(o => o.StatusHistory)
-            .ThenInclude(history => history.ToStatus)
             .Include(o => o.Items)
             .Include(o => o.ItemShipments)
             .Include(o => o.SellerFeedback)
@@ -731,9 +728,6 @@ WHERE (@SellerId IS NULL OR o.seller_id = @SellerId)
                 .ThenInclude(status => status.AllowedTransitions)
                 .ThenInclude(transition => transition.ToStatus)
             .Include(order => order.StatusHistory)
-                .ThenInclude(history => history.FromStatus)
-            .Include(order => order.StatusHistory)
-                .ThenInclude(history => history.ToStatus)
             .Where(order => order.Status != null && awaitingStatuses.Contains(order.Status.Code))
             .ToListAsync(cancellationToken);
 
@@ -794,96 +788,5 @@ WHERE (@SellerId IS NULL OR o.seller_id = @SellerId)
             DateTimeKind.Local => value.ToUniversalTime(),
             _ => value
         };
-    }
-
-    public async Task InsertBuyItNowOrderAsync(
-        Guid orderId, string orderNumber, Guid buyerId, Guid sellerId,
-        Guid statusId, decimal amount, string currency,
-        Guid orderItemId, Guid listingId, Guid? categoryId, string imageUrl,
-        string title, string? sku, int quantity,
-        CancellationToken cancellationToken = default)
-    {
-        var now = DateTime.UtcNow;
-
-        const string insertOrder = """
-            INSERT INTO orders (
-                id, order_number, buyer_id, seller_id, status_id,
-                shipping_status, fulfillment_type, ordered_at, paid_at,
-                sub_total_amount, sub_total_currency,
-                shipping_cost_amount, shipping_cost_currency,
-                platform_fee_amount, platform_fee_currency,
-                tax_amount, tax_currency,
-                discount_amount, discount_currency,
-                total_amount, total_currency,
-                created_at, created_by, updated_at, updated_by, is_deleted
-            ) VALUES (
-                @Id, @OrderNumber, @BuyerId, @SellerId, @StatusId,
-                0, 0, @Now, @Now,
-                @Amount, @Currency,
-                0, @Currency,
-                0, @Currency,
-                0, @Currency,
-                0, @Currency,
-                @Amount, @Currency,
-                @Now, 'system', @Now, 'system', false
-            )
-            """;
-
-        const string insertItem = """
-            INSERT INTO order_items (
-                id, order_id, listing_id, variation_id, category_id,
-                image_url, title, sku, quantity,
-                unit_price_amount, unit_price_currency,
-                total_price_amount, total_price_currency,
-                created_at, created_by, updated_at, updated_by, is_deleted
-            ) VALUES (
-                @ItemId, @OrderId, @ListingId, NULL, @CategoryId,
-                @ImageUrl, @Title, @Sku, @Quantity,
-                @Amount, @Currency,
-                @TotalAmount, @Currency,
-                @Now, 'system', @Now, 'system', false
-            )
-            """;
-
-        using var connection = await ConnectionFactory.CreateConnectionAsync();
-        using var tx = connection.BeginTransaction();
-
-        await connection.ExecuteAsync(new CommandDefinition(
-            insertOrder,
-            new
-            {
-                Id = orderId,
-                OrderNumber = orderNumber,
-                BuyerId = buyerId,
-                SellerId = sellerId,
-                StatusId = statusId,
-                Amount = amount,
-                Currency = currency,
-                Now = now
-            },
-            tx,
-            cancellationToken: cancellationToken));
-
-        await connection.ExecuteAsync(new CommandDefinition(
-            insertItem,
-            new
-            {
-                ItemId = orderItemId,
-                OrderId = orderId,
-                ListingId = listingId,
-                CategoryId = categoryId,
-                ImageUrl = imageUrl,
-                Title = title,
-                Sku = sku,
-                Quantity = quantity,
-                Amount = amount,
-                TotalAmount = amount * quantity,
-                Currency = currency,
-                Now = now
-            },
-            tx,
-            cancellationToken: cancellationToken));
-
-        tx.Commit();
     }
 }

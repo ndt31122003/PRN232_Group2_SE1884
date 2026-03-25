@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using PRN232_EbayClone.Application.Abstractions.Data;
@@ -12,7 +12,6 @@ namespace PRN232_EbayClone.Application.Orders.Commands;
 
 public sealed record PrintShippingLabelCommand(
     Guid OrderId,
-    Guid SellerId,
     string Carrier,
     string ServiceCode,
     string ServiceName,
@@ -69,21 +68,12 @@ public sealed class PrintShippingLabelCommandHandler : ICommandHandler<PrintShip
                 Error.Failure("Order.NotFound", "Order not found."));
         }
 
-        if (order.SellerId != request.SellerId)
-        {
-            return Result.Failure<PrintShippingLabelResult>(
-                Error.Failure("Order.AccessDenied", "You do not have permission to update this order."));
-        }
-
         var buyerName = order.Buyer?.FullName ?? order.Buyer?.Username ?? "Unknown Recipient";
-
-        // Use real buyer address if available; otherwise fall back to a placeholder for demo
-        var buyerAddress = order.Buyer?.BusinessAddress;
-        var buyerStreet   = buyerAddress?.Street   ?? "Address on file";
-        var buyerCity     = buyerAddress?.City      ?? "N/A";
-        var buyerState    = buyerAddress?.State     ?? "N/A";
-        var buyerPostalCode = buyerAddress?.ZipCode ?? "00000";
-        var buyerCountry  = buyerAddress?.Country   ?? "US";
+        var buyerStreet = "742 Evergreen Terrace";
+        var buyerCity = "Springfield";
+        var buyerState = "IL";
+        var buyerPostalCode = "62704";
+        var buyerCountry = "US";
 
         var providerResponse = await _shippingProvider.CreateShippingLabelAsync(
             fromName: DefaultSenderName,

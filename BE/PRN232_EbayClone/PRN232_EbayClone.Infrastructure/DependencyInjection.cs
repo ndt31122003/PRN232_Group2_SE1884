@@ -16,7 +16,6 @@ using PRN232_EbayClone.Application.Abstractions.Identity;
 using PRN232_EbayClone.Application.Abstractions.Mail;
 using PRN232_EbayClone.Application.Abstractions.Realtime;
 using PRN232_EbayClone.Application.Abstractions.Shipping;
-using PRN232_EbayClone.Application.Abstractions.Security;
 using PRN232_EbayClone.Application.Performance.Abstractions;
 using PRN232_EbayClone.Application.Reports.Downloads.Abstractions;
 using PRN232_EbayClone.Application.Research.Abstractions;
@@ -66,10 +65,6 @@ public static class DependencyInjection
             .AddSharedDataProtection()
             .AddShippingServices()
             .AddHub(configuration);
-
-        services.AddHttpContextAccessor();
-        services.AddHttpClient<IRecaptchaVerificationService, RecaptchaService>();
-        services.AddScoped<ICaptchaProtectionService, CaptchaProtectionService>();
 
         services.AddScoped<ISourcingInsightsRepository, SourcingInsightsRepository>();
 

@@ -1,5 +1,4 @@
 ﻿using PRN232_EbayClone.Application.Abstractions.Authentication;
-using PRN232_EbayClone.Application.Abstractions.Security;
 using PRN232_EbayClone.Domain.Identity.Enums;
 using PRN232_EbayClone.Domain.Identity.Errors;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
@@ -10,9 +9,7 @@ namespace PRN232_EbayClone.Application.Identity.Commands;
 public sealed record ResetPasswordCommand(
     string Email,
     string Code,
-    string NewPassword,
-    string? CaptchaToken = null,
-    string? CaptchaAction = null
+    string NewPassword
 ) : ICommand;
 
 public sealed class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordCommand>
@@ -40,36 +37,20 @@ public sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswordC
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly ICaptchaProtectionService _captchaProtectionService;
-
     public ResetPasswordCommandHandler(
         IUserRepository userRepository,
         IOtpRepository otpRepository,
         IUnitOfWork unitOfWork,
-        IPasswordHasher passwordHasher,
-        ICaptchaProtectionService captchaProtectionService)
+        IPasswordHasher passwordHasher)
     {
         _userRepository = userRepository;
         _otpRepository = otpRepository;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
-        _captchaProtectionService = captchaProtectionService;
     }
 
     public async Task<Result> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
-        var captchaResult = await _captchaProtectionService.EnsureValidAsync(
-            CaptchaActions.IdentityResetPassword,
-            request.CaptchaToken,
-            request.CaptchaAction,
-            request.Email,
-            cancellationToken);
-
-        if (captchaResult.IsFailure)
-        {
-            return captchaResult;
-        }
-
         var emailOrError = Email.Create(request.Email);
         if (emailOrError.IsFailure)
             return emailOrError.Error;

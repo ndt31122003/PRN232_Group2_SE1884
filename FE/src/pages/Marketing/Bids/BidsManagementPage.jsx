@@ -6,8 +6,7 @@ import ListingService from "../../../services/ListingService";
 import STORAGE, { getStorage } from "../../../lib/storage";
 import "./BidsManagement.css";
 
-const isDev = process.env.NODE_ENV === "development";
-const HUB_URL = isDev ? "http://localhost:5149/hub" : "https://propval.io.vn/hub";
+const HUB_URL = "http://localhost:5149/hub";
 
 /* ------------------------------------------------------------------ */
 /* Countdown timer component                                            */
