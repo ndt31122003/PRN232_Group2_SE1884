@@ -53,8 +53,6 @@ const GlobalNotificationListener = () => {
     useSignalR({ Notification: handleNotification });
 
     // ── 2. REST polling fallback (30s) ─────────────────────────────────────
-    const isFirstPoll = useRef(true);
-
     useEffect(() => {
         let isMounted = true;
 
@@ -63,19 +61,7 @@ const GlobalNotificationListener = () => {
                 const notifications = await NotificationService.getNotifications(20);
                 if (!isMounted) return;
 
-                if (isFirstPoll.current) {
-                    // Seed existing unread IDs silently — don't show toasts for old notifications
-                    isFirstPoll.current = false;
-                    notifications
-                        .filter(n => !(n.isRead ?? n.IsRead))
-                        .forEach(n => {
-                            const id = String(n.id ?? n.Id ?? "");
-                            if (id) addSeenId(id);
-                        });
-                    return;
-                }
-
-                // Subsequent polls: only toast truly new unread notifications
+                // Only show unread notifications not already seen
                 notifications
                     .filter(n => !(n.isRead ?? n.IsRead))
                     .forEach(n => showToast(n));
