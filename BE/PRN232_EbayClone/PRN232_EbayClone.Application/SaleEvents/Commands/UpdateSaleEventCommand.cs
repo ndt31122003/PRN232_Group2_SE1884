@@ -1,61 +1,109 @@
-using PRN232_EbayClone.Domain.SaleEvents.Enums;
+using PRN232_EbayClone.Application.Abstractions.Authentication;
 
 namespace PRN232_EbayClone.Application.SaleEvents.Commands;
 
 public sealed record UpdateSaleEventCommand(
     Guid SaleEventId,
-    string Name,
+    string? Name,
     string? Description,
-    SaleEventMode Mode,
-    DateTime StartDate,
-    DateTime EndDate,
-    bool OfferFreeShipping,
-    bool IncludeSkippedItems,
-    bool BlockPriceIncreaseRevisions,
-    decimal? HighlightPercentage,
-    IReadOnlyList<CreateSaleEventTierRequest>? Tiers
-) : ICommand<Guid>;
+    DateTime? StartDate,
+    DateTime? EndDate,
+    string? BuyerMessageLabel,
+    bool? OfferFreeShipping,
+    bool? BlockPriceIncreaseRevisions,
+    bool? IncludeSkippedItems
+) : ICommand;
 
 public sealed class UpdateSaleEventCommandValidator : AbstractValidator<UpdateSaleEventCommand>
 {
     public UpdateSaleEventCommandValidator()
     {
         RuleFor(x => x.SaleEventId)
-            .NotEqual(Guid.Empty);
+            .NotEmpty()
+            .WithMessage("Sale event ID is required");
 
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(90);
+            .MaximumLength(200)
+            .When(x => x.Name != null)
+            .WithMessage("Sale event name cannot exceed 200 characters");
 
-        RuleFor(x => x.StartDate)
-            .LessThan(x => x.EndDate)
-            .WithMessage("Start date must be before end date.");
+        RuleFor(x => x.Description)
+            .MaximumLength(1000)
+            .When(x => x.Description != null)
+            .WithMessage("Description cannot exceed 1000 characters");
 
-        RuleFor(x => x.Mode)
-            .IsInEnum();
+        RuleFor(x => x.BuyerMessageLabel)
+            .MaximumLength(200)
+            .When(x => x.BuyerMessageLabel != null)
+            .WithMessage("Buyer message label cannot exceed 200 characters");
 
-        When(x => x.Mode == SaleEventMode.DiscountAndSaleEvent, () =>
+        RuleFor(x => x)
+            .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue || x.StartDate.Value < x.EndDate.Value)
+            .When(x => x.StartDate.HasValue && x.EndDate.HasValue)
+            .WithMessage("Start date must be before end date");
+    }
+}
+
+public sealed class UpdateSaleEventCommandHandler : ICommandHandler<UpdateSaleEventCommand>
+{
+    private readonly ISaleEventRepository _saleEventRepository;
+    private readonly IUserContext _userContext;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public UpdateSaleEventCommandHandler(
+        ISaleEventRepository saleEventRepository,
+        IUserContext userContext,
+        IUnitOfWork unitOfWork)
+    {
+        _saleEventRepository = saleEventRepository;
+        _userContext = userContext;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<Result> Handle(UpdateSaleEventCommand request, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(_userContext.UserId, out var sellerGuid))
         {
-            RuleFor(x => x.Tiers)
-                .Cascade(CascadeMode.Stop)
-                .NotNull()
-                .NotEmpty()
-                .Must(t => t!.Count <= 10)
-                .WithMessage("A sale event can include at most 10 discount tiers.");
+            return new Error("SaleEvent.Unauthorized", "User is not authorized");
+        }
 
-            When(x => x.Tiers is not null, () =>
-            {
-                RuleForEach(x => x.Tiers!)
-                    .SetValidator(new SaleEventTierRequestValidator());
-            });
-        });
-
-        When(x => x.Mode == SaleEventMode.SaleEventOnly, () =>
+        var saleEvent = await _saleEventRepository.GetByIdAsync(request.SaleEventId, cancellationToken);
+        if (saleEvent == null)
         {
-            RuleFor(x => x.HighlightPercentage)
-                .NotNull()
-                .GreaterThan(0)
-                .LessThanOrEqualTo(90);
-        });
+            return new Error("SaleEvent.NotFound", "Sale event not found");
+        }
+
+        // Verify ownership
+        if (saleEvent.SellerId != sellerGuid)
+        {
+            return new Error("SaleEvent.Unauthorized", "User does not own this sale event");
+        }
+
+        try
+        {
+            saleEvent.Update(
+                request.Name,
+                request.Description,
+                request.StartDate,
+                request.EndDate,
+                request.BuyerMessageLabel,
+                request.OfferFreeShipping,
+                request.BlockPriceIncreaseRevisions,
+                request.IncludeSkippedItems);
+
+            await _saleEventRepository.UpdateAsync(saleEvent, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
+        }
+        catch (ArgumentException ex)
+        {
+            return new Error("SaleEvent.ValidationFailed", ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return new Error("SaleEvent.OperationFailed", ex.Message);
+        }
     }
 }

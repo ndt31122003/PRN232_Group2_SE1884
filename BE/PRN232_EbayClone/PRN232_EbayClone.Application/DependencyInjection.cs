@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PRN232_EbayClone.Application.Behaviors;
+using PRN232_EbayClone.Application.Coupons;
+using PRN232_EbayClone.Application.OrderDiscounts.Services;
+using PRN232_EbayClone.Application.SaleEvents.Services;
 using System.Reflection;
 
 namespace PRN232_EbayClone.Application;
@@ -17,6 +20,13 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         services.AddTransient(typeof(IPipelineBehavior<,>),typeof(ValidationPipelineBehavior<,>));
+
+        // Register application services
+        services.AddScoped<ICouponCalculationService, CouponCalculationService>();
+        services.AddScoped<ISaleEventPriceCalculator, SaleEventPriceCalculator>();
+        services.AddScoped<ISaleEventEligibilityValidator, SaleEventEligibilityValidator>();
+        services.AddScoped<IDiscountPriorityService, DiscountPriorityService>();
+        services.AddScoped<IPriceIncreaseValidator, PriceIncreaseValidator>();
 
         return services;
     }

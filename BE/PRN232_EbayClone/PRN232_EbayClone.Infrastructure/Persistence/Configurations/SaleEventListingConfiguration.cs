@@ -1,21 +1,31 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PRN232_EbayClone.Domain.SaleEvents.Entities;
+using PRN232_EbayClone.Domain.Discounts.Entities;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence.Configurations;
 
-public sealed class SaleEventListingConfiguration : IEntityTypeConfiguration<SaleEventListing>
+internal sealed class SaleEventListingConfiguration : IEntityTypeConfiguration<SaleEventListing>
 {
     public void Configure(EntityTypeBuilder<SaleEventListing> builder)
     {
-        builder.ToTable("sale_event_listing");
+        builder.ToTable("sale_event_listings");
 
         builder.HasKey(l => l.Id);
-        builder.Property(l => l.Id).HasColumnName("id");
-        builder.Property(l => l.SaleEventId).HasColumnName("sale_event_id");
-        builder.Property(l => l.DiscountTierId).HasColumnName("discount_tier_id");
-        builder.Property(l => l.ListingId).HasColumnName("listing_id");
 
-        builder.HasIndex(l => new { l.SaleEventId, l.ListingId }).IsUnique();
+        builder.Property(l => l.SaleEventId)
+            .IsRequired();
+
+        builder.Property(l => l.DiscountTierId)
+            .IsRequired();
+
+        builder.Property(l => l.ListingId)
+            .IsRequired();
+
+        builder.Property(l => l.AssignedAt)
+            .IsRequired();
+
+        builder.HasIndex(l => l.ListingId);
+        builder.HasIndex(l => new { l.SaleEventId, l.ListingId })
+            .IsUnique();
     }
 }

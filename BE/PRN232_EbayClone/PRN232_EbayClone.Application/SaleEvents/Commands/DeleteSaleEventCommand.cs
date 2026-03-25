@@ -1,6 +1,4 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
-using PRN232_EbayClone.Application.Abstractions.Data;
-using PRN232_EbayClone.Domain.SaleEvents.Errors;
 
 namespace PRN232_EbayClone.Application.SaleEvents.Commands;
 
@@ -11,7 +9,8 @@ public sealed class DeleteSaleEventCommandValidator : AbstractValidator<DeleteSa
     public DeleteSaleEventCommandValidator()
     {
         RuleFor(x => x.SaleEventId)
-            .NotEqual(Guid.Empty);
+            .NotEmpty()
+            .WithMessage("Sale event ID is required");
     }
 }
 
@@ -35,17 +34,34 @@ public sealed class DeleteSaleEventCommandHandler : ICommandHandler<DeleteSaleEv
     {
         if (!Guid.TryParse(_userContext.UserId, out var sellerGuid))
         {
-            return SaleEventErrors.Unauthorized;
+            return new Error("SaleEvent.Unauthorized", "User is not authorized");
         }
 
-        var sellerIdString = sellerGuid.ToString();
-        var saleEvent = await _saleEventRepository.GetByIdForSellerTrackingAsync(request.SaleEventId, sellerIdString, cancellationToken);
-        if (saleEvent is null)
+        var saleEvent = await _saleEventRepository.GetByIdAsync(request.SaleEventId, cancellationToken);
+        if (saleEvent == null)
         {
-            return SaleEventErrors.NotFound;
+            return new Error("SaleEvent.NotFound", "Sale event not found");
         }
 
-        _saleEventRepository.Remove(saleEvent);
+        // Verify ownership
+        if (saleEvent.SellerId != sellerGuid)
+        {
+            return new Error("SaleEvent.Unauthorized", "User does not own this sale event");
+        }
+
+        // Check if sale event has been activated
+        var hasBeenApplied = await _saleEventRepository.HasBeenAppliedToOrdersAsync(
+            request.SaleEventId,
+            cancellationToken);
+
+        if (hasBeenApplied)
+        {
+            return new Error(
+                "SaleEvent.CannotDelete",
+                "Cannot delete a sale event that has been applied to orders");
+        }
+
+        await _saleEventRepository.DeleteAsync(saleEvent, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
