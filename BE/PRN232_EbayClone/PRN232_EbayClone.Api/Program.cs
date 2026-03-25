@@ -78,7 +78,11 @@ app.MapHealthChecks("/");
 
 app.UseExceptionHandler();
 
-app.UseHttpsRedirection();
+// Only redirect to HTTPS in development; in production, Cloudflare handles SSL
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseMiddleware<RequestLogContextMiddleware>();
 app.UseSerilogRequestLogging();
