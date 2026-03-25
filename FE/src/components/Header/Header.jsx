@@ -327,6 +327,11 @@ const NavHeader = ({ setCurrentSession }) => {
           id: "service-metrics",
           label: "Service metrics",
           onClick: () => console.log("Service metrics")
+        },
+        {
+          id: "performance-stock",
+          label: "Stock",
+          onClick: () => goTo("performance", "/performance/stock")
         }
       ]
     },
@@ -433,7 +438,7 @@ const NavHeader = ({ setCurrentSession }) => {
       label: "Shipping discount",
       onClick: () => {
         setPromotionMenuOpen(false);
-        showComingSoon("Shipping discount");
+        navigate("/marketing/shipping-discounts/create");
       }
     },
     {
@@ -441,7 +446,7 @@ const NavHeader = ({ setCurrentSession }) => {
       label: "Volume pricing",
       onClick: () => {
         setPromotionMenuOpen(false);
-        showComingSoon("Volume pricing");
+        navigate("/marketing/volume-pricing/create");
       }
     }
   ];

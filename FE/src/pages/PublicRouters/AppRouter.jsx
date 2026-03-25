@@ -24,6 +24,10 @@ const PromotionsOverviewPage = lazy(() => import("../Marketing/PromotionsOvervie
 const MarketingSummaryPage = lazy(() => import("../Marketing/Summary/MarketingSummary"));
 const MarketingLayout = lazy(() => import("../Marketing/MarketingLayout"));
 const CreateOrderDiscountPage = lazy(() => import("../Marketing/OrderDiscount/CreateOrderDiscount"));
+const ShippingDiscountsSummaryPage = lazy(() => import("../Marketing/ShippingDiscounts/ShippingDiscountsSummary"));
+const CreateShippingDiscountPage = lazy(() => import("../Marketing/ShippingDiscounts/CreateShippingDiscount"));
+const VolumePricingSummaryPage = lazy(() => import("../Marketing/VolumePricing/VolumePricingSummary"));
+const CreateVolumePricingPage = lazy(() => import("../Marketing/VolumePricing/CreateVolumePricing"));
 const OverviewPage = lazy(() => import("../Overview/OverviewPage"));
 const OffersManagementPage = lazy(() => import("../Marketing/Offers/OffersManagementPage"));
 const BidsManagementPage = lazy(() => import("../Marketing/Bids/BidsManagementPage"));
@@ -77,6 +81,7 @@ const PerformanceSalesPage = lazy(() => import("../Performance/PerformanceSalesP
 const PerformanceTrafficPage = lazy(() => import("../Performance/PerformanceTrafficPage"));
 const PerformanceSellerLevelPage = lazy(() => import("../Performance/PerformanceSellerLevelPage"));
 const PerformanceServiceMetricsPage = lazy(() => import("../Performance/PerformanceServiceMetricsPage"));
+const PerformanceInventoryPage = lazy(() => import("../Performance/PerformanceInventoryPage"));
 
 // Store pages
 const MyStoresPage = lazy(() => import("../Store/MyStoresPage"));
@@ -294,6 +299,7 @@ const router = createBrowserRouter([
           { path: "sales", element: <PerformanceSalesPage /> },
           { path: "traffic", element: <PerformanceTrafficPage /> },
           { path: "service-metrics", element: <PerformanceServiceMetricsPage /> },
+          { path: "stock", element: <PerformanceInventoryPage /> },
         ],
       },
       {
@@ -341,8 +347,8 @@ const router = createBrowserRouter([
           </Suspense>
         ),
         children: [
-          { 
-            index: true, 
+          {
+            index: true,
             element: (
               <Suspense fallback={<LoadingScreen isOverlay={true} />}>
                 <PromotionsOverviewPage />
@@ -370,6 +376,22 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<LoadingScreen isOverlay={true} />}>
                 <SaleEventsSummaryPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "shipping-discounts",
+            element: (
+              <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+                <ShippingDiscountsSummaryPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "volume-pricing",
+            element: (
+              <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+                <VolumePricingSummaryPage />
               </Suspense>
             ),
           },
@@ -432,6 +454,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingScreen isOverlay={true} />}>
             <CreateOrderDiscountPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "marketing/shipping-discounts/create",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <CreateShippingDiscountPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "marketing/volume-pricing/create",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <CreateVolumePricingPage />
           </Suspense>
         ),
       },

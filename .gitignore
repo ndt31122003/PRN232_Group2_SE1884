@@ -73,3 +73,5 @@ errors_readable.txt
 # Secrets - DO NOT commit real credentials
 appsettings.Development.json
 appsettings.Production.json
+/.history/BE
+/.history/FE

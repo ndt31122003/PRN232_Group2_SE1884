@@ -1,0 +1,257 @@
+.create-volume-pricing {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  font-family: "Market Sans", Arial, sans-serif;
+  color: #111820;
+
+  &__header {
+    margin-bottom: 40px;
+    border-bottom: 2px solid #111820;
+    padding-bottom: 16px;
+
+    h1 { 
+      font-size: 32px; 
+      font-weight: 700; 
+      margin: 0 0 8px; 
+      letter-spacing: -0.5px;
+    }
+    p { font-size: 14px; color: #707070; margin: 0; }
+  }
+}
+
+.btn-back-link {
+  color: #3665f3;
+  text-decoration: underline;
+  font-size: 14px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: 24px;
+  display: inline-block;
+  
+  &:hover {
+    color: #0630b5;
+  }
+}
+
+.form-error {
+  background: #ffebef; 
+  color: #dd1e31;
+  border-left: 4px solid #dd1e31;
+  padding: 16px; 
+  font-size: 14px; 
+  margin-bottom: 32px;
+}
+
+.discount-form { 
+  display: flex; 
+  flex-direction: column; 
+}
+
+.form-section {
+  padding: 32px 0;
+  border-bottom: 1px solid #e5e5e5;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  h2 { 
+    font-size: 20px; 
+    font-weight: 700; 
+    margin: 0 0 24px;
+    letter-spacing: -0.3px;
+  }
+}
+
+.section-note {
+  font-size: 14px; 
+  color: #555; 
+  margin: -16px 0 24px;
+}
+
+.form-group {
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  margin-bottom: 24px;
+  
+  &:last-child { margin-bottom: 0; }
+
+  label { 
+    font-size: 14px; 
+    font-weight: 600; 
+    color: #111820; 
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="datetime-local"],
+  textarea,
+  select {
+    border: 1px solid #8f8f8f; 
+    border-radius: 8px;
+    padding: 10px 14px; 
+    font-size: 14px; 
+    color: #111820;
+    width: 100%; 
+    max-width: 480px;
+    box-sizing: border-box;
+    font-family: inherit;
+    
+    &:focus { 
+      outline: none; 
+      border-color: #3665f3; 
+      box-shadow: 0 0 0 1px #3665f3;
+    }
+    &::placeholder { color: #707070; }
+  }
+  
+  textarea { 
+    resize: vertical; 
+    min-height: 80px;
+  }
+}
+
+.form-row { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 24px; 
+  max-width: 600px;
+}
+
+.radio-group { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 16px; 
+  margin-bottom: 24px; 
+}
+
+.radio-label {
+  display: flex; 
+  align-items: center; 
+  gap: 12px;
+  font-size: 14px; 
+  cursor: pointer; 
+  color: #111820;
+
+  input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #3665f3;
+    cursor: pointer;
+  }
+}
+
+/* Specific Tier Builder styling similar to eBay */
+.tier-builder {
+  background: #f8f8f8;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 8px;
+  max-width: 600px;
+}
+
+.tier-header {
+  display: grid;
+  grid-template-columns: 120px 140px 120px 40px;
+  gap: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #707070;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #d4d4d4;
+}
+
+.tier-row {
+  display: grid;
+  grid-template-columns: 120px 140px 120px 40px;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: center;
+
+  input[type="number"], select {
+    max-width: none;
+  }
+  
+  .tier-prefix {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+}
+
+.btn-remove {
+  background: none; 
+  border: none;
+  color: #000;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  height: 40px;
+  opacity: 0.6;
+  
+  &:hover:not(:disabled) { 
+    opacity: 1;
+    color: #dd1e31;
+  }
+  &:disabled { 
+    opacity: 0.2; 
+    cursor: not-allowed; 
+  }
+}
+
+.btn-add-tier {
+  background: transparent; 
+  color: #3665f3;
+  border: 1px solid #3665f3; 
+  border-radius: 20px;
+  padding: 8px 16px; 
+  font-size: 14px; 
+  font-weight: 600;
+  cursor: pointer; 
+  margin-top: 8px;
+  &:hover { background: #f0f4ff; }
+}
+
+/* Actions */
+.form-actions {
+  display: flex; 
+  gap: 16px;
+  margin-top: 40px; 
+  padding-top: 32px; 
+  border-top: 1px solid #e5e5e5;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 12px 32px; 
+  border-radius: 24px;
+  font-size: 16px; 
+  font-weight: 600; 
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: #3665f3; 
+  color: white;
+  &:hover:not(:disabled) { background: #0630b5; }
+  &:disabled { background: #c7c7c7; cursor: not-allowed; }
+}
+
+.btn-secondary {
+  background: transparent; 
+  color: #3665f3;
+  border: 1px solid #3665f3;
+  &:hover { background: #f0f4ff; }
+}
