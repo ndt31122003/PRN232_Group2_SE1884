@@ -112,6 +112,12 @@ const rejectReturnRequest = (returnRequestId, payload, signal) =>
         signal,
     });
 
+const markAsShipped = (orderId, signal) =>
+    axios.post(`${resource}/${orderId}/mark-as-shipped`, {}, { signal });
+
+const archiveOrder = (orderId, signal) =>
+    axios.post(`${resource}/${orderId}/archive`, {}, { signal });
+
 const OrderService = {
     getOrders,
     getStatuses,
@@ -134,6 +140,8 @@ const OrderService = {
     rejectReturnRequest,
     upsertShipments,
     leaveFeedback,
+    markAsShipped,
+    archiveOrder,
 };
 
 export default OrderService;

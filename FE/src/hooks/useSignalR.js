@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import STORAGE, { getStorage } from "../lib/storage";
 
-const HUB_URL = "http://localhost:5149/hub";
+const isDev = process.env.NODE_ENV === "development";
+const HUB_URL = isDev ? "http://localhost:5149/hub" : "https://propval.io.vn/hub";
 
 /**
  * useSignalR – stable SignalR hook.
