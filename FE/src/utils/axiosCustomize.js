@@ -11,6 +11,7 @@ import AuthService from "../services/AuthService";
 const isDev = process.env.NODE_ENV !== "production";
 const BASE_URL = isDev ? "http://localhost:5149/api" : "https://propval.io.vn/api";
 
+
 const { refreshToken } = AuthService;
 
 // Hàm chuẩn hóa dữ liệu: Trim các chuỗi trong request
