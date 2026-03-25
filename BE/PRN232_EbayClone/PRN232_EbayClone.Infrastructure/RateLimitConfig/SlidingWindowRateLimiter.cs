@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using PRN232_EbayClone.Api.Infrastructure.RateLimitConfig;
 using StackExchange.Redis;
 
@@ -35,6 +36,7 @@ public class SlidingWindowRateLimiter
     private readonly IDatabase? _db;
     private readonly IConfiguration _config;
     private readonly IOptionsMonitor<List<RateLimitRule>> _rulesMonitor;
+    private readonly ILogger<SlidingWindowRateLimiter> _logger;
     private readonly RequestDelegate _next;
     private readonly bool _redisAvailable;
 
@@ -43,14 +45,16 @@ public class SlidingWindowRateLimiter
         _next = next;
         _config = config;
         _rulesMonitor = rulesMonitor;
+        _logger = serviceProvider.GetRequiredService<ILogger<SlidingWindowRateLimiter>>();
         try
         {
             var muxer = serviceProvider.GetService<IConnectionMultiplexer>();
             _db = muxer?.GetDatabase();
             _redisAvailable = _db != null;
         }
-        catch
+        catch (Exception exception)
         {
+            _logger.LogWarning(exception, "Redis rate limiter is unavailable during middleware initialization. Falling back to pass-through mode.");
             _redisAvailable = false;
         }
     }
@@ -86,7 +90,16 @@ public class SlidingWindowRateLimiter
             args.Add(rule.WindowSeconds);
             args.Add(rule.MaxRequests);
         }
-        return (int)await _db.ScriptEvaluateAsync(SlidingRateLimiter, keys, args.ToArray()) == 1;
+
+        try
+        {
+            return (int)await _db!.ScriptEvaluateAsync(SlidingRateLimiter, keys, args.ToArray()) == 1;
+        }
+        catch (RedisException exception)
+        {
+            _logger.LogWarning(exception, "Redis rate limiting failed for key {ApiKey}. Allowing request to continue.", apiKey);
+            return false;
+        }
     }
 
     public async Task InvokeAsync(HttpContext httpContext)
@@ -106,6 +119,12 @@ public class SlidingWindowRateLimiter
         }
 
         var applicableRules = GetApplicableRules(httpContext);
+        if (!applicableRules.Any())
+        {
+            await _next(httpContext);
+            return;
+        }
+
         if (await IsLimited(applicableRules, apiKey))
         {
             httpContext.Response.StatusCode = 429;

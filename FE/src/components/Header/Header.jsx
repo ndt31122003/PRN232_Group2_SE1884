@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthService from "../../services/AuthService";
 import UserService from "../../services/UserService";
@@ -10,6 +10,8 @@ import Notice from "../Common/CustomNotification";
 import { clearAuthSession, getStoredUser, mapUserProfile, storeUserInfo } from "../../utils/auth";
 import STORAGE, { getStorage } from "../../lib/storage";
 import { useAuth } from "../../Context/AuthContext";
+import NotificationService from "../../services/NotificationService";
+import { useSignalR } from "../../hooks/useSignalR";
 const { logout } = AuthService;
 const NavHeader = ({ setCurrentSession }) => {
   const navigate = useNavigate();
@@ -325,6 +327,11 @@ const NavHeader = ({ setCurrentSession }) => {
           id: "service-metrics",
           label: "Service metrics",
           onClick: () => console.log("Service metrics")
+        },
+        {
+          id: "performance-stock",
+          label: "Stock",
+          onClick: () => goTo("performance", "/performance/stock")
         }
       ]
     },
@@ -443,7 +450,59 @@ const NavHeader = ({ setCurrentSession }) => {
       }
     }
   ];
-  const notifications = [];
+  const [notifications, setNotifications] = useState([]);
+
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const data = await NotificationService.getNotifications(20);
+      setNotifications(
+        data.map(n => ({
+          id: n.id ?? n.Id,
+          text: n.message ?? n.Message ?? n.title ?? n.Title,
+          time: n.createdAt ?? n.CreatedAt
+            ? new Date(n.createdAt ?? n.CreatedAt).toLocaleString()
+            : "",
+          isRead: n.isRead ?? n.IsRead,
+          type: n.type ?? n.Type,
+        }))
+      );
+    } catch {
+      // silent
+    }
+  }, []);
+
+  // Load notifications on mount and every 30s
+  useEffect(() => {
+    fetchNotifications();
+    const id = setInterval(fetchNotifications, 30_000);
+    return () => clearInterval(id);
+  }, [fetchNotifications]);
+
+  // Receive realtime notification via SignalR → add to bell
+  const handleRealTimeNotif = useCallback((payload) => {
+    const newNotif = {
+      id: payload.id ?? payload.Id ?? Date.now().toString(),
+      text: payload.message ?? payload.Message ?? payload.title ?? payload.Title,
+      time: new Date().toLocaleString(),
+      isRead: false,
+      type: payload.type ?? payload.Type,
+    };
+    setNotifications(prev => [newNotif, ...prev].slice(0, 20));
+  }, []);
+
+  useSignalR({ Notification: handleRealTimeNotif });
+
+  const handleBellClick = useCallback(async () => {
+    // Mark all as read when user opens the bell
+    try {
+      await NotificationService.markAllRead();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch {
+      // silent
+    }
+  }, []);
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   useEffect(() => {
     setPromotionMenuOpen(false);
@@ -669,11 +728,24 @@ const NavHeader = ({ setCurrentSession }) => {
 
             <Dropdown
               label={
-                <svg className="top-nav__icon top-nav__icon--large" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>}
-
-
+                <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+                  <svg className="top-nav__icon top-nav__icon--large" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  {unreadCount > 0 && (
+                    <span style={{
+                      position: "absolute", top: -6, right: -6,
+                      background: "#e53935", color: "#fff",
+                      borderRadius: "50%", fontSize: 10, fontWeight: 700,
+                      minWidth: 16, height: 16, display: "flex",
+                      alignItems: "center", justifyContent: "center", padding: "0 3px"
+                    }}>
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </span>
+              }
+              onClick={handleBellClick}
               menuItems={
                 notifications.length > 0
                   ? notifications.map((notif) => ({

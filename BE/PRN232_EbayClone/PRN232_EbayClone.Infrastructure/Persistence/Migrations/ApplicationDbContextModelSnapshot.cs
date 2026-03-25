@@ -4762,6 +4762,142 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                     b.ToTable("offers", (string)null);
                 });
 
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.Inventory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("AvailableQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("available_quantity");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<bool>("IsLowStock")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_low_stock");
+
+                    b.Property<DateTime?>("LastLowStockNotificationAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_low_stock_notification_at");
+
+                    b.Property<DateTime>("LastUpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_updated_at");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("listing_id");
+
+                    b.Property<int>("ReservedQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("reserved_quantity");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<int>("SoldQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("sold_quantity");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<int?>("ThresholdQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("threshold_quantity");
+
+                    b.Property<int>("TotalQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_quantity");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_inventory");
+
+                    b.HasIndex("LastUpdatedAt")
+                        .IsDescending()
+                        .HasDatabaseName("idx_inventory_updated_at");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique()
+                        .HasDatabaseName("uk_inventory_listing_id");
+
+                    b.HasIndex("SellerId")
+                        .HasDatabaseName("idx_inventory_seller_id");
+
+                    b.HasIndex("SellerId", "IsLowStock")
+                        .HasDatabaseName("idx_inventory_is_low_stock");
+
+                    b.ToTable("inventory", (string)null);
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.InventoryAdjustment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("AdjustedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("adjusted_at");
+
+                    b.Property<string>("AdjustedBy")
+                        .HasColumnType("text")
+                        .HasColumnName("adjusted_by");
+
+                    b.Property<byte>("AdjustmentType")
+                        .HasColumnType("smallint")
+                        .HasColumnName("adjustment_type");
+
+                    b.Property<Guid>("InventoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("inventory_id");
+
+                    b.Property<int>("QuantityChange")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity_change");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text")
+                        .HasColumnName("reason");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_inventory_adjustment");
+
+                    b.HasIndex("InventoryId")
+                        .HasDatabaseName("idx_inventory_adjustment_inventory_id");
+
+                    b.ToTable("inventory_adjustment", (string)null);
+                });
+
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback", b =>
                 {
                     b.Property<Guid>("Id")
@@ -16252,6 +16388,70 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_offers_listing_listing_id");
+
+                });
+
+            modelBuilder.Entity("PRN232_EbayClone.Domain.Listings.Inventory.Entities.Inventory", b =>
+                {
+                    b.OwnsMany("PRN232_EbayClone.Domain.Listings.Inventory.ValueObjects.InventoryReservation", "Reservations", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<Guid>("BuyerId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("buyer_id");
+
+                            b1.Property<DateTime?>("CommittedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("committed_at");
+
+                            b1.Property<DateTime>("ExpiresAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("expires_at");
+
+                            b1.Property<Guid>("InventoryId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("inventory_id");
+
+                            b1.Property<Guid?>("OrderId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("order_id");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("integer")
+                                .HasColumnName("quantity");
+
+                            b1.Property<DateTime?>("ReleasedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("released_at");
+
+                            b1.Property<byte>("ReservationType")
+                                .HasColumnType("smallint")
+                                .HasColumnName("reservation_type");
+
+                            b1.Property<DateTime>("ReservedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("reserved_at");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_inventory_reservation");
+
+                            b1.HasIndex("ExpiresAt")
+                                .HasDatabaseName("idx_inventory_reservation_expires_at");
+
+                            b1.HasIndex("InventoryId")
+                                .HasDatabaseName("ix_inventory_reservation_inventory_id");
+
+                            b1.ToTable("inventory_reservation", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("InventoryId")
+                                .HasConstraintName("fk_inventory_reservation_inventory_inventory_id");
+                        });
+
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("PRN232_EbayClone.Domain.Orders.Entities.BuyerFeedback", b =>

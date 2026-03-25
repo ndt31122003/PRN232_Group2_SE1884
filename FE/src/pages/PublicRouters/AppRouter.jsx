@@ -81,6 +81,7 @@ const PerformanceSalesPage = lazy(() => import("../Performance/PerformanceSalesP
 const PerformanceTrafficPage = lazy(() => import("../Performance/PerformanceTrafficPage"));
 const PerformanceSellerLevelPage = lazy(() => import("../Performance/PerformanceSellerLevelPage"));
 const PerformanceServiceMetricsPage = lazy(() => import("../Performance/PerformanceServiceMetricsPage"));
+const PerformanceInventoryPage = lazy(() => import("../Performance/PerformanceInventoryPage"));
 
 // Store pages
 const MyStoresPage = lazy(() => import("../Store/MyStoresPage"));
@@ -298,6 +299,7 @@ const router = createBrowserRouter([
           { path: "sales", element: <PerformanceSalesPage /> },
           { path: "traffic", element: <PerformanceTrafficPage /> },
           { path: "service-metrics", element: <PerformanceServiceMetricsPage /> },
+          { path: "stock", element: <PerformanceInventoryPage /> },
         ],
       },
       {

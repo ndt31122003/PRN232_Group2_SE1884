@@ -2,6 +2,7 @@
 using PRN232_EbayClone.Application.Abstractions.Security;
 using PRN232_EbayClone.Domain.Identity.Entities;
 using PRN232_EbayClone.Domain.Identity.Errors;
+using System;
 
 namespace PRN232_EbayClone.Application.Identity.Commands;
 
@@ -85,13 +86,18 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, LoginCom
             return IdentityErrors.InvalidCredentials;
         }
 
-        if (!_passwordHasher.Verify(user.PasswordHash, request.Password))
-        {
-            await _captchaProtectionService.RegisterFailureAsync(
-                CaptchaActions.IdentityLogin,
-                request.Username,
-                cancellationToken);
+        bool isPasswordValid;
 
+        try
+        {
+            isPasswordValid = _passwordHasher.Verify(user.PasswordHash, request.Password);
+        }
+        catch (Exception)
+        {
+            return IdentityErrors.InvalidCredentials;
+        }
+
+        if (!isPasswordValid)
             return IdentityErrors.InvalidCredentials;
         }
 

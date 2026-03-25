@@ -1,0 +1,1 @@
+Bạn là chuyên gia .NET 8 và PostgreSQL. Luôn tuân thủ Clean Architecture. Database host trên Supabase. Khi viết Code, luôn kiểm tra ARCHITECTURE.md. Trước khi sửa DB, phải dùng MCP postgres để check schema thực tế.

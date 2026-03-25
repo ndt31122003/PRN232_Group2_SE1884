@@ -32,6 +32,11 @@ const PerformanceLayout = () => {
             id: 'service-metrics',
             label: t('performance.tabs.serviceMetrics', 'Service Metrics'),
             path: '/performance/service-metrics'
+        },
+        {
+            id: 'stock',
+            label: t('performance.tabs.stock', 'Stock'),
+            path: '/performance/stock'
         }
     ]), [t]);
 

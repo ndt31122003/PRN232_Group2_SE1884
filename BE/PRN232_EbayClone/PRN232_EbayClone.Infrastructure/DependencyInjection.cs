@@ -104,6 +104,7 @@ public static class DependencyInjection
         services.AddScoped<IOtpRepository, OtpRepository>();
         services.AddScoped<IFileMetadataRepository, FileMetadataRepository>();
         services.AddScoped<IListingRepository, ListingRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<IListingTemplateRepository, ListingTemplateRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
@@ -131,6 +132,7 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IShippingDiscountRepository, ShippingDiscountRepository>();
         services.AddScoped<IVolumePricingRepository, VolumePricingRepository>();
         services.AddScoped<ISaleEventRepository, SaleEventRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
         return services;
@@ -184,7 +186,27 @@ services.AddScoped<ICouponRepository, CouponRepository>();
                 ),
                 ClockSkew = TimeSpan.Zero
             };
+
+            // ✅ Required for SignalR WebSocket authentication
+            // The SignalR client sends the JWT as ?access_token= in query string (not in header)
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        path.StartsWithSegments("/hub"))
+                    {
+                        context.Token = accessToken;
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
         });
+
 
         services.AddAuthorization(options =>
         {
@@ -350,7 +372,7 @@ services.AddScoped<ICouponRepository, CouponRepository>();
 
         try
         {
-            multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            multiplexer = ConnectionMultiplexer.Connect(BuildRedisConfiguration(connectionString));
             return true;
         }
         catch
@@ -359,17 +381,32 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         }
     }
 
+    private static ConfigurationOptions BuildRedisConfiguration(string connectionString)
+    {
+        var options = ConfigurationOptions.Parse(connectionString, true);
+        options.AbortOnConnectFail = false;
+        options.ConnectRetry = Math.Max(options.ConnectRetry, 3);
+        options.ConnectTimeout = Math.Max(options.ConnectTimeout, 10000);
+        options.AsyncTimeout = Math.Max(options.AsyncTimeout, 10000);
+        options.SyncTimeout = Math.Max(options.SyncTimeout, 10000);
+        options.KeepAlive = Math.Max(options.KeepAlive, 60);
+        options.ReconnectRetryPolicy = new ExponentialRetry(5000);
+
+        return options;
+    }
+
     private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
     {
         var redisConnection = configuration.GetConnectionString("Redis");
 
         if (TryConnectRedis(redisConnection, out var redis))
         {
+            var redisOptions = BuildRedisConfiguration(redisConnection!);
             services.AddSingleton(redis!);
 
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = redisConnection;
+                options.ConfigurationOptions = redisOptions;
                 options.InstanceName = "EbayClone_";
             });
         }
