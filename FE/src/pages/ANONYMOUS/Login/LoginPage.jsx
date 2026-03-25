@@ -69,7 +69,7 @@ export default function LoginPage() {
   const [staySignedIn, setStaySignedIn] = useState(true);
   const handleSocialLogin = async (provider) => {
     if (provider === 'Google') {
-      const apiBaseUrl = "https://prn232.mnhduc.site";
+      const apiBaseUrl = "https://propval.io.vn";
       const callbackUrl = `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTarget)}`;
       window.location.href = `${apiBaseUrl}/api/identity/google/login?returnUrl=${encodeURIComponent(callbackUrl)}`;
     }
