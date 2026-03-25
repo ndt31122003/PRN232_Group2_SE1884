@@ -44,7 +44,29 @@ public sealed class UserRepository :
     {
         return DbContext.Users
             .Include(u => u.Roles)
-            .SingleOrDefaultAsync(u => u.Username == username, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+    }
+
+    public async Task<User?> GetByUsernameOrEmailAsync(string identifier, CancellationToken cancellationToken)
+    {
+        var normalizedIdentifier = identifier.Trim();
+
+        var user = await DbContext.Users
+            .Include(u => u.Roles)
+            .FirstOrDefaultAsync(u => u.Username == normalizedIdentifier, cancellationToken);
+
+        if (user is not null)
+        {
+            return user;
+        }
+
+        var emailOrError = Email.Create(normalizedIdentifier);
+        if (emailOrError.IsFailure)
+        {
+            return null;
+        }
+
+        return await GetByEmailAsync(emailOrError.Value, cancellationToken);
     }
 
     // Add this method

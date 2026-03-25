@@ -2,6 +2,7 @@
 using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Domain.Identity.Entities;
 using PRN232_EbayClone.Domain.Identity.Errors;
+using System;
 
 namespace PRN232_EbayClone.Application.Identity.Commands;
 
@@ -52,11 +53,22 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, LoginCom
 
     public async Task<Result<LoginCommandResult>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetByUsernameAsync(request.Username, cancellationToken);
+        var user = await _userRepository.GetByUsernameOrEmailAsync(request.Username, cancellationToken);
         if (user is null)
             return IdentityErrors.InvalidCredentials;
 
-        if (!_passwordHasher.Verify(user.PasswordHash, request.Password))
+        bool isPasswordValid;
+
+        try
+        {
+            isPasswordValid = _passwordHasher.Verify(user.PasswordHash, request.Password);
+        }
+        catch (Exception)
+        {
+            return IdentityErrors.InvalidCredentials;
+        }
+
+        if (!isPasswordValid)
             return IdentityErrors.InvalidCredentials;
 
         if(user.IsDeleted)

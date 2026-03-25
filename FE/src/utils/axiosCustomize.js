@@ -6,7 +6,8 @@ import AuthService from "../services/AuthService";
 
 // const BASE_URL = "https://prn232.mnhduc.site/api";
 // const BASE_URL = "https://localhost:7046/api";
-const BASE_URL = "http://localhost:5149/api";
+// const BASE_URL = "http://localhost:5149/api";
+const BASE_URL = "https://propval.io.vn/api";
 
 const { refreshToken } = AuthService;
 

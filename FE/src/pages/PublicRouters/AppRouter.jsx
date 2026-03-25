@@ -13,6 +13,8 @@ import ListingsPage from "../Listing/ListingsLayout";
 const LoginPage = lazy(() => import("../ANONYMOUS/Login/LoginPage"));
 const NotFoundPage = lazy(() => import("../NOTFOUND/NotFound"));
 const AuthCallbackPage = lazy(() => import("../ANONYMOUS/Login/AuthCallBackPage"));
+const ForgotPasswordPage = lazy(() => import("../ANONYMOUS/Login/ForgotPasswordPage"));
+const PaymentVerificationPage = lazy(() => import("../Store/PaymentVerificationPage"));
 const AccountSettingsPage = lazy(() => import("../Account/AccountSettings"));
 const CreateSellerCouponPage = lazy(() => import("../Coupons/CreateSellerCoupon"));
 const CouponsSummaryPage = lazy(() => import("../Coupons/CouponsSummary"));
@@ -83,6 +85,7 @@ const PerformanceSalesPage = lazy(() => import("../Performance/PerformanceSalesP
 const PerformanceTrafficPage = lazy(() => import("../Performance/PerformanceTrafficPage"));
 const PerformanceSellerLevelPage = lazy(() => import("../Performance/PerformanceSellerLevelPage"));
 const PerformanceServiceMetricsPage = lazy(() => import("../Performance/PerformanceServiceMetricsPage"));
+const PerformanceInventoryPage = lazy(() => import("../Performance/PerformanceInventoryPage"));
 
 // Store pages
 const MyStoresPage = lazy(() => import("../Store/MyStoresPage"));
@@ -316,6 +319,7 @@ const router = createBrowserRouter([
           { path: "sales", element: <PerformanceSalesPage /> },
           { path: "traffic", element: <PerformanceTrafficPage /> },
           { path: "service-metrics", element: <PerformanceServiceMetricsPage /> },
+          { path: "stock", element: <PerformanceInventoryPage /> },
         ],
       },
       {
@@ -581,6 +585,24 @@ const router = createBrowserRouter([
       <Suspense fallback={<LoadingScreen />}>
         <Register />
       </Suspense>
+    ),
+  },
+  {
+    path: "forgot-password",
+    element: (
+      <Suspense fallback={<LoadingScreen />}>
+        <ForgotPasswordPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "payment-verification",
+    element: (
+      <PrivateRoute>
+        <Suspense fallback={<LoadingScreen />}>
+          <PaymentVerificationPage />
+        </Suspense>
+      </PrivateRoute>
     ),
   },
 

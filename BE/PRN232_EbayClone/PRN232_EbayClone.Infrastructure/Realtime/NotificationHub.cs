@@ -1,28 +1,34 @@
-﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace PRN232_EbayClone.Infrastructure.Realtime;
 
-[Authorize]
+/// <summary>
+/// SignalR hub that:
+/// - Adds connected authenticated users to a group named after their userId
+/// - Allows clients to join a listing group (to receive live bid/price updates)
+/// </summary>
 public sealed class NotificationHub : Hub
 {
     public override async Task OnConnectedAsync()
     {
         var userId = Context.UserIdentifier;
-        var connectionId = Context.ConnectionId;
-        
-        Console.WriteLine($"[SignalR] User {userId} connected with connection {connectionId}");
-        
+        if (!string.IsNullOrEmpty(userId))
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, userId);
+        }
+
         await base.OnConnectedAsync();
     }
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
+    /// <summary>Client calls this to subscribe to live updates for a listing.</summary>
+    public async Task JoinListingGroup(string listingId)
     {
-        var userId = Context.UserIdentifier;
-        var connectionId = Context.ConnectionId;
-        
-        Console.WriteLine($"[SignalR] User {userId} disconnected from connection {connectionId}");
-        
-        await base.OnDisconnectedAsync(exception);
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"listing-{listingId}");
+    }
+
+    /// <summary>Client calls this when leaving the listing page.</summary>
+    public async Task LeaveListingGroup(string listingId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"listing-{listingId}");
     }
 }

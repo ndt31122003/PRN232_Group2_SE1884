@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PublicListingService from "../../services/PublicListingService";
 import Notice from "../../components/Common/CustomNotification";
+import { usePolling } from "../../hooks/usePolling";
 import "./ProductDetailPage.css";
 
 const ProductDetailPage = () => {
@@ -20,25 +21,21 @@ const ProductDetailPage = () => {
         4: "Ended"
     };
 
-    useEffect(() => {
-        const fetchListing = async () => {
-            try {
-                const response = await PublicListingService.getPublicListing(id);
-                setListing(response.data);
-            } catch (error) {
-                console.error("Failed to fetch listing:", error);
-                Notice({
-                    msg: "Error",
-                    desc: "Listing not found or not active.",
-                    isSuccess: false
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchListing = useCallback(async () => {
+        try {
+            const response = await PublicListingService.getPublicListing(id);
+            setListing(response.data);
+        } catch (error) {
+            console.error("Failed to fetch listing:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [id]); // ← only depend on `id`, not `loading`
 
-        fetchListing();
-    }, [id]);
+    // Initial fetch and 30s polling
+    usePolling(fetchListing, 30000);
+
+
 
     const handleMakeOffer = async () => {
         try {

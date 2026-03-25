@@ -78,6 +78,10 @@ const getPerformanceServiceMetrics = (period, options = {}) => {
     return axios.get(`/${resource}/service-metrics`, withParams(params, options));
 };
 
+const getInventoryDashboard = (options = {}) => {
+    return axios.get(`/${resource}/inventory-dashboard`, options);
+};
+
 /**
  * Tải báo cáo doanh số (UC-33)
  */
@@ -102,5 +106,6 @@ export const PerformanceService = {
     getPerformanceTraffic,
     getPerformanceSellerLevel,
     getPerformanceServiceMetrics,
+    getInventoryDashboard,
     downloadSalesReport,
 };

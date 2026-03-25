@@ -1,8 +1,11 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
+using PRN232_EbayClone.Application.Abstractions.Realtime;
 using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.Enums;
+using PRN232_EbayClone.Domain.Notifications.Entities;
 using PRN232_EbayClone.Domain.Shared.Results;
+using PRN232_EbayClone.Domain.Users.ValueObjects;
 
 namespace PRN232_EbayClone.Application.Listings.Commands;
 
@@ -12,17 +15,26 @@ public sealed class CreateOfferCommandHandler : ICommandHandler<CreateOfferComma
 {
     private readonly IListingRepository _listingRepository;
     private readonly IOfferRepository _offerRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly IRealtimeNotifier _realtimeNotifier;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserContext _userContext;
 
     public CreateOfferCommandHandler(
         IListingRepository listingRepository,
         IOfferRepository offerRepository,
+        IUserRepository userRepository,
+        INotificationRepository notificationRepository,
+        IRealtimeNotifier realtimeNotifier,
         IUnitOfWork unitOfWork,
         IUserContext userContext)
     {
         _listingRepository = listingRepository;
         _offerRepository = offerRepository;
+        _userRepository = userRepository;
+        _notificationRepository = notificationRepository;
+        _realtimeNotifier = realtimeNotifier;
         _unitOfWork = unitOfWork;
         _userContext = userContext;
     }
@@ -56,18 +68,54 @@ public sealed class CreateOfferCommandHandler : ICommandHandler<CreateOfferComma
             return Error.Failure("Offer.TooLow", $"The offer amount must be at least {fixedPriceListing.OfferSettings.MinimumOffer.Value}.");
         }
 
+        // Lookup buyer name
+        string buyerName = userId;
+        if (Guid.TryParse(userId, out var buyerGuid))
+        {
+            var buyer = await _userRepository.GetByIdAsync(new UserId(buyerGuid), cancellationToken);
+            if (buyer is not null) buyerName = buyer.FullName;
+        }
+
         var offer = Offer.Create(request.ListingId, userId, request.Amount);
-        
+
         // Auto-accept logic if configured
-        if (fixedPriceListing.OfferSettings.AutoAcceptOffer.HasValue && request.Amount >= fixedPriceListing.OfferSettings.AutoAcceptOffer.Value)
+        if (fixedPriceListing.OfferSettings.AutoAcceptOffer.HasValue &&
+            request.Amount >= fixedPriceListing.OfferSettings.AutoAcceptOffer.Value)
         {
             offer.Accept();
-            // In a full implementation, this might trigger Order creation immediately.
-            // For now, we just mark it as accepted.
         }
 
         _offerRepository.Add(offer);
+
+        // Persist notification for the seller
+        if (Guid.TryParse(listing.CreatedBy, out var sellerGuid))
+        {
+            var notification = Notification.Create(
+                sellerGuid,
+                "NewOffer",
+                "New offer received!",
+                $"{buyerName} made an offer of ${request.Amount:F2} on \"{listing.Title}\".",
+                request.ListingId);
+
+            _notificationRepository.Add(notification);
+        }
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Push real-time toast to seller
+        if (!string.IsNullOrEmpty(listing.CreatedBy))
+        {
+            var toastPayload = new
+            {
+                Type = "NewOffer",
+                Title = "New offer received!",
+                Message = $"{buyerName} offered ${request.Amount:F2} on \"{listing.Title}\".",
+                ReferenceId = request.ListingId
+            };
+
+            await _realtimeNotifier.BroadcastToUserAsync(
+                listing.CreatedBy, "Notification", toastPayload, cancellationToken);
+        }
 
         return offer.Id;
     }

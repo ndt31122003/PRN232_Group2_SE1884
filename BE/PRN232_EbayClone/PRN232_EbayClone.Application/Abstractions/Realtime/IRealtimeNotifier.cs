@@ -1,4 +1,4 @@
-﻿namespace PRN232_EbayClone.Application.Abstractions.Realtime;
+namespace PRN232_EbayClone.Application.Abstractions.Realtime;
 
 public interface IRealtimeNotifier
 {
@@ -8,15 +8,18 @@ public interface IRealtimeNotifier
         T message,
         CancellationToken cancellationToken = default);
 
-    Task SendToUserAsync<T>(
+    /// <summary>Sends to all connections belonging to a specific user (userId group).</summary>
+    Task BroadcastToUserAsync<T>(
         string userId,
         string method,
         T message,
         CancellationToken cancellationToken = default);
 
-    Task SendToUsersAsync<T>(
-        IEnumerable<string> userIds,
+    /// <summary>Sends to everyone currently watching a listing (group = listingId).</summary>
+    Task BroadcastToListingGroupAsync<T>(
+        Guid listingId,
         string method,
         T message,
         CancellationToken cancellationToken = default);
 }
+

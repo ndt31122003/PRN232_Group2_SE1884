@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -100,6 +99,7 @@ public static class DependencyInjection
         services.AddScoped<IOtpRepository, OtpRepository>();
         services.AddScoped<IFileMetadataRepository, FileMetadataRepository>();
         services.AddScoped<IListingRepository, ListingRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<IListingTemplateRepository, ListingTemplateRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
@@ -120,16 +120,14 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IReturnPolicyRepository, ReturnPolicyRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IDisputeRepository, DisputeRepository>();
-        services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
         services.AddScoped<ISellerPreferenceRepository, SellerPreferenceRepository>();
-        services.AddScoped<IBuyerFeedbackRepository, BuyerFeedbackRepository>();
-        services.AddScoped<ISellerBlacklistRepository, SellerBlacklistRepository>();
         services.AddScoped<IOfferRepository, OfferRepository>();
         services.AddScoped<IBidRepository, BidRepository>();
         services.AddScoped<IOrderDiscountRepository, OrderDiscountRepository>();
         services.AddScoped<IShippingDiscountRepository, ShippingDiscountRepository>();
         services.AddScoped<IVolumePricingRepository, VolumePricingRepository>();
         services.AddScoped<ISaleEventRepository, SaleEventRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
         return services;
@@ -184,24 +182,26 @@ services.AddScoped<ICouponRepository, CouponRepository>();
                 ClockSkew = TimeSpan.Zero
             };
 
-            // Allow SignalR to read token from query string
+            // ✅ Required for SignalR WebSocket authentication
+            // The SignalR client sends the JWT as ?access_token= in query string (not in header)
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
                 {
                     var accessToken = context.Request.Query["access_token"];
                     var path = context.HttpContext.Request.Path;
-                    
-                    // If the request is for SignalR hub and token is in query string
-                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hub"))
+
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        path.StartsWithSegments("/hub"))
                     {
                         context.Token = accessToken;
                     }
-                    
+
                     return Task.CompletedTask;
                 }
             };
         });
+
 
         services.AddAuthorization(options =>
         {
@@ -347,10 +347,6 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         IConfiguration configuration)
     {
         services.Configure<CloudinaryConfiguration>(configuration.GetSection("Cloudinary"));
-        
-        // Use LocalFileManager instead of CloudinaryFileManager to avoid external dependency
-        services.AddTransient<IFileManager, LocalFileManager>();
-        
         services.AddTransient<IFileManager, CloudinaryFileManager>();
         services.AddTransient<ICloudinaryService, CloudinaryService>();
         return services;
@@ -371,7 +367,7 @@ services.AddScoped<ICouponRepository, CouponRepository>();
 
         try
         {
-            multiplexer = ConnectionMultiplexer.Connect(connectionString);
+            multiplexer = ConnectionMultiplexer.Connect(BuildRedisConfiguration(connectionString));
             return true;
         }
         catch
@@ -380,17 +376,32 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         }
     }
 
+    private static ConfigurationOptions BuildRedisConfiguration(string connectionString)
+    {
+        var options = ConfigurationOptions.Parse(connectionString, true);
+        options.AbortOnConnectFail = false;
+        options.ConnectRetry = Math.Max(options.ConnectRetry, 3);
+        options.ConnectTimeout = Math.Max(options.ConnectTimeout, 10000);
+        options.AsyncTimeout = Math.Max(options.AsyncTimeout, 10000);
+        options.SyncTimeout = Math.Max(options.SyncTimeout, 10000);
+        options.KeepAlive = Math.Max(options.KeepAlive, 60);
+        options.ReconnectRetryPolicy = new ExponentialRetry(5000);
+
+        return options;
+    }
+
     private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
     {
         var redisConnection = configuration.GetConnectionString("Redis");
 
         if (TryConnectRedis(redisConnection, out var redis))
         {
+            var redisOptions = BuildRedisConfiguration(redisConnection!);
             services.AddSingleton(redis!);
 
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = redisConnection;
+                options.ConfigurationOptions = redisOptions;
                 options.InstanceName = "EbayClone_";
             });
         }
@@ -428,9 +439,6 @@ services.AddScoped<ICouponRepository, CouponRepository>();
 
         var redisConnection = configuration.GetConnectionString("Redis");
         var signalR = services.AddSignalR();
-
-        // Configure SignalR to use custom user ID provider
-        services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
         if (!string.IsNullOrWhiteSpace(redisConnection) && !redisConnection.Contains("your_redis"))
         {

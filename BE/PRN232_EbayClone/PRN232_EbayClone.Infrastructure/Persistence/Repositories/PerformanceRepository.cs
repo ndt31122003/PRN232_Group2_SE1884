@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using PRN232_EbayClone.Application.Performance.Abstractions;
 using PRN232_EbayClone.Application.Performance.Records;
 using PRN232_EbayClone.Application.Performance.Helpers; // ✅ THÊM DÒNG NÀY
@@ -11,6 +14,7 @@ using PRN232_EbayClone.Domain.Orders.Constants;
 using PRN232_EbayClone.Domain.Orders.Enums;
 using PRN232_EbayClone.Domain.Users.ValueObjects;
 using PRN232_EbayClone.Infrastructure.Persistence;
+using System.Text.Json;
 using static PRN232_EbayClone.Application.Performance.ValueObjects.SellerStandards;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence.Repositories;
@@ -18,15 +22,25 @@ namespace PRN232_EbayClone.Infrastructure.Persistence.Repositories;
 public sealed class PerformanceRepository : IPerformanceRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IDistributedCache _cache;
+    private readonly ILogger<PerformanceRepository> _logger;
     // ❌ XÓA DÒNG NÀY:
     // private const int DefaultHandlingTimeHours = 48;
     
     // ✅ THAY BẰNG:
     private const int DefaultHandlingTimeDays = 2; // eBay standard: 2 business days
 
-    public PerformanceRepository(ApplicationDbContext context)
+    public PerformanceRepository(
+        ApplicationDbContext context,
+        IDbConnectionFactory connectionFactory,
+        IDistributedCache cache,
+        ILogger<PerformanceRepository> logger)
     {
         _context = context;
+        _connectionFactory = connectionFactory;
+        _cache = cache;
+        _logger = logger;
     }
 
     public async Task<IReadOnlyList<PerformanceOverviewRecord>> GetOverviewRecordsAsync(
@@ -185,6 +199,93 @@ public sealed class PerformanceRepository : IPerformanceRepository
             totalQuantity,
             grossSales,
             currency);
+    }
+
+    public async Task<InventoryDashboardRecord> GetInventoryDashboardAsync(
+        Guid sellerId,
+        CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"inventory:dashboard:{sellerId}";
+        try
+        {
+            var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(cached))
+            {
+                var cachedPayload = JsonSerializer.Deserialize<InventoryDashboardRecord>(cached);
+                if (cachedPayload is not null)
+                {
+                    return cachedPayload;
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning(exception, "Inventory dashboard cache read failed for seller {SellerId}. Falling back to database.", sellerId);
+        }
+
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+
+        const string summarySql = @"
+SELECT
+    COUNT(*)::int AS TotalListings,
+    COALESCE(SUM(i.available_quantity), 0)::int AS AvailableQuantity,
+    COALESCE(SUM(i.reserved_quantity), 0)::int AS ReservedQuantity,
+    COALESCE(SUM(i.sold_quantity), 0)::int AS SoldQuantity,
+    COUNT(*) FILTER (WHERE i.is_low_stock)::int AS LowStockListings,
+    COUNT(*) FILTER (WHERE i.available_quantity <= 0)::int AS OutOfStockListings
+FROM inventory i
+WHERE i.seller_id = @SellerId;";
+
+        const string criticalSql = @"
+SELECT
+    i.listing_id AS ListingId,
+    COALESCE(l.title, '') AS Title,
+    COALESCE(l.sku, '') AS Sku,
+    i.available_quantity AS AvailableQuantity,
+    i.reserved_quantity AS ReservedQuantity,
+    i.sold_quantity AS SoldQuantity,
+    i.threshold_quantity AS ThresholdQuantity,
+    i.last_updated_at AS LastUpdatedAt
+FROM inventory i
+LEFT JOIN listing l ON l.id = i.listing_id
+WHERE i.seller_id = @SellerId
+  AND (i.available_quantity <= 0 OR i.is_low_stock)
+ORDER BY i.available_quantity ASC, i.last_updated_at DESC
+LIMIT 10;";
+
+        var summary = await connection.QuerySingleAsync<InventoryDashboardSummaryRow>(
+            new CommandDefinition(summarySql, new { SellerId = sellerId }, cancellationToken: cancellationToken));
+
+        var criticalListings = (await connection.QueryAsync<InventoryHealthRecord>(
+            new CommandDefinition(criticalSql, new { SellerId = sellerId }, cancellationToken: cancellationToken)))
+            .ToList();
+
+        var payload = new InventoryDashboardRecord(
+            summary.TotalListings,
+            summary.AvailableQuantity,
+            summary.ReservedQuantity,
+            summary.SoldQuantity,
+            summary.LowStockListings,
+            summary.OutOfStockListings,
+            criticalListings);
+
+        try
+        {
+            await _cache.SetStringAsync(
+                cacheKey,
+                JsonSerializer.Serialize(payload),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15)
+                },
+                cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning(exception, "Inventory dashboard cache write failed for seller {SellerId}. Returning fresh database result without cache.", sellerId);
+        }
+
+        return payload;
     }
 
     public async Task<PerformanceSellerLevelRecord> GetSellerLevelAsync(
@@ -546,13 +647,12 @@ public sealed class PerformanceRepository : IPerformanceRepository
             .Include(o => o.Status)
             .Where(o =>
                 o.SellerId == sellerId &&
-                o.BuyerId != null &&
                 o.OrderedAt >= normalizedFromUtc &&
                 o.OrderedAt <= normalizedToUtc &&
                     o.Status.Code != OrderStatusCodes.Draft)
             .Select(o => new ServiceMetricsOrderRecord(
                 o.Id,
-                o.BuyerId!.Value,
+                o.BuyerId.Value,
                 o.OrderedAt,
                 o.PaidAt,
                 o.ShippedAt,
@@ -703,3 +803,11 @@ public sealed class PerformanceRepository : IPerformanceRepository
         return new DateOnly(referenceDate.Year, referenceDate.Month, evaluationDay);
     }
 }
+
+internal sealed record InventoryDashboardSummaryRow(
+    int TotalListings,
+    int AvailableQuantity,
+    int ReservedQuantity,
+    int SoldQuantity,
+    int LowStockListings,
+    int OutOfStockListings);

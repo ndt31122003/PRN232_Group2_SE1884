@@ -71,6 +71,7 @@ public sealed class CreateListingCommandValidator : AbstractValidator<CreateList
 public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateListingCommand>
 {
     private readonly IListingRepository _listingRepository;
+    private readonly IInventoryRepository _inventoryRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUserContext _userContext;
@@ -79,6 +80,7 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
 
     public CreateListingCommandCommandHandler(
         IListingRepository listingRepository,
+        IInventoryRepository inventoryRepository,
         IUnitOfWork unitOfWork,
         ICategoryRepository categoryRepository,
         IUserContext userContext,
@@ -86,6 +88,7 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
         ICloudinaryService cloudinaryService)
     {
         _listingRepository = listingRepository;
+        _inventoryRepository = inventoryRepository;
         _unitOfWork = unitOfWork;
         _categoryRepository = categoryRepository;
         _userContext = userContext;
@@ -149,7 +152,15 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
         if (statusResult.IsFailure)
             return statusResult.Error;
 
+        var inventoryResult = Domain.Listings.Inventory.Entities.Inventory.Create(
+            new ListingId(createdListing.Id),
+            seller.Id,
+            ResolveInitialQuantity(createdListing));
+        if (inventoryResult.IsFailure)
+            return inventoryResult.Error;
+
         _listingRepository.Add(createdListing);
+        _inventoryRepository.Add(inventoryResult.Value);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -338,6 +349,20 @@ public sealed class CreateListingCommandCommandHandler : ICommandHandler<CreateL
         );
         if (listingOrError.IsFailure) return listingOrError.Error;
         return listingOrError.Value;
+    }
+
+    private static int ResolveInitialQuantity(Listing listing)
+    {
+        return listing switch
+        {
+            FixedPriceListing fixedPriceListing when fixedPriceListing.Type == ListingType.Single
+                => fixedPriceListing.Pricing.Quantity,
+            FixedPriceListing fixedPriceListing when fixedPriceListing.Type == ListingType.MultiVariation
+                => fixedPriceListing.Variations.Sum(x => x.Quantity),
+            AuctionListing auctionListing
+                => auctionListing.Pricing.Quantity,
+            _ => 0
+        };
     }
 
 }

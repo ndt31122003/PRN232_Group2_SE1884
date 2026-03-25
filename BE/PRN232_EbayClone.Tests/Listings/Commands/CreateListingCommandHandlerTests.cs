@@ -12,7 +12,10 @@ using PRN232_EbayClone.Application.Listings.Commands;
 using PRN232_EbayClone.Domain.Categories.Entities;
 using PRN232_EbayClone.Domain.Categories.Errors;
 using PRN232_EbayClone.Domain.Listings.Enums;
+using PRN232_EbayClone.Domain.Users.Entities;
+using PRN232_EbayClone.Domain.Users.Services;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
+using PRN232_EbayClone.Domain.Users.ValueObjects;
 using Xunit;
 
 namespace PRN232_EbayClone.Tests.Listings.Commands;
@@ -20,6 +23,7 @@ namespace PRN232_EbayClone.Tests.Listings.Commands;
 public sealed class CreateListingCommandHandlerTests
 {
     private readonly IListingRepository _listingRepository = Substitute.For<IListingRepository>();
+    private readonly IInventoryRepository _inventoryRepository = Substitute.For<IInventoryRepository>();
     private readonly ICategoryRepository _categoryRepository = Substitute.For<ICategoryRepository>();
     private readonly IUserRepository _userRepository = Substitute.For<IUserRepository>();
     private readonly IUserContext _userContext = Substitute.For<IUserContext>();
@@ -28,17 +32,22 @@ public sealed class CreateListingCommandHandlerTests
     private readonly CreateListingCommandCommandHandler _handler;
 
     private readonly Category _category;
+    private readonly User _seller;
 
     public CreateListingCommandHandlerTests()
     {
-        _userContext.UserId.Returns("user-123");
+        var sellerId = Guid.NewGuid();
+        _userContext.UserId.Returns(sellerId.ToString());
         _handler = new CreateListingCommandCommandHandler(
             _listingRepository,
+            _inventoryRepository,
             _unitOfWork,
             _categoryRepository,
             _userContext,
             _userRepository,
             _cloudinaryService);
+
+        _seller = CreateVerifiedSeller().GetAwaiter().GetResult();
 
         _category = ListingTestData.CreateLeafCategory(
             ListingTestData.CreateSpecific("Color", required: true, allowMultiple: true),
@@ -46,6 +55,8 @@ public sealed class CreateListingCommandHandlerTests
 
         _categoryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(_category);
+            _userRepository.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>())
+                .Returns(_seller);
     }
 
     [Fact]
@@ -80,6 +91,7 @@ public sealed class CreateListingCommandHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         _listingRepository.Received(1).Add(Arg.Any<Domain.Listings.Entities.Listing>());
+        _inventoryRepository.Received(1).Add(Arg.Any<Domain.Listings.Inventory.Entities.Inventory>());
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -119,6 +131,7 @@ public sealed class CreateListingCommandHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         _listingRepository.Received(1).Add(Arg.Any<Domain.Listings.Entities.Listing>());
+        _inventoryRepository.Received(1).Add(Arg.Any<Domain.Listings.Inventory.Entities.Inventory>());
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -154,6 +167,7 @@ public sealed class CreateListingCommandHandlerTests
 
         result.IsSuccess.Should().BeTrue();
         _listingRepository.Received(1).Add(Arg.Any<Domain.Listings.Entities.Listing>());
+        _inventoryRepository.Received(1).Add(Arg.Any<Domain.Listings.Inventory.Entities.Inventory>());
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -193,6 +207,7 @@ public sealed class CreateListingCommandHandlerTests
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(CategoryErrors.NotFound);
         _listingRepository.DidNotReceive().Add(Arg.Any<Domain.Listings.Entities.Listing>());
+        _inventoryRepository.DidNotReceive().Add(Arg.Any<Domain.Listings.Inventory.Entities.Inventory>());
     }
 
     [Fact]
@@ -228,5 +243,28 @@ public sealed class CreateListingCommandHandlerTests
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("ItemSpecific.Required");
         _listingRepository.DidNotReceive().Add(Arg.Any<Domain.Listings.Entities.Listing>());
+    }
+
+    private static async Task<User> CreateVerifiedSeller()
+    {
+        var emailChecker = Substitute.For<IEmailUniquenessChecker>();
+        emailChecker.IsUniqueEmail(Arg.Any<PRN232_EbayClone.Domain.Shared.ValueObjects.Email>()).Returns(true);
+
+        var userResult = await User.CreateAsync(
+            emailChecker,
+            "Seller Test",
+            "seller@example.com",
+            "hashed-password",
+            []);
+
+        var user = userResult.Value;
+        user.VerifyEmail();
+        user.SetPhoneNumber("0123456789");
+        user.VerifyPhone();
+        user.SetBusinessInfo(
+            "Seller Business",
+            BusinessAddress.Create("Street 1", "City", "State", "70000", "VN").Value);
+
+        return user;
     }
 }

@@ -18,9 +18,12 @@ using PRN232_EbayClone.Domain.Reviews.Entities;
 using PRN232_EbayClone.Domain.Disputes.Entities;
 using PRN232_EbayClone.Domain.BuyerFeedback.Entities;
 using PRN232_EbayClone.Domain.Discounts.Entities;
+using PRN232_EbayClone.Domain.Notifications.Entities;
+using PRN232_EbayClone.Domain.Listings.Inventory.Entities;
 using PRN232_EbayClone.Infrastructure.Outbox;
 using PRN232_EbayClone.Infrastructure.Persistence.Repositories;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence;
 
@@ -88,6 +91,15 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
     public DbSet<SaleEventPerformanceMetrics> SaleEventPerformanceMetrics => Set<SaleEventPerformanceMetrics>();
     public DbSet<SaleEventPriceSnapshot> SaleEventPriceSnapshots => Set<SaleEventPriceSnapshot>();
     public DbSet<AppliedSaleEvent> AppliedSaleEvents => Set<AppliedSaleEvent>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+    public DbSet<InventoryAdjustment> InventoryAdjustments => Set<InventoryAdjustment>();
+
+    public async Task<IUnitOfWorkTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        var transaction = await Database.BeginTransactionAsync(cancellationToken);
+        return new EfUnitOfWorkTransaction(transaction);
+    }
 
 
 
@@ -97,4 +109,16 @@ public DbSet<Coupon> Coupons => Set<Coupon>();
         builder.HasPostgresExtension("pg_trgm");
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
+}
+
+internal sealed class EfUnitOfWorkTransaction(IDbContextTransaction transaction) : IUnitOfWorkTransaction
+{
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+        => transaction.CommitAsync(cancellationToken);
+
+    public Task RollbackAsync(CancellationToken cancellationToken = default)
+        => transaction.RollbackAsync(cancellationToken);
+
+    public ValueTask DisposeAsync()
+        => transaction.DisposeAsync();
 }
