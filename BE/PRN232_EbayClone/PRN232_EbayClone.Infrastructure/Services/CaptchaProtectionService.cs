@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Logging;
 using PRN232_EbayClone.Application.Abstractions.Security;
 using PRN232_EbayClone.Domain.Identity.Errors;
 using PRN232_EbayClone.Domain.Shared.Results;
@@ -25,18 +24,15 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
     private readonly IDistributedCache _distributedCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRecaptchaVerificationService _recaptchaVerificationService;
-    private readonly ILogger<CaptchaProtectionService> _logger;
 
     public CaptchaProtectionService(
         IDistributedCache distributedCache,
         IHttpContextAccessor httpContextAccessor,
-        IRecaptchaVerificationService recaptchaVerificationService,
-        ILogger<CaptchaProtectionService> logger)
+        IRecaptchaVerificationService recaptchaVerificationService)
     {
         _distributedCache = distributedCache;
         _httpContextAccessor = httpContextAccessor;
         _recaptchaVerificationService = recaptchaVerificationService;
-        _logger = logger;
     }
 
     public async Task<Result> EnsureValidAsync(
@@ -89,17 +85,10 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
         var failedAttempts = decision.FailedAttempts + 1;
         var data = BitConverter.GetBytes(failedAttempts);
 
-        try
+        await _distributedCache.SetAsync(cacheKey, data, new DistributedCacheEntryOptions
         {
-            await _distributedCache.SetAsync(cacheKey, data, new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = FailedAttemptTtl
-            }, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Redis unavailable when recording captcha failure for {Action}. Skipping.", actionName);
-        }
+            AbsoluteExpirationRelativeToNow = FailedAttemptTtl
+        }, cancellationToken);
     }
 
     public async Task RegisterSuccessAsync(string actionName, string? identityHint, CancellationToken cancellationToken)
@@ -111,14 +100,7 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
         }
 
         var cacheKey = BuildCacheKey(actionName, identityHint);
-        try
-        {
-            await _distributedCache.RemoveAsync(cacheKey, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Redis unavailable when clearing captcha state for {Action}. Skipping.", actionName);
-        }
+        await _distributedCache.RemoveAsync(cacheKey, cancellationToken);
     }
 
     public async Task<CaptchaPolicyDecision> GetDecisionAsync(string actionName, string? identityHint, CancellationToken cancellationToken)
@@ -134,15 +116,7 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
         }
 
         var cacheKey = BuildCacheKey(actionName, identityHint);
-        byte[]? payload = null;
-        try
-        {
-            payload = await _distributedCache.GetAsync(cacheKey, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Redis unavailable when reading captcha state for {Action}. Defaulting to 0 failed attempts.", actionName);
-        }
+        var payload = await _distributedCache.GetAsync(cacheKey, cancellationToken);
 
         var failedAttempts = payload is { Length: 4 }
             ? BitConverter.ToInt32(payload)
