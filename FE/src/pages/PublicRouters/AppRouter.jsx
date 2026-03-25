@@ -13,6 +13,8 @@ import ListingsPage from "../Listing/ListingsLayout";
 const LoginPage = lazy(() => import("../ANONYMOUS/Login/LoginPage"));
 const NotFoundPage = lazy(() => import("../NOTFOUND/NotFound"));
 const AuthCallbackPage = lazy(() => import("../ANONYMOUS/Login/AuthCallBackPage"));
+const ForgotPasswordPage = lazy(() => import("../ANONYMOUS/Login/ForgotPasswordPage"));
+const PaymentVerificationPage = lazy(() => import("../Store/PaymentVerificationPage"));
 const AccountSettingsPage = lazy(() => import("../Account/AccountSettings"));
 const CreateSellerCouponPage = lazy(() => import("../Coupons/CreateSellerCoupon"));
 const CouponsSummaryPage = lazy(() => import("../Coupons/CouponsSummary"));
@@ -565,6 +567,24 @@ const router = createBrowserRouter([
       <Suspense fallback={<LoadingScreen />}>
         <Register />
       </Suspense>
+    ),
+  },
+  {
+    path: "forgot-password",
+    element: (
+      <Suspense fallback={<LoadingScreen />}>
+        <ForgotPasswordPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "payment-verification",
+    element: (
+      <PrivateRoute>
+        <Suspense fallback={<LoadingScreen />}>
+          <PaymentVerificationPage />
+        </Suspense>
+      </PrivateRoute>
     ),
   },
 
