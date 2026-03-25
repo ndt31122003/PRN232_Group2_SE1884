@@ -2,6 +2,7 @@ using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Domain.Listings.Inventory.Entities;
 using PRN232_EbayClone.Domain.Listings.Inventory.ValueObjects;
 using PRN232_EbayClone.Domain.Listings.ValueObjects;
+using PRN232_EbayClone.Domain.Users.ValueObjects;
 
 namespace PRN232_EbayClone.Infrastructure.Persistence.Repositories;
 
@@ -41,6 +42,16 @@ public sealed class InventoryRepository : Repository<Inventory, InventoryId>, II
             .FirstOrDefaultAsync(
                 x => x.Reservations.Any(r => r.Id == reservationId),
                 cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Inventory>> GetBySellerIdAsync(UserId sellerId, CancellationToken cancellationToken = default)
+    {
+        return await DbContext.Inventories
+            .AsNoTracking()
+            .Include(x => x.Reservations)
+            .Where(x => x.SellerId == sellerId)
+            .OrderByDescending(x => x.LastUpdatedAt)
+            .ToListAsync(cancellationToken);
     }
 
     public Task<bool> ExistsForListingAsync(ListingId listingId, CancellationToken cancellationToken = default)

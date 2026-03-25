@@ -19,6 +19,10 @@ public static class InventoryErrors
     public static Error InvalidThreshold => Error.Failure(
         "Inventory.InvalidThreshold",
         "The threshold must be greater than zero.");
+
+    public static readonly Error EmailAlertRequiresThreshold = Error.Failure(
+        "Inventory.EmailAlertRequiresThreshold",
+        "A low-stock threshold is required when email alerts are enabled.");
     
     public static Error NotFound => Error.Failure(
         "Inventory.NotFound",

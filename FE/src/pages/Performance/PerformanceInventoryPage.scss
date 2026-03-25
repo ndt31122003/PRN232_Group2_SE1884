@@ -176,8 +176,13 @@
 
 .performance-inventory__panel--flow,
 .performance-inventory__panel--insight,
+.performance-inventory__panel--alerts,
 .performance-inventory__panel--table {
     padding: 22px;
+}
+
+.performance-inventory__panel--alerts {
+    grid-column: 1 / -1;
 }
 
 .performance-inventory__panel-head {
@@ -288,6 +293,10 @@
     overflow-x: auto;
 }
 
+.performance-inventory__table-wrap--alerts {
+    margin-top: 4px;
+}
+
 .performance-inventory__table {
     width: 100%;
     border-collapse: collapse;
@@ -350,6 +359,59 @@
     color: var(--stock-critical);
 }
 
+.performance-inventory__input {
+    width: 100%;
+    min-width: 120px;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--stock-border);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--stock-ink);
+}
+
+.performance-inventory__input:focus {
+    outline: none;
+    border-color: #2c6ecb;
+    box-shadow: 0 0 0 3px rgba(44, 110, 203, 0.14);
+}
+
+.performance-inventory__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--stock-ink);
+}
+
+.performance-inventory__toggle input {
+    width: 16px;
+    height: 16px;
+}
+
+.performance-inventory__save-btn {
+    min-width: 96px;
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid #183b67;
+    border-radius: 12px;
+    background: #183b67;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.performance-inventory__save-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(16, 38, 63, 0.14);
+}
+
+.performance-inventory__save-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
 @media (max-width: 1280px) {
     .performance-inventory__summary-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -384,6 +446,7 @@
     .performance-inventory__hero,
     .performance-inventory__panel--flow,
     .performance-inventory__panel--insight,
+    .performance-inventory__panel--alerts,
     .performance-inventory__panel--table {
         padding: 18px;
         border-radius: 20px;

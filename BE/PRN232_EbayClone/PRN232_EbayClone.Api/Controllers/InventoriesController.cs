@@ -3,6 +3,8 @@ using PRN232_EbayClone.Application.Listings.Inventory.Commands.CommitStock;
 using PRN232_EbayClone.Application.Listings.Inventory.Commands.InitializeInventory;
 using PRN232_EbayClone.Application.Listings.Inventory.Commands.ReleaseStock;
 using PRN232_EbayClone.Application.Listings.Inventory.Commands.ReserveStock;
+using PRN232_EbayClone.Application.Listings.Inventory.Commands.UpdateLowStockAlert;
+using PRN232_EbayClone.Application.Listings.Inventory.Queries.GetSellerInventoryAlerts;
 using PRN232_EbayClone.Application.Listings.Inventory.Queries.GetInventoryByListingId;
 
 namespace PRN232_EbayClone.Api.Controllers;
@@ -25,6 +27,14 @@ public sealed class InventoriesController(ISender sender) : ApiController(sender
 
     [HttpPost("release")]
     public Task<IActionResult> Release([FromBody] ReleaseStockCommand command, CancellationToken cancellationToken)
+        => SendAsync(command, cancellationToken);
+
+    [HttpGet("alerts")]
+    public Task<IActionResult> GetAlerts(CancellationToken cancellationToken)
+        => SendAsync(new GetSellerInventoryAlertsQuery(), cancellationToken);
+
+    [HttpPut("alerts")]
+    public Task<IActionResult> UpdateAlerts([FromBody] UpdateLowStockAlertCommand command, CancellationToken cancellationToken)
         => SendAsync(command, cancellationToken);
 
     [HttpGet("listing/{listingId:guid}")]

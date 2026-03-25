@@ -11,7 +11,7 @@ namespace PRN232_EbayClone.Domain.Listings.Inventory.Entities;
 public sealed class Inventory : AggregateRoot<InventoryId>
 {
     // Properties
-    public ListingId ListingId { get; private set; }
+    public ListingId ListingId { get; private set; } = null!;
     public UserId SellerId { get; private set; }
     
     public int TotalQuantity { get; private set; }
@@ -21,6 +21,7 @@ public sealed class Inventory : AggregateRoot<InventoryId>
     
     public int? ThresholdQuantity { get; private set; }
     public bool IsLowStock { get; private set; }
+    public bool EmailNotificationsEnabled { get; private set; }
     public DateTime? LastLowStockNotificationAt { get; private set; }
     
     public DateTime LastUpdatedAt { get; private set; }
@@ -51,6 +52,7 @@ public sealed class Inventory : AggregateRoot<InventoryId>
             SoldQuantity = 0,
             ThresholdQuantity = null,
             IsLowStock = false,
+            EmailNotificationsEnabled = false,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = null,
             UpdatedAt = null,
@@ -101,21 +103,41 @@ public sealed class Inventory : AggregateRoot<InventoryId>
         
         return Result.Success();
     }
+
+    public Result ConfigureLowStockAlert(int? thresholdQuantity, bool emailNotificationsEnabled)
+    {
+        if (thresholdQuantity.HasValue && thresholdQuantity.Value <= 0)
+            return InventoryErrors.InvalidThreshold;
+
+        if (emailNotificationsEnabled && !thresholdQuantity.HasValue)
+            return InventoryErrors.EmailAlertRequiresThreshold;
+
+        ThresholdQuantity = thresholdQuantity;
+        EmailNotificationsEnabled = emailNotificationsEnabled;
+        LastUpdatedAt = DateTime.UtcNow;
+
+        UpdateLowStockStatus();
+
+        return Result.Success();
+    }
     
     private void UpdateLowStockStatus()
     {
         if (ThresholdQuantity.HasValue && AvailableQuantity <= ThresholdQuantity.Value)
         {
             IsLowStock = true;
-            if (!LastLowStockNotificationAt.HasValue)
-            {
-                LastLowStockNotificationAt = DateTime.UtcNow;
-            }
         }
         else
         {
             IsLowStock = false;
+            LastLowStockNotificationAt = null;
         }
+    }
+
+    public void MarkLowStockNotificationSent(DateTime sentAtUtc)
+    {
+        LastLowStockNotificationAt = sentAtUtc;
+        LastUpdatedAt = sentAtUtc;
     }
     
     // UC2.2: Reserve Stock
