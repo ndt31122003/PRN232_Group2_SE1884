@@ -11,6 +11,10 @@ const PublicListingService = {
 
   placeBid: async (id, amount) => {
     return axios.post(`/listings/${id}/bids`, { amount });
+  },
+
+  buyItNow: async (listingId, quantity = 1) => {
+    return axios.post(`/orders/buy-it-now`, { listingId, quantity });
   }
 };
 
