@@ -56,7 +56,7 @@ internal static class OrderStatusSeed
         Transition("2abdffad-037d-48a0-8c3d-a8dd0f00c5ba", AwaitingShipmentOverdueId, PaidAndShippedId, OrderRoles.Seller, OrderRoles.System),
         Transition("64648c83-2c87-47b8-8c2a-32e96c369f41", AwaitingExpeditedShipmentId, PaidAndShippedId, OrderRoles.Seller, OrderRoles.System),
         Transition("c6a927ee-4fb6-48cc-bbf0-d2624de3458f", PaidAndShippedId, PaidAwaitingFeedbackId, OrderRoles.System),
-        Transition("d0cb2575-023a-45dc-840a-8e09b2f4c4c8", PaidAndShippedId, ShippedAwaitingFeedbackId, OrderRoles.System),
+        Transition("d0cb2575-023a-45dc-840a-8e09b2f4c4c8", PaidAndShippedId, ShippedAwaitingFeedbackId, OrderRoles.Seller, OrderRoles.System),
         Transition("b8fa2c60-13ad-4e83-9516-8f406bcf8414", PaidAndShippedId, DeliveryFailedId, OrderRoles.Seller, OrderRoles.Support, OrderRoles.System),
         Transition("6cb6fa65-3d6c-45f0-9f27-cf5d292743ff", DeliveryFailedId, AwaitingShipmentId, OrderRoles.Seller, OrderRoles.Support, OrderRoles.System),
         Transition("a4c5df71-b5bb-4f13-9659-a5047cf4f087", DeliveryFailedId, CancelledId, OrderRoles.Seller, OrderRoles.Support, OrderRoles.System),

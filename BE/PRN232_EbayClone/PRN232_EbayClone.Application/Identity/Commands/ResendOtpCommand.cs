@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using PRN232_EbayClone.Application.Abstractions.Identity;
+using PRN232_EbayClone.Application.Abstractions.Security;
 using PRN232_EbayClone.Domain.Identity.Entities;
 using PRN232_EbayClone.Domain.Identity.Enums;
 using PRN232_EbayClone.Domain.Shared.ValueObjects;
@@ -10,7 +11,9 @@ namespace PRN232_EbayClone.Application.Identity.Commands;
 
 public sealed record ResendOtpCommand(
     string Email,
-    OtpType Type
+    OtpType Type,
+    string? CaptchaToken = null,
+    string? CaptchaAction = null
 ) : ICommand<OtpDeliveryResult>;
 
 public sealed class ResendOtpCommandHandler : ICommandHandler<ResendOtpCommand, OtpDeliveryResult>
@@ -20,24 +23,39 @@ public sealed class ResendOtpCommandHandler : ICommandHandler<ResendOtpCommand, 
     private readonly IOtpGenerator _otpGenerator;
     private readonly IUnitOfWork _unitOfWork;
     private readonly bool _isSmsSimulation;
+    private readonly ICaptchaProtectionService _captchaProtectionService;
 
     public ResendOtpCommandHandler(
         IUserRepository userRepository,
         IOtpRepository otpRepository,
         IOtpGenerator otpGenerator,
         IUnitOfWork unitOfWork,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ICaptchaProtectionService captchaProtectionService)
     {
         _userRepository = userRepository;
         _otpRepository = otpRepository;
         _otpGenerator = otpGenerator;
         _unitOfWork = unitOfWork;
+        _captchaProtectionService = captchaProtectionService;
         var provider = configuration.GetValue<string>("Sms:Provider")?.ToLowerInvariant();
         _isSmsSimulation = string.IsNullOrEmpty(provider) || provider == "dev";
     }
 
     public async Task<Result<OtpDeliveryResult>> Handle(ResendOtpCommand request, CancellationToken cancellationToken)
     {
+        var captchaResult = await _captchaProtectionService.EnsureValidAsync(
+            CaptchaActions.IdentityResendOtp,
+            request.CaptchaToken,
+            request.CaptchaAction,
+            request.Email,
+            cancellationToken);
+
+        if (captchaResult.IsFailure)
+        {
+            return captchaResult.Error;
+        }
+
         var emailOrError = Email.Create(request.Email);
         if (emailOrError.IsFailure)
             return emailOrError.Error;

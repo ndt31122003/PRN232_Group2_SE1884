@@ -140,6 +140,7 @@ public sealed class BulkPrintShippingLabelsCommandHandler : ICommandHandler<Bulk
 
             var result = await _sender.Send(new PrintShippingLabelCommand(
                 orderId,
+                request.SellerId,
                 request.Carrier,
                 request.ServiceCode,
                 request.ServiceName,
