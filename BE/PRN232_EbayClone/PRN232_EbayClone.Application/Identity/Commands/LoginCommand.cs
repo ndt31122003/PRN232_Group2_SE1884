@@ -75,7 +75,7 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, LoginCom
             return captchaResult.Error;
         }
 
-        var user = await _userRepository.GetByUsernameAsync(request.Username, cancellationToken);
+        var user = await _userRepository.GetByUsernameOrEmailAsync(request.Username, cancellationToken);
         if (user is null)
         {
             await _captchaProtectionService.RegisterFailureAsync(
@@ -98,6 +98,11 @@ public sealed class LoginCommandHandler : ICommandHandler<LoginCommand, LoginCom
         }
 
         if (!isPasswordValid)
+        {
+            await _captchaProtectionService.RegisterFailureAsync(
+                CaptchaActions.IdentityLogin,
+                request.Username,
+                cancellationToken);
             return IdentityErrors.InvalidCredentials;
         }
 
