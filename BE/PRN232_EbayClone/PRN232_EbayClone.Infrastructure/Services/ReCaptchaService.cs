@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using PRN232_EbayClone.Application.Abstractions.Security;
 using System.Net.Http;
 using System.Text.Json;
@@ -45,8 +45,9 @@ namespace PRN232_EbayClone.Infrastructure.Services
         }
 
         private sealed record RecaptchaResponse(
-            bool Success,
-            string? Action
+            [property: JsonPropertyName("success")] bool Success,
+            [property: JsonPropertyName("action")] string? Action,
+            [property: JsonPropertyName("error-codes")] List<string>? ErrorCodes
         );
     }
 }
