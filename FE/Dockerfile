@@ -10,10 +10,6 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install --legacy-peer-deps
 
-# Build args (passed from docker-compose build args)
-ARG REACT_APP_RECAPTCHA_SITE_KEY
-ENV REACT_APP_RECAPTCHA_SITE_KEY=$REACT_APP_RECAPTCHA_SITE_KEY
-
 # Copy phần còn lại của mã nguồn
 COPY . .
 
