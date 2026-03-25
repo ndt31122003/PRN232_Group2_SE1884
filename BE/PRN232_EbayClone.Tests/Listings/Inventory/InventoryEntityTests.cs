@@ -134,6 +134,68 @@ public class InventoryEntityTests
         // Assert
         inventory.IsLowStock.Should().BeTrue();
     }
+
+    [Fact]
+    public void ConfigureLowStockAlert_WithThresholdAndEmail_ShouldPersistConfiguration()
+    {
+        // Arrange
+        var inventory = Domain.Listings.Inventory.Entities.Inventory.Create(ListingId, SellerId, 25).Value;
+
+        // Act
+        var result = inventory.ConfigureLowStockAlert(20, true, "ops@example.com, stock@example.com");
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        inventory.ThresholdQuantity.Should().Be(20);
+        inventory.EmailNotificationsEnabled.Should().BeTrue();
+        inventory.AdditionalNotificationEmails.Should().Be("ops@example.com, stock@example.com");
+        inventory.GetAdditionalNotificationEmailList().Should().HaveCount(2);
+        inventory.IsLowStock.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ConfigureLowStockAlert_WithEmailAndNoThreshold_ShouldFail()
+    {
+        // Arrange
+        var inventory = Domain.Listings.Inventory.Entities.Inventory.Create(ListingId, SellerId, 25).Value;
+
+        // Act
+        var result = inventory.ConfigureLowStockAlert(null, true);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(InventoryErrors.EmailAlertRequiresThreshold);
+    }
+
+    [Fact]
+    public void Restock_WhenInventoryRecovers_ShouldClearNotificationTimestamp()
+    {
+        // Arrange
+        var inventory = Domain.Listings.Inventory.Entities.Inventory.Create(ListingId, SellerId, 10).Value;
+        inventory.ConfigureLowStockAlert(10, true);
+        inventory.MarkLowStockNotificationSent(DateTime.UtcNow);
+
+        // Act
+        inventory.Restock(5);
+
+        // Assert
+        inventory.IsLowStock.Should().BeFalse();
+        inventory.LastLowStockNotificationAt.Should().BeNull();
+    }
+
+    [Fact]
+    public void ConfigureLowStockAlert_WithInvalidAdditionalEmail_ShouldFail()
+    {
+        // Arrange
+        var inventory = Domain.Listings.Inventory.Entities.Inventory.Create(ListingId, SellerId, 25).Value;
+
+        // Act
+        var result = inventory.ConfigureLowStockAlert(10, true, "ops@example.com, invalid-email");
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(InventoryErrors.InvalidAdditionalEmail);
+    }
     
     [Fact]
     public void ReleaseStock_AfterReserve_ShouldSuccess()

@@ -1,4 +1,5 @@
 using PRN232_EbayClone.Application.Abstractions.Authentication;
+using PRN232_EbayClone.Application.Abstractions.Data;
 using PRN232_EbayClone.Application.Listings.Inventory.Dtos;
 using PRN232_EbayClone.Domain.Listings.Entities;
 using PRN232_EbayClone.Domain.Listings.Errors;

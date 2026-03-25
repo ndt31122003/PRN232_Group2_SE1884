@@ -74,6 +74,7 @@ try
 
     // ✅ Register Background Service for Monthly Seller Evaluation
     builder.Services.AddHostedService<SellerLevelEvaluationJob>();
+builder.Services.AddHostedService<LowStockAlertWorker>();
 
     var app = builder.Build();
 
