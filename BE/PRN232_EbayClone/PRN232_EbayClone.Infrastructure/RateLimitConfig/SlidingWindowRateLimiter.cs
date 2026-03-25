@@ -64,6 +64,16 @@ public class SlidingWindowRateLimiter
         if (!string.IsNullOrEmpty(userId))
             return userId;
 
+        // Cloudflare Tunnel injects the real client IP in CF-Connecting-IP
+        var cfIp = context.Request.Headers["CF-Connecting-IP"].FirstOrDefault();
+        if (!string.IsNullOrEmpty(cfIp))
+            return cfIp;
+
+        // Generic reverse-proxy fallback
+        var forwarded = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (!string.IsNullOrEmpty(forwarded))
+            return forwarded.Split(',')[0].Trim();
+
         return context.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
     }
 
