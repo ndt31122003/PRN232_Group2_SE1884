@@ -16,7 +16,7 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
             [CaptchaActions.IdentityRegister] = (CaptchaRequirementType.Always, 0),
             [CaptchaActions.IdentityForgotPassword] = (CaptchaRequirementType.Always, 0),
             [CaptchaActions.IdentityResetPassword] = (CaptchaRequirementType.Always, 0),
-            [CaptchaActions.IdentityResendOtp] = (CaptchaRequirementType.Always, 0)
+            [CaptchaActions.IdentityResendOtp] = (CaptchaRequirementType.None, 0)
         };
 
     private static readonly TimeSpan FailedAttemptTtl = TimeSpan.FromMinutes(30);
