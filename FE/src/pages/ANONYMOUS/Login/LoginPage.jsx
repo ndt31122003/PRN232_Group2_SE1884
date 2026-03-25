@@ -104,7 +104,7 @@ export default function LoginPage() {
   const [staySignedIn, setStaySignedIn] = useState(true);
   const handleSocialLogin = async (provider) => {
     if (provider === 'Google') {
-      const apiBaseUrl = "https://prn232.mnhduc.site";
+      const apiBaseUrl = "https://propval.io.vn";
       const callbackUrl = `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTarget)}`;
       window.location.href = `${apiBaseUrl}/api/identity/google/login?returnUrl=${encodeURIComponent(callbackUrl)}`;
     }
@@ -164,6 +164,16 @@ export default function LoginPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
 
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                Forgot password?
+              </button>
+            </div>
+            
             {isCaptchaRequired && (
               <div className="pt-2">
                 <ReCaptcha ref={captchaRef} onChange={onChange} />

@@ -65,18 +65,21 @@ public sealed class ProcessOutboxMessagesJob : IJob
                     continue;
                 }
 
-                await _publisher.Publish(domainEvent, context.CancellationToken);
-
+                // Mark as processed BEFORE publishing to prevent duplicate sends on retry
                 outboxMessage.ProcessedOn = DateTime.UtcNow;
+                await _dbContext.SaveChangesAsync(context.CancellationToken);
+
+                await _publisher.Publish(domainEvent, context.CancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error publishing outbox message with ID {OutboxMessageId}", outboxMessage.Id);
+                // Roll back ProcessedOn so it can be retried, but only if it wasn't a send-related error
+                outboxMessage.ProcessedOn = null;
                 outboxMessage.RetryCount++;
                 outboxMessage.Error = $"{ex.Message}";
+                await _dbContext.SaveChangesAsync(context.CancellationToken);
             }
-
-            await _dbContext.SaveChangesAsync(context.CancellationToken);
         }
     }
 }

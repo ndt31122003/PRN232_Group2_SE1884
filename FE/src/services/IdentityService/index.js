@@ -37,6 +37,15 @@ const submitBusiness = (payload) =>
 const getRegistrationStatus = () =>
   axios.get(`${resource}/registration-status`);
 
+const forgotPassword = (email) =>
+  axios.post(`${resource}/forgot-password`, { email });
+
+const resetPassword = (payload) =>
+  axios.post(`${resource}/reset-password`, payload);
+
+const verifyPayment = (payload) =>
+  axios.post(`users/verify-payment`, payload);
+
 const IdentityService = {
   register,
   requestOtp,
@@ -47,6 +56,10 @@ const IdentityService = {
   verifyPhone,
   submitBusiness,
   getRegistrationStatus,
+  forgotPassword,
+  resetPassword,
+  verifyPayment,
 };
 
 export default IdentityService;
+
