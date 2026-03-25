@@ -64,18 +64,21 @@ const OverviewPage = () => {
     return [
       {
         key: "views",
-        label: "Listing views (90d)",
-        value: header.listingViewsLast90Days?.toLocaleString() ?? "0"
+        icon: "👁",
+        value: header.listingViewsLast90Days?.toLocaleString() ?? "0",
+        label: "Listing views (90d)"
       },
       {
         key: "sales",
-        label: "Sales (90d)",
-        value: formatCurrency(header.salesLast90Days, header.salesCurrency)
+        icon: "💰",
+        value: formatCurrency(header.salesLast90Days, header.salesCurrency),
+        label: "Sales (90d)"
       },
       {
         key: "orders",
-        label: "Orders (90d)",
-        value: header.ordersLast90Days?.toLocaleString() ?? "0"
+        icon: "🛒",
+        value: header.ordersLast90Days?.toLocaleString() ?? "0",
+        label: "Orders (90d)"
       }
     ];
   }, [header]);
@@ -84,7 +87,8 @@ const OverviewPage = () => {
     const points = sales?.chart ?? [];
     if (!points || points.length === 0) {
       return {
-        polyline: ""
+        polyline: "",
+        labels: []
       };
     }
 
@@ -100,7 +104,15 @@ const OverviewPage = () => {
       })
       .join(" ");
 
-    return { polyline };
+    // Pick ~5 evenly-spaced labels for the X axis
+    const labelCount = Math.min(points.length, 5);
+    const step = Math.max(1, Math.floor((points.length - 1) / (labelCount - 1)));
+    const labels = [];
+    for (let i = 0; i < points.length; i += step) {
+      labels.push({ x: (i * stepX).toFixed(2), text: points[i].label ?? "" });
+    }
+
+    return { polyline, labels, max };
   }, [sales]);
 
   const renderSection = (section) => {
@@ -167,63 +179,102 @@ const OverviewPage = () => {
 
   return (
     <div className="overview">
+      {/* ── Hero bar ─────────────────────────────────── */}
       <section className="overview-hero">
         <div className="overview-hero__identity">
           <div className="overview-hero__avatar" aria-hidden="true">
             {header?.sellerName?.slice(0, 1)?.toUpperCase() ?? "?"}
           </div>
-          <div>
-            <h1>{header?.sellerName ?? "Seller Hub"}</h1>
-            <p>{header?.sellerUsername}</p>
-          </div>
+          <h1>{header?.sellerName ?? "Seller Hub"}</h1>
         </div>
+
         <div className="overview-hero__metrics">
           {heroMetrics.map((metric) => (
             <div key={metric.key} className="overview-hero__metric">
-              <span className="overview-hero__metric-label">{metric.label}</span>
+              <span className="overview-hero__metric-icon">{metric.icon}</span>
               <span className="overview-hero__metric-value">{metric.value}</span>
+              <span className="overview-hero__metric-label">{metric.label}</span>
             </div>
           ))}
         </div>
+
         <Link to="/listing-form" className="overview-hero__cta">
           Create listing
         </Link>
       </section>
 
+      {/* ── Status banner ────────────────────────────── */}
       {status && (
         <div className={`overview-status overview-status--${status.level ?? "info"}`}>
-          <span className="overview-status__icon" aria-hidden="true">●</span>
+          <span className="overview-status__icon" aria-hidden="true">
+            {status.level === "success" ? "✓" : status.level === "warning" ? "⚠" : "ℹ"}
+          </span>
           <div>
             <strong>{status.message}</strong>
             {status.outstandingTasks > 0 && (
-              <p>{status.outstandingTasks} outstanding {status.outstandingTasks === 1 ? "task" : "tasks"}.</p>
+              <p>
+                {status.outstandingTasks} outstanding{" "}
+                {status.outstandingTasks === 1 ? "task" : "tasks"}.
+              </p>
             )}
           </div>
         </div>
       )}
 
+      {/* ── Three-column grid ────────────────────────── */}
       <div className="overview__grid">
         {renderSection(listings)}
         {renderSection(orders)}
+
+        {/* Sales card */}
         <section className="overview-card overview-card--sales">
           <header className="overview-card__header">
             <h2>Sales</h2>
-            <span className="overview-card__currency">{sales?.currency ?? "USD"}</span>
           </header>
+
           <div className="overview-sales-chart">
+            <div className="overview-sales-chart__title">
+              Chart for sales data across 31 days
+            </div>
             {chartModel.polyline ? (
               <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                {/* Grid lines */}
+                <line
+                  x1="0" y1="0" x2="100" y2="0"
+                  stroke="#e5e5e5" strokeWidth="0.5" vectorEffect="non-scaling-stroke"
+                />
+                <line
+                  x1="0" y1="50" x2="100" y2="50"
+                  stroke="#e5e5e5" strokeWidth="0.5" vectorEffect="non-scaling-stroke"
+                />
+                <line
+                  x1="0" y1="100" x2="100" y2="100"
+                  stroke="#e5e5e5" strokeWidth="0.5" vectorEffect="non-scaling-stroke"
+                />
+
+                {/* Area fill */}
+                <polyline
+                  points={`0,100 ${chartModel.polyline} 100,100`}
+                  fill="rgba(54, 101, 243, 0.08)"
+                  stroke="none"
+                />
+
+                {/* Line */}
                 <polyline
                   points={chartModel.polyline}
-                  fill="rgba(49, 120, 198, 0.15)"
-                  stroke="rgba(49, 120, 198, 0.85)"
+                  fill="none"
+                  stroke="#3665f3"
                   strokeWidth="2"
+                  vectorEffect="non-scaling-stroke"
                 />
               </svg>
             ) : (
-              <div className="overview-sales-chart__empty">No sales recorded for the selected period.</div>
+              <div className="overview-sales-chart__empty">
+                No sales recorded for the selected period.
+              </div>
             )}
           </div>
+
           <ul className="overview-sales-summary">
             {sales?.summary?.map((row) => (
               <li key={row.key}>
