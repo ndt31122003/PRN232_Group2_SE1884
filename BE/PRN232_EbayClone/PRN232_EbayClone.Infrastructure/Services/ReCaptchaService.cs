@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using PRN232_EbayClone.Application.Abstractions.Security;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PRN232_EbayClone.Infrastructure.Services
 {
