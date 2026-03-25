@@ -13,7 +13,6 @@ namespace PRN232_EbayClone.Application.Orders.Commands;
 
 public sealed record PreviewShippingLabelCommand(
     Guid OrderId,
-    Guid SellerId,
     string Carrier,
     string ServiceCode,
     string ServiceName,
@@ -61,12 +60,6 @@ public sealed class PreviewShippingLabelCommandHandler : ICommandHandler<Preview
         {
             return Result.Failure<PreviewShippingLabelResult>(
                 Error.Failure("Order.NotFound", "Order not found."));
-        }
-
-        if (order.SellerId != request.SellerId)
-        {
-            return Result.Failure<PreviewShippingLabelResult>(
-                Error.Failure("Order.AccessDenied", "You do not have permission to access this order."));
         }
 
         var latestLabel = await _shippingLabelRepository.GetLatestForOrderAsync(order.Id, cancellationToken);

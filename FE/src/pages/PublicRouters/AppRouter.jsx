@@ -627,47 +627,11 @@ const router = createBrowserRouter([
   }
 ]);
 
-class ChunkErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    const isChunkError = error?.name === "ChunkLoadError" || error?.message?.includes("Loading chunk");
-    if (isChunkError) {
-      const reloadKey = "chunk_reload_attempted";
-      if (!sessionStorage.getItem(reloadKey)) {
-        sessionStorage.setItem(reloadKey, "1");
-        window.location.reload();
-        return { hasError: false };
-      }
-    }
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{ textAlign: "center", padding: "2rem" }}>
-          <h2>Đã có lỗi xảy ra</h2>
-          <button onClick={() => { sessionStorage.clear(); window.location.reload(); }}>
-            Tải lại trang
-          </button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 const AppRouter = () => {
   return (
-    <ChunkErrorBoundary>
-      <Suspense fallback={<LoadingScreen />}>
-        <RouterProvider router={router} />
-      </Suspense>
-    </ChunkErrorBoundary>
+    <Suspense fallback={<LoadingScreen />}>
+      <RouterProvider router={router} />
+    </Suspense>
   );
 };
 

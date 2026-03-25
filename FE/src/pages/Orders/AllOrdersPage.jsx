@@ -803,106 +803,15 @@ const AllOrdersPage = () => {
         setOpenMenuId((prev) => (prev === orderId ? null : orderId));
     };
 
-    const handleMarkAsShipped = (order) => {
-        withRowAction(order, "mark-as-shipped", () =>
-            OrderService.markAsShipped(order.id)
-        );
-    };
-
-    const handleArchiveOrder = (order) => {
-        withRowAction(order, "archive", () =>
-            OrderService.archiveOrder(order.id)
-        );
-    };
-
-    const handlePrintPackingSlip = (order) => {
-        if (!order) {
-            return;
-        }
-        const items = Array.isArray(order.items) ? order.items : [];
-        const buyerName = order.buyerFullName || order.buyerUsername || "Unknown buyer";
-        const itemsHtml = items.length > 0
-            ? items.map((item) =>
-                `<tr>
-                    <td><img src="${escapeHtml(item.imageUrl || "")}" alt="" style="width:48px;height:48px;object-fit:contain;" /></td>
-                    <td>${escapeHtml(item.title || "Untitled item")}</td>
-                    <td>${escapeHtml(item.sku || "-")}</td>
-                    <td style="text-align:center">${escapeHtml(String(item.quantity ?? 1))}</td>
-                    <td style="text-align:right">${escapeHtml(formatCurrency(item.unitPrice?.amount ?? item.unitPrice ?? null))}</td>
-                </tr>`
-            ).join("")
-            : "<tr><td colspan='5'>No items</td></tr>";
-
-        const html = `<!doctype html>
-<html>
-<head>
-<meta charset="utf-8" />
-<title>Packing slip – ${escapeHtml(order.orderNumber)}</title>
-<style>
-body { font-family: "Segoe UI", Arial, sans-serif; color: #0f172a; margin: 32px; font-size: 13px; }
-h1 { font-size: 18px; margin: 0 0 4px; }
-.meta { color: #475569; margin-bottom: 16px; }
-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-th, td { border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; vertical-align: top; }
-th { background: #f1f5f9; }
-.total { text-align: right; font-weight: 600; margin-top: 12px; }
-</style>
-</head>
-<body>
-<h1>Packing slip</h1>
-<div class="meta">
-    <p><strong>Order:</strong> ${escapeHtml(order.orderNumber)}</p>
-    <p><strong>Buyer:</strong> ${escapeHtml(buyerName)}</p>
-    <p><strong>Date sold:</strong> ${escapeHtml(formatDate(order.orderedAt))}</p>
-</div>
-<table>
-<thead><tr><th>Image</th><th>Item</th><th>SKU</th><th>Qty</th><th>Price</th></tr></thead>
-<tbody>${itemsHtml}</tbody>
-</table>
-<p class="total">Total: ${escapeHtml(formatCurrency(order.total?.amount ?? order.total ?? null))}</p>
-</body>
-</html>`;
-
-        const iframe = document.createElement("iframe");
-        iframe.style.cssText = "position:fixed;width:0;height:0;border:0;top:-9999px";
-        iframe.setAttribute("aria-hidden", "true");
-        document.body.appendChild(iframe);
-        const cleanup = () => window.setTimeout(() => iframe.parentNode?.removeChild(iframe), 0);
-        const cw = iframe.contentWindow;
-        if (!cw) { cleanup(); return; }
-        cw.document.open();
-        cw.document.write(html);
-        cw.document.close();
-        window.setTimeout(() => { try { cw.focus(); cw.print(); } finally { cleanup(); } }, 20);
-    };
-
     const handleRowMenuAction = (order, actionKey) => {
         setOpenMenuId(null);
         if (!order) {
             return;
         }
-        switch (actionKey) {
-            case "add-tracking": {
-                const firstItem = Array.isArray(order.items) && order.items.length > 0 ? order.items[0] : null;
-                if (firstItem) {
-                    handleOpenTrackingEditor(order, firstItem);
-                } else {
-                    Notice({ msg: "No items found for this order.", isSuccess: false });
-                }
-                break;
-            }
-            case "print-packing-slip":
-                handlePrintPackingSlip(order);
-                break;
-            case "mark-as-shipped":
-                handleMarkAsShipped(order);
-                break;
-            case "archive":
-                handleArchiveOrder(order);
-                break;
-            default:
-                console.info("Unhandled row action", actionKey);
-        }
+        console.info("Row action selected", {
+            action: actionKey,
+            orderId: order.id,
+        });
     };
 
     const computeReportDateRange = useCallback(() => {

@@ -5,11 +5,6 @@ import IdentityService from "../../../services/IdentityService";
 import OTP_TYPES from "../../../constants/otpTypes";
 import { isAuthenticated, persistAuthSession } from "../../../utils/auth";
 import Notice from "../../../components/Common/CustomNotification";
-import ReCaptcha from "../../../components/Common/ReCaptcha";
-import { useCaptcha } from "../../../hooks/useCaptcha";
-
-const REGISTER_CAPTCHA_ACTION = "identity.register";
-const RESEND_OTP_CAPTCHA_ACTION = "identity.resend-otp";
 
 const STEPS = [
   { key: "basic", label: "Create Account" },
@@ -66,14 +61,7 @@ function StepIndicator({ currentStep }) {
   );
 }
 
-function BasicInfoStep({
-  onSubmit,
-  loading,
-  captchaRequired,
-  captchaToken,
-  captchaRef,
-  onCaptchaChange,
-}) {
+function BasicInfoStep({ onSubmit, loading }) {
   const [form, setForm] = useState({
     email: "",
     fullName: "",
@@ -94,7 +82,6 @@ function BasicInfoStep({
     else if (!/[0-9]/.test(form.password)) errs.password = "Must contain a number";
     else if (!/[^a-zA-Z0-9]/.test(form.password)) errs.password = "Must contain a special character";
     if (form.password !== form.confirmPassword) errs.confirmPassword = "Passwords do not match";
-    if (captchaRequired && !captchaToken) errs.captcha = "Please complete CAPTCHA";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -161,28 +148,11 @@ function BasicInfoStep({
       >
         {loading ? "Creating account..." : "Create account"}
       </button>
-
-      {captchaRequired && (
-        <div className="pt-2">
-          <ReCaptcha ref={captchaRef} onChange={onCaptchaChange} />
-          {errors.captcha && <p className="text-red-500 text-sm mt-1">{errors.captcha}</p>}
-        </div>
-      )}
     </form>
   );
 }
 
-function OtpVerifyStep({
-  title,
-  description,
-  onVerify,
-  onResend,
-  loading,
-  otpData,
-  showResendCaptcha,
-  resendCaptchaRef,
-  onResendCaptchaChange,
-}) {
+function OtpVerifyStep({ title, description, onVerify, onResend, loading, otpData }) {
   const [code, setCode] = useState("");
   const [countdown, setCountdown] = useState(0);
 
@@ -261,37 +231,21 @@ function OtpVerifyStep({
             Resend available in {formatTime(countdown)}
           </p>
         ) : (
-          <>
-            {showResendCaptcha && (
-              <div className="flex justify-center mb-3">
-                <ReCaptcha ref={resendCaptchaRef} onChange={onResendCaptchaChange} />
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={loading}
-              className="text-sm text-blue-600 hover:underline disabled:opacity-50"
-            >
-              Resend code
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={loading}
+            className="text-sm text-blue-600 hover:underline disabled:opacity-50"
+          >
+            Resend code
+          </button>
         )}
       </div>
     </form>
   );
 }
 
-function PhoneStep({
-  onSubmit,
-  onVerify,
-  onResend,
-  loading,
-  otpData,
-  showResendCaptcha,
-  resendCaptchaRef,
-  onResendCaptchaChange,
-}) {
+function PhoneStep({ onSubmit, onVerify, onResend, loading, otpData }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneSent, setPhoneSent] = useState(false);
   const [phoneError, setPhoneError] = useState("");
@@ -346,9 +300,6 @@ function PhoneStep({
       onResend={onResend}
       loading={loading}
       otpData={otpData}
-      showResendCaptcha={showResendCaptcha}
-      resendCaptchaRef={resendCaptchaRef}
-      onResendCaptchaChange={onResendCaptchaChange}
     />
   );
 }
@@ -501,15 +452,6 @@ export default function RegisterPage() {
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [emailOtpData, setEmailOtpData] = useState(null);
   const [phoneOtpData, setPhoneOtpData] = useState(null);
-  const registerCaptcha = useCaptcha();
-  const resendOtpCaptcha = useCaptcha();
-
-  const isRegisterCaptchaRequired = registerCaptcha.shouldRequireCaptcha(
-    REGISTER_CAPTCHA_ACTION
-  );
-  const isResendOtpCaptchaRequired = resendOtpCaptcha.shouldRequireCaptcha(
-    RESEND_OTP_CAPTCHA_ACTION
-  );
 
   useEffect(() => {
     if (isAuthenticated() && currentStep === 0) {
@@ -518,32 +460,16 @@ export default function RegisterPage() {
   }, [navigate, currentStep]);
 
   const handleRegister = async (data) => {
-    if (isRegisterCaptchaRequired && !registerCaptcha.token) {
-      Notice({
-        msg: "CAPTCHA required",
-        desc: "Please complete CAPTCHA before creating account.",
-        isSuccess: false,
-        place: "bottomRight",
-      });
-      return;
-    }
-
     try {
       setLoading(true);
-      const payload = registerCaptcha.withCaptchaPayload(
-        data,
-        REGISTER_CAPTCHA_ACTION
-      );
-      const res = await IdentityService.register(payload);
+      const res = await IdentityService.register(data);
       const tokens = res?.data ?? res;
       if (tokens?.accessToken && tokens?.refreshToken) {
-        registerCaptcha.resetCaptcha();
         persistAuthSession(tokens.accessToken, tokens.refreshToken);
         setRegisteredEmail(data.email);
         setCurrentStep(1);
       }
     } catch (err) {
-      registerCaptcha.resetCaptcha();
       const msg =
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
@@ -568,32 +494,18 @@ export default function RegisterPage() {
   };
 
   const handleResendEmailOtp = useCallback(async () => {
-    if (isResendOtpCaptchaRequired && !resendOtpCaptcha.token) {
-      Notice({
-        msg: "CAPTCHA required",
-        desc: "Please complete CAPTCHA before requesting another code.",
-        isSuccess: false,
-        place: "bottomRight",
-      });
-      return null;
-    }
-
     try {
-      const payload = resendOtpCaptcha.withCaptchaPayload({
+      const res = await IdentityService.requestOtp({
         email: registeredEmail,
         type: OTP_TYPES.VERIFY_EMAIL,
-      }, RESEND_OTP_CAPTCHA_ACTION);
-
-      const res = await IdentityService.requestOtp(payload);
-      resendOtpCaptcha.resetCaptcha();
+      });
       setEmailOtpData(res);
       Notice({ msg: "Code resent", desc: "A new code has been sent to your email.", isSuccess: true, place: "bottomRight" });
       return res;
     } catch {
-      resendOtpCaptcha.resetCaptcha();
       Notice({ msg: "Failed to resend", desc: "Could not resend code.", isSuccess: false, place: "bottomRight" });
     }
-  }, [isResendOtpCaptchaRequired, registeredEmail, resendOtpCaptcha]);
+  }, [registeredEmail]);
 
   const handleSetPhone = async (phoneNumber) => {
     try {
@@ -626,32 +538,18 @@ export default function RegisterPage() {
   };
 
   const handleResendPhoneOtp = useCallback(async () => {
-    if (isResendOtpCaptchaRequired && !resendOtpCaptcha.token) {
-      Notice({
-        msg: "CAPTCHA required",
-        desc: "Please complete CAPTCHA before requesting another SMS.",
-        isSuccess: false,
-        place: "bottomRight",
-      });
-      return null;
-    }
-
     try {
-      const payload = resendOtpCaptcha.withCaptchaPayload({
+      const res = await IdentityService.requestOtp({
         email: registeredEmail,
         type: OTP_TYPES.VERIFY_PHONE,
-      }, RESEND_OTP_CAPTCHA_ACTION);
-
-      const res = await IdentityService.requestOtp(payload);
-      resendOtpCaptcha.resetCaptcha();
+      });
       setPhoneOtpData(res);
       Notice({ msg: "Code resent", desc: "A new SMS code has been sent.", isSuccess: true, place: "bottomRight" });
       return res;
     } catch {
-      resendOtpCaptcha.resetCaptcha();
       Notice({ msg: "Failed to resend", desc: "Could not resend SMS.", isSuccess: false, place: "bottomRight" });
     }
-  }, [isResendOtpCaptchaRequired, registeredEmail, resendOtpCaptcha]);
+  }, [registeredEmail]);
 
   const handleSubmitBusiness = async (data) => {
     try {
@@ -675,16 +573,7 @@ export default function RegisterPage() {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <BasicInfoStep
-            onSubmit={handleRegister}
-            loading={loading}
-            captchaRequired={isRegisterCaptchaRequired}
-            captchaToken={registerCaptcha.token}
-            captchaRef={registerCaptcha.captchaRef}
-            onCaptchaChange={registerCaptcha.onChange}
-          />
-        );
+        return <BasicInfoStep onSubmit={handleRegister} loading={loading} />;
       case 1:
         return (
           <OtpVerifyStep
@@ -694,9 +583,6 @@ export default function RegisterPage() {
             onResend={handleResendEmailOtp}
             loading={loading}
             otpData={emailOtpData}
-            showResendCaptcha={isResendOtpCaptchaRequired}
-            resendCaptchaRef={resendOtpCaptcha.captchaRef}
-            onResendCaptchaChange={resendOtpCaptcha.onChange}
           />
         );
       case 2:
@@ -707,9 +593,6 @@ export default function RegisterPage() {
             onResend={handleResendPhoneOtp}
             loading={loading}
             otpData={phoneOtpData}
-            showResendCaptcha={isResendOtpCaptchaRequired}
-            resendCaptchaRef={resendOtpCaptcha.captchaRef}
-            onResendCaptchaChange={resendOtpCaptcha.onChange}
           />
         );
       case 3:
