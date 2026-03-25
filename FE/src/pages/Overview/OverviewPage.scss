@@ -27,6 +27,7 @@ $ebay-green-bg: #f0faf0;
       background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
       animation: overview-skeleton 1.4s ease infinite;
       margin-bottom: 16px;
+      border-radius: 8px;
     }
 
     .overview__grid {
@@ -37,6 +38,7 @@ $ebay-green-bg: #f0faf0;
 
     .overview__skeleton-card {
       height: 300px;
+      border-radius: 8px;
       background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
       animation: overview-skeleton 1.4s ease infinite;
     }
@@ -52,11 +54,27 @@ $ebay-green-bg: #f0faf0;
   }
 }
 
+/* ── Top Link ──────────────────────────────────────────────── */
+.overview-top-link {
+  text-align: right;
+  padding: 12px 32px 0;
+  font-size: 12px;
+  a {
+    color: $ebay-dark;
+    text-decoration: underline;
+    &:hover {
+      color: $ebay-blue;
+    }
+  }
+}
+
 /* ── Hero bar ──────────────────────────────────────────────── */
 .overview-hero {
   background: $ebay-white;
-  border-bottom: 1px solid $ebay-light-gray;
+  border: 1px solid $ebay-light-gray;
+  border-radius: 8px;
   padding: 20px 32px;
+  margin: 12px 32px 0;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -69,8 +87,8 @@ $ebay-green-bg: #f0faf0;
     flex-shrink: 0;
 
     h1 {
-      font-size: 16px;
-      font-weight: 400;
+      font-size: 18px;
+      font-weight: 700;
       margin: 0;
       color: $ebay-dark;
       white-space: nowrap;
@@ -80,33 +98,52 @@ $ebay-green-bg: #f0faf0;
   &__avatar {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
-    background: #c7c7c7;
-    color: $ebay-white;
+    border-radius: 8px;
+    background: #f5f5f5;
+    color: $ebay-gray;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 18px;
+    font-size: 20px;
     flex-shrink: 0;
+    border: 1px solid $ebay-light-gray;
+    svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
   }
 
   &__metrics {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 32px;
     margin-left: auto;
   }
 
   &__metric {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     white-space: nowrap;
+
+    &-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     &-icon {
       font-size: 16px;
-      color: $ebay-gray;
+      color: $ebay-dark;
+      display: flex;
+      align-items: center;
+      svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
     }
 
     &-value {
@@ -117,10 +154,20 @@ $ebay-green-bg: #f0faf0;
 
     &-label {
       font-size: 12px;
-      color: $ebay-gray;
+      color: $ebay-dark;
       cursor: pointer;
-      text-decoration: underline;
-      text-decoration-style: dotted;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      &::after {
+        content: "›";
+        font-size: 14px;
+      }
+      
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 
@@ -152,18 +199,24 @@ $ebay-green-bg: #f0faf0;
 
 /* ── Status banner ─────────────────────────────────────────── */
 .overview-status {
+  background: transparent;
   margin: 16px 32px 0;
   padding: 14px 20px;
   display: flex;
   gap: 12px;
   align-items: flex-start;
   border-radius: 8px;
-  border: 1px solid transparent;
 
   &__icon {
-    font-size: 16px;
-    line-height: 1.4;
+    font-size: 18px;
+    line-height: 1.2;
     flex-shrink: 0;
+    color: $ebay-green;
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
   }
 
   strong {
@@ -171,51 +224,27 @@ $ebay-green-bg: #f0faf0;
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 2px;
+    color: $ebay-dark;
   }
 
   p {
     margin: 0;
-    font-size: 13px;
-    color: $ebay-gray;
+    font-size: 12px;
+    color: $ebay-dark;
   }
 
   &--success {
-    background: $ebay-green-bg;
-    border-color: #c8e6a0;
-    color: #2e6609;
-
-    .overview-status__icon {
-      color: $ebay-green;
-    }
-  }
-
-  &--warning {
-    background: #fef9ee;
-    border-color: #f5c518;
-    color: #6e4b00;
-
-    p {
-      color: #8c6200;
-    }
-  }
-
-  &--info {
-    background: #eef4ff;
-    border-color: #a4c3f5;
-    color: #1a3d80;
+    background: transparent;
+    color: $ebay-dark;
   }
 }
 
 /* ── Grid ──────────────────────────────────────────────────── */
 .overview__grid {
   display: grid;
-  gap: 0;
+  gap: 16px;
   grid-template-columns: 1fr 1fr 1fr;
-  margin: 24px 32px 0;
-  border: 1px solid $ebay-light-gray;
-  border-radius: 8px;
-  overflow: hidden;
-  background: $ebay-white;
+  margin: 16px 32px 0;
 }
 
 /* ── Cards (Listings / Orders / Sales) ─────────────────────── */
@@ -224,14 +253,12 @@ $ebay-green-bg: #f0faf0;
   display: flex;
   flex-direction: column;
   min-height: 360px;
-
-  &:not(:last-child) {
-    border-right: 1px solid $ebay-light-gray;
-  }
+  border: 1px solid $ebay-light-gray;
+  border-radius: 8px;
+  overflow: hidden;
 
   &__header {
-    padding: 18px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -239,25 +266,22 @@ $ebay-green-bg: #f0faf0;
 
     h2 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: $ebay-dark;
     }
 
     &::after {
       content: "›";
-      font-size: 22px;
+      font-size: 20px;
       color: $ebay-gray;
       font-weight: 400;
       line-height: 1;
     }
-  }
-
-  &__currency {
-    font-size: 11px;
-    color: $ebay-gray;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    
+    &:hover h2 {
+      text-decoration: underline;
+    }
   }
 
   &__list {
@@ -274,13 +298,10 @@ $ebay-green-bg: #f0faf0;
     padding: 10px 20px;
     gap: 12px;
     min-height: 40px;
-
-    &:not(:last-child) {
-      border-bottom: 1px solid #f5f5f5;
-    }
+    border-top: 1px solid #f5f5f5;
 
     &:hover {
-      background: #fafafa;
+      background: rgba(0,0,0,0.02);
     }
 
     a,
@@ -295,15 +316,15 @@ $ebay-green-bg: #f0faf0;
     a {
       color: $ebay-blue;
       font-size: 13px;
+      text-decoration: underline;
 
       &:hover {
-        text-decoration: underline;
         color: $ebay-blue-hover;
       }
     }
 
     &--disabled {
-      color: #999;
+      color: $ebay-dark;
 
       .overview-card__count {
         color: inherit;
@@ -311,6 +332,14 @@ $ebay-green-bg: #f0faf0;
 
       &:hover {
         background: transparent;
+      }
+    }
+    
+    &--link-only {
+      padding: 14px 20px;
+      border-top: none;
+      a {
+        text-decoration: underline;
       }
     }
   }
@@ -321,7 +350,7 @@ $ebay-green-bg: #f0faf0;
   }
 
   &__count {
-    font-weight: 400;
+    font-weight: 700;
     font-size: 13px;
     color: $ebay-dark;
   }
@@ -342,22 +371,51 @@ $ebay-green-bg: #f0faf0;
   padding: 12px 20px;
 
   &__title {
-    font-size: 12px;
-    color: $ebay-gray;
-    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: $ebay-dark;
+    margin-bottom: 24px;
     text-align: center;
+  }
+
+  &__layout {
+    display: flex;
+    position: relative;
+  }
+
+  &__y-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 20px;
+    margin-right: 8px;
+    font-size: 10px;
+    color: $ebay-gray;
+  }
+
+  &__graph-container {
+    flex: 1;
+  }
+
+  &__x-axis {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px 0;
+    font-size: 11px;
+    color: $ebay-dark;
+  }
+  
+  &__x-label {
+    text-align: center;
+    font-size: 11px;
+    color: $ebay-gray;
+    margin-top: 4px;
   }
 
   svg {
     width: 100%;
-    height: 120px;
-  }
-
-  &__empty {
-    padding: 24px 16px;
-    text-align: center;
-    color: #999;
-    font-size: 13px;
+    height: 100px;
+    background: #f5f5f5;
   }
 }
 
@@ -369,52 +427,38 @@ $ebay-green-bg: #f0faf0;
   display: flex;
   flex-direction: column;
   gap: 0;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid $ebay-light-gray;
+  margin-top: 8px;
 
   li {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
+    padding: 10px 0;
     font-size: 13px;
     color: $ebay-dark;
-    border-bottom: 1px dotted #e0e0e0;
+    border-bottom: 1px solid #f5f5f5;
 
     &:last-child {
       border-bottom: none;
     }
 
-    span:first-child {
-      color: $ebay-dark;
+    span:first-child a {
+      color: $ebay-blue;
+      text-decoration: underline;
     }
 
     span:last-child {
       font-weight: 700;
-      color: $ebay-blue;
+      color: $ebay-dark;
     }
   }
 }
 
-/* ── Empty state ───────────────────────────────────────────── */
-.overview__empty {
-  background: $ebay-white;
-  border-radius: 8px;
-  padding: 40px;
-  text-align: center;
-  border: 1px solid $ebay-light-gray;
-  margin: 24px 32px 0;
-
-  h1 {
-    margin: 0 0 12px;
-    font-size: 20px;
-    font-weight: 700;
-    color: $ebay-dark;
-  }
-
-  p {
-    margin: 0;
-    color: $ebay-gray;
-    font-size: 14px;
-  }
+.overview-sales-footer {
+  padding: 0 20px 20px;
+  font-size: 11px;
+  color: $ebay-gray;
+  line-height: 1.4;
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
@@ -423,40 +467,14 @@ $ebay-green-bg: #f0faf0;
     grid-template-columns: 1fr;
     margin: 16px 16px 0;
   }
-
-  .overview-card:not(:last-child) {
-    border-right: none;
-    border-bottom: 1px solid $ebay-light-gray;
-  }
-
   .overview-hero {
     flex-wrap: wrap;
     padding: 16px;
+    margin: 8px 16px 0;
     gap: 12px;
   }
-
   .overview-hero__metrics {
     margin-left: 0;
     flex-wrap: wrap;
-  }
-
-  .overview-status {
-    margin: 12px 16px 0;
-  }
-
-  .overview__empty {
-    margin: 16px;
-  }
-}
-
-@media (max-width: 600px) {
-  .overview-hero {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .overview-hero__cta {
-    align-self: stretch;
-    text-align: center;
   }
 }
