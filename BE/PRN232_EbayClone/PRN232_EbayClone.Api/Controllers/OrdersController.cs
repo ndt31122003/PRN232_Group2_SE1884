@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using PRN232_EbayClone.Api.Services;
@@ -168,8 +168,15 @@ public class OrdersController : ApiController
         [FromBody] PrintShippingLabelRequest request,
         CancellationToken cancellationToken)
     {
+        var unauthorizedResult = TryGetAuthenticatedSeller(out var sellerId);
+        if (unauthorizedResult is not null)
+        {
+            return unauthorizedResult;
+        }
+
         var command = new PreviewShippingLabelCommand(
             orderId,
+            sellerId,
             request.Carrier,
             request.ServiceCode,
             request.ServiceName,
@@ -194,8 +201,15 @@ public class OrdersController : ApiController
         [FromBody] PrintShippingLabelRequest request,
         CancellationToken cancellationToken)
     {
+        var unauthorizedResult = TryGetAuthenticatedSeller(out var sellerId);
+        if (unauthorizedResult is not null)
+        {
+            return unauthorizedResult;
+        }
+
         var command = new PrintShippingLabelCommand(
             orderId,
+            sellerId,
             request.Carrier,
             request.ServiceCode,
             request.ServiceName,
@@ -501,6 +515,52 @@ public class OrdersController : ApiController
         return result;
     }
 
+    [HttpPost("{orderId:guid}/mark-as-shipped")]
+    public async Task<IActionResult> MarkAsShipped(Guid orderId, CancellationToken cancellationToken)
+    {
+        var unauthorizedResult = TryGetAuthenticatedSeller(out var sellerId);
+        if (unauthorizedResult is not null)
+        {
+            return unauthorizedResult;
+        }
+
+        var command = new MarkOrderAsShippedCommand(orderId, sellerId);
+        var result = await SendAsync(command, cancellationToken);
+        return result;
+    }
+
+    [HttpPost("{orderId:guid}/archive")]
+    public async Task<IActionResult> ArchiveOrder(Guid orderId, CancellationToken cancellationToken)
+    {
+        var unauthorizedResult = TryGetAuthenticatedSeller(out var sellerId);
+        if (unauthorizedResult is not null)
+        {
+            return unauthorizedResult;
+        }
+
+        var command = new ArchiveOrderCommand(orderId, sellerId);
+        var result = await SendAsync(command, cancellationToken);
+        return result;
+    }
+
+    [HttpPost("buy-it-now")]
+    public async Task<IActionResult> BuyItNow([FromBody] BuyItNowRequest request, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(_userContext.UserId, out var buyerId))
+        {
+            return Unauthorized(new ProblemDetails
+            {
+                Title = "Lỗi xác thực",
+                Detail = "Người dùng chưa được xác thực",
+                Status = StatusCodes.Status401Unauthorized
+            });
+        }
+
+        var command = new BuyItNowCommand(request.ListingId, request.Quantity, buyerId);
+        var result = await SendAsync(command, cancellationToken);
+        return result;
+    }
+
     private IActionResult? TryGetAuthenticatedSeller(out Guid sellerId)
     {
         sellerId = Guid.Empty;
@@ -519,3 +579,5 @@ public class OrdersController : ApiController
     }
 
 }
+
+public sealed record BuyItNowRequest(Guid ListingId, int Quantity = 1);

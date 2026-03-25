@@ -77,6 +77,24 @@ const ProductDetailPage = () => {
         }
     };
 
+    const handleBuyItNow = async () => {
+        try {
+            await PublicListingService.buyItNow(id, 1);
+            Notice({
+                msg: "Success",
+                desc: "Mua hàng thành công!",
+                isSuccess: true
+            });
+            navigate("/order/all?status=all");
+        } catch (error) {
+            Notice({
+                msg: "Mua hàng thất bại",
+                desc: error.response?.data?.Detail || error.response?.data?.detail || "Đã xảy ra lỗi khi mua hàng.",
+                isSuccess: false
+            });
+        }
+    };
+
     if (loading) return <div className="product-loading">Loading product...</div>;
     if (!listing) return <div className="product-not-found">Listing not found.</div>;
 
@@ -137,7 +155,7 @@ const ProductDetailPage = () => {
                     <div className="actions-section">
                         {isFixedPrice && (
                             <div className="fixed-price-actions">
-                                <button className="buy-now-btn">Buy It Now</button>
+                                <button className="buy-now-btn" onClick={handleBuyItNow}>Buy It Now</button>
                                 {allowOffers && (
                                     <button 
                                         className="make-offer-btn"
@@ -161,7 +179,7 @@ const ProductDetailPage = () => {
                                     <button className="place-bid-btn" onClick={handlePlaceBid}>Place Bid</button>
                                 </div>
                                 {buyItNowPrice > 0 && (
-                                    <button className="buy-now-btn">
+                                    <button className="buy-now-btn" onClick={handleBuyItNow}>
                                         Buy It Now for ${buyItNowPrice.toFixed(2)}
                                     </button>
                                 )}
