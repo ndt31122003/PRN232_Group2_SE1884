@@ -85,6 +85,8 @@ public sealed class CreateListingCommandHandlerTests
             true,
             10m,
             15m,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             true);
 
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -125,6 +127,8 @@ public sealed class CreateListingCommandHandlerTests
             false,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             false);
 
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -161,6 +165,8 @@ public sealed class CreateListingCommandHandlerTests
             false,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             false);
 
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -200,6 +206,8 @@ public sealed class CreateListingCommandHandlerTests
             false,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             true);
 
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -236,6 +244,8 @@ public sealed class CreateListingCommandHandlerTests
             false,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             true);
 
         var result = await _handler.Handle(command, CancellationToken.None);

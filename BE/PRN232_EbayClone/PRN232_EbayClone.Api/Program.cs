@@ -91,15 +91,16 @@ builder.Services.AddHostedService<LowStockAlertWorker>();
     app.MapHealthChecks("/");
 
     app.UseExceptionHandler();
-// Only redirect to HTTPS in development; in production, Cloudflare handles SSL
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+
+    // NOTE: UseHttpsRedirection is intentionally omitted for local dev.
+    // In production, Cloudflare/Nginx handles SSL termination.
+    // Enabling it locally breaks CORS preflight (OPTIONS) requests.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseHttpsRedirection();
+    }
 
     app.UseMiddleware<RequestLogContextMiddleware>();
-
-    app.UseHttpsRedirection();
 
     app.UseSerilogRequestLogging(options =>
     {
@@ -124,9 +125,9 @@ if (app.Environment.IsDevelopment())
         DefaultContentType = "application/octet-stream"
     });
 
-    app.UseRouting();
-
     app.UseCors(CorsPolicyName);
+
+    app.UseRouting();
 
     app.UseSwagger();
     app.UseSwaggerUI();

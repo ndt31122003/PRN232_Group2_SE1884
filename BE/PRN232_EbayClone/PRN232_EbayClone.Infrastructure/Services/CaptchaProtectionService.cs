@@ -85,10 +85,17 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
         var failedAttempts = decision.FailedAttempts + 1;
         var data = BitConverter.GetBytes(failedAttempts);
 
-        await _distributedCache.SetAsync(cacheKey, data, new DistributedCacheEntryOptions
+        try
         {
-            AbsoluteExpirationRelativeToNow = FailedAttemptTtl
-        }, cancellationToken);
+            await _distributedCache.SetAsync(cacheKey, data, new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = FailedAttemptTtl
+            }, cancellationToken);
+        }
+        catch
+        {
+            // Redis unavailable — silently ignore, do not block login
+        }
     }
 
     public async Task RegisterSuccessAsync(string actionName, string? identityHint, CancellationToken cancellationToken)
@@ -100,7 +107,14 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
         }
 
         var cacheKey = BuildCacheKey(actionName, identityHint);
-        await _distributedCache.RemoveAsync(cacheKey, cancellationToken);
+        try
+        {
+            await _distributedCache.RemoveAsync(cacheKey, cancellationToken);
+        }
+        catch
+        {
+            // Redis unavailable — silently ignore
+        }
     }
 
     public async Task<CaptchaPolicyDecision> GetDecisionAsync(string actionName, string? identityHint, CancellationToken cancellationToken)
@@ -116,7 +130,16 @@ public sealed class CaptchaProtectionService : ICaptchaProtectionService
         }
 
         var cacheKey = BuildCacheKey(actionName, identityHint);
-        var payload = await _distributedCache.GetAsync(cacheKey, cancellationToken);
+        byte[]? payload = null;
+        
+        try
+        {
+            payload = await _distributedCache.GetAsync(cacheKey, cancellationToken);
+        }
+        catch
+        {
+            // Redis unavailable — treat as 0 failed attempts (no captcha required)
+        }
 
         var failedAttempts = payload is { Length: 4 }
             ? BitConverter.ToInt32(payload)

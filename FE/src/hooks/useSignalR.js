@@ -22,6 +22,12 @@ export function useSignalR(handlers = {}, listingId = null) {
     const connectionRef = useRef(null);
 
     useEffect(() => {
+        // 🔒 Guard: do not attempt to connect if the user is not authenticated
+        const token = getStorage(STORAGE.TOKEN);
+        if (!token) {
+            return;
+        }
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(HUB_URL, {
                 accessTokenFactory: () => getStorage(STORAGE.TOKEN) ?? "",
@@ -77,4 +83,3 @@ export function useSignalR(handlers = {}, listingId = null) {
 
     return connectionRef;
 }
-

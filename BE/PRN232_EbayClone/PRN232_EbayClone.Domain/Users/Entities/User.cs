@@ -95,6 +95,14 @@ public sealed class User : AggregateRoot<UserId>
     public void VerifyPayment() => IsPaymentVerified = true;
     public void UpdatePassword(string newHashedPassword) => PasswordHash = newHashedPassword;
 
+    public void UpdateProfile(string? fullName, string? displayName)
+    {
+        if (!string.IsNullOrWhiteSpace(fullName))
+            FullName = fullName.Trim();
+        if (!string.IsNullOrWhiteSpace(displayName))
+            Username = displayName.Trim();
+    }
+
     public void SetPhoneNumber(string phoneNumber)
     {
         PhoneNumber = phoneNumber;

@@ -44,10 +44,15 @@ public sealed class GetActiveListingsQueryHandlerTests
                 0m,
                 3m,
                 DateTime.UtcNow,
-                DateTime.UtcNow.AddDays(7))
+                DateTime.UtcNow.AddDays(7),
+                0,    // WatchersCount
+                0,    // BidsCount
+                0,    // OffersCount
+                null, // BestOfferAmount
+                null) // BuyItNowPrice
         };
 
-        _listingRepository.GetActiveListingsAsync("user-123", null, 1, 20, Arg.Any<CancellationToken>())
+        _listingRepository.GetActiveListingsAsync("user-123", null, null, null, 1, 20, Arg.Any<CancellationToken>())
             .Returns((items, items.Count));
 
         var result = await _handler.Handle(new GetActiveListingsQuery(PageNumber: 1, PageSize: 20), CancellationToken.None);
@@ -60,12 +65,12 @@ public sealed class GetActiveListingsQueryHandlerTests
     [Fact]
     public async Task Handle_ShouldClampPagingValues()
     {
-        _listingRepository.GetActiveListingsAsync("user-123", null, 1, 200, Arg.Any<CancellationToken>())
+        _listingRepository.GetActiveListingsAsync("user-123", null, null, null, 1, 200, Arg.Any<CancellationToken>())
             .Returns((new List<ActiveListingDto>(), 0));
 
         await _handler.Handle(new GetActiveListingsQuery(PageNumber: 0, PageSize: 500), CancellationToken.None);
 
         await _listingRepository.Received(1)
-            .GetActiveListingsAsync("user-123", null, 1, 200, Arg.Any<CancellationToken>());
+            .GetActiveListingsAsync("user-123", null, null, null, 1, 200, Arg.Any<CancellationToken>());
     }
 }

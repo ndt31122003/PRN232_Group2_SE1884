@@ -15,6 +15,20 @@ public interface IRealtimeNotifier
         T message,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Alias for BroadcastToUserAsync — sends to a single user.</summary>
+    Task SendToUserAsync<T>(
+        string userId,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Sends the same message to multiple users.</summary>
+    Task SendToUsersAsync<T>(
+        IEnumerable<string> userIds,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Sends to everyone currently watching a listing (group = listingId).</summary>
     Task BroadcastToListingGroupAsync<T>(
         Guid listingId,

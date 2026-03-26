@@ -846,7 +846,7 @@ const NavHeader = ({ setCurrentSession }) => {
         <div className="hub__container">
           <div className="hub__info">
             <h1 className="hub__title">Seller Hub</h1>
-            <button type="button" className="hub__username" onClick={() => showComingSoon("Seller profile")}>mnh20</button>
+            <button type="button" className="hub__username" onClick={() => userInfo?.id && navigate(`/usr/${userInfo.id}`)}>{userInfo?.name || userInfo?.email || "My Profile"}</button>
             <span className="hub__rating">( 0 )</span>
           </div>
 

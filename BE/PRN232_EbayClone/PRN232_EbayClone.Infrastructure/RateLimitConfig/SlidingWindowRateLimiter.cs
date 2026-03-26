@@ -101,11 +101,23 @@ public class SlidingWindowRateLimiter
             args.Add(rule.MaxRequests);
         }
 
+        // Use a short timeout so a slow/unavailable Redis Cloud never blocks the HTTP pipeline
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
         try
         {
-            return (int)await _db!.ScriptEvaluateAsync(SlidingRateLimiter, keys, args.ToArray()) == 1;
+            var task = _db!.ScriptEvaluateAsync(SlidingRateLimiter, keys, args.ToArray());
+
+            // Await with timeout; if Redis takes > 2 s, fail-open (allow request)
+            var completed = await Task.WhenAny(task, Task.Delay(Timeout.Infinite, cts.Token));
+            if (completed != task)
+            {
+                _logger.LogWarning("Redis rate limiting timed out for key {ApiKey}. Allowing request to continue.", apiKey);
+                return false;
+            }
+
+            return (int)await task == 1;
         }
-        catch (RedisException exception)
+        catch (Exception exception)
         {
             _logger.LogWarning(exception, "Redis rate limiting failed for key {ApiKey}. Allowing request to continue.", apiKey);
             return false;
