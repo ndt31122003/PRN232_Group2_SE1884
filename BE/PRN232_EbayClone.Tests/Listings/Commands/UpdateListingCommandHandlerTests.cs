@@ -74,6 +74,8 @@ public sealed class UpdateListingCommandHandlerTests
             true,
             10m,
             15m,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             true,
             null);
 
@@ -118,6 +120,8 @@ public sealed class UpdateListingCommandHandlerTests
             false,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             false,
             DateTime.UtcNow.AddHours(2));
 
@@ -159,6 +163,8 @@ public sealed class UpdateListingCommandHandlerTests
             false,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             false,
             null);
 
@@ -198,6 +204,8 @@ public sealed class UpdateListingCommandHandlerTests
             false,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             true,
             null);
 
@@ -238,6 +246,8 @@ public sealed class UpdateListingCommandHandlerTests
             true,
             null,
             null,
+            null,  // ShippingPolicyId
+            null,  // ReturnPolicyId
             true,
             null);
 

@@ -33,6 +33,23 @@ public sealed class RealtimeNotifier : IRealtimeNotifier
             .SendAsync(method, message, cancellationToken);
     }
 
+    public Task SendToUserAsync<T>(
+        string userId,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default)
+        => BroadcastToUserAsync(userId, method, message, cancellationToken);
+
+    public Task SendToUsersAsync<T>(
+        IEnumerable<string> userIds,
+        string method,
+        T message,
+        CancellationToken cancellationToken = default)
+    {
+        var tasks = userIds.Select(uid => BroadcastToUserAsync(uid, method, message, cancellationToken));
+        return Task.WhenAll(tasks);
+    }
+
     public Task BroadcastToListingGroupAsync<T>(
         Guid listingId,
         string method,

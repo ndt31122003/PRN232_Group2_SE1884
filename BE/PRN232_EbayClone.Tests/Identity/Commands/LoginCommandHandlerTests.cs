@@ -6,6 +6,7 @@ using FluentAssertions;
 using NSubstitute;
 using PRN232_EbayClone.Application.Abstractions.Authentication;
 using PRN232_EbayClone.Application.Abstractions.Data;
+using PRN232_EbayClone.Application.Abstractions.Security;
 using PRN232_EbayClone.Application.Identity.Commands;
 using PRN232_EbayClone.Domain.Identity.Entities;
 using PRN232_EbayClone.Domain.Identity.Errors;
@@ -23,15 +24,20 @@ public sealed class LoginCommandHandlerTests
     private readonly ITokenProvider _tokenProvider = Substitute.For<ITokenProvider>();
     private readonly IRefreshTokenRepository _refreshTokenRepository = Substitute.For<IRefreshTokenRepository>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly ICaptchaProtectionService _captchaProtectionService = Substitute.For<ICaptchaProtectionService>();
     private readonly LoginCommandHandler _handler;
 
     public LoginCommandHandlerTests()
     {
+        _captchaProtectionService
+            .EnsureValidAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(PRN232_EbayClone.Domain.Shared.Results.Result.Success());
         _handler = new LoginCommandHandler(
             _userRepository,
             _passwordHasher,
             _tokenProvider,
             _refreshTokenRepository,
+            _captchaProtectionService,
             _unitOfWork);
     }
 

@@ -16,6 +16,7 @@ const AuthCallbackPage = lazy(() => import("../ANONYMOUS/Login/AuthCallBackPage"
 const ForgotPasswordPage = lazy(() => import("../ANONYMOUS/Login/ForgotPasswordPage"));
 const PaymentVerificationPage = lazy(() => import("../Store/PaymentVerificationPage"));
 const AccountSettingsPage = lazy(() => import("../Account/AccountSettings"));
+const SellerProfilePage = lazy(() => import("../Public/SellerProfilePage"));
 const CreateSellerCouponPage = lazy(() => import("../Coupons/CreateSellerCoupon"));
 const CouponsSummaryPage = lazy(() => import("../Coupons/CouponsSummary"));
 const SaleEventsSummaryPage = lazy(() => import("../Marketing/SaleEvents/SaleEventsSummary"));
@@ -519,6 +520,14 @@ const router = createBrowserRouter([
           { path: "subscription", element: <SubscriptionPage /> },
         ],
       },
+      {
+        path: "usr/:id",
+        element: (
+          <Suspense fallback={<LoadingScreen isOverlay={true} />}>
+            <SellerProfilePage />
+          </Suspense>
+        ),
+      },
     ],
   },
 
@@ -595,6 +604,7 @@ const router = createBrowserRouter([
       </Suspense>
     ),
   },
+
   {
     path: "payment-verification",
     element: (

@@ -46,8 +46,16 @@ const AccountSettingsPage = () => {
     return stored ? mapUserProfile(stored, stored) : null;
   });
   const [isLoading, setIsLoading] = useState(!profile);
-  const [busy, setBusy] = useState({ email: false, payment: false });
+  const [busy, setBusy] = useState({ email: false, payment: false, profile: false });
   const [paymentCard, setPaymentCard] = useState({ holderName: "", number: "", expiry: "", cvv: "" });
+  const [profileForm, setProfileForm] = useState({ fullName: "", displayName: "" });
+
+  // Sync profileForm when profile loads
+  useEffect(() => {
+    if (profile) {
+      setProfileForm({ fullName: profile.name ?? "", displayName: "" });
+    }
+  }, [profile?.name]);
 
   useEffect(() => {
     let ignore = false;
@@ -135,6 +143,31 @@ const AccountSettingsPage = () => {
 
   const setBusyFlag = (key, value) => {
     setBusy((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profileForm.fullName.trim() && !profileForm.displayName.trim()) {
+      Notice({ msg: "Vui lòng nhập ít nhất một trường.", isSuccess: false });
+      return;
+    }
+    setBusyFlag("profile", true);
+    try {
+      await import("../../utils/axiosCustomize").then(({ default: axios }) =>
+        axios.patch("users/profile", {
+          fullName: profileForm.fullName.trim(),
+          displayName: profileForm.displayName.trim(),
+        })
+      );
+      updateProfile((prev) => prev ? {
+        ...prev,
+        name: profileForm.fullName.trim() || prev.name,
+      } : prev);
+      Notice({ msg: "Thông tin hồ sơ đã được cập nhật.", isSuccess: true });
+    } catch {
+      Notice({ msg: "Không thể cập nhật hồ sơ.", isSuccess: false });
+    } finally {
+      setBusyFlag("profile", false);
+    }
   };
 
   const sanitizeCardNumber = (value) => value.replace(/[^0-9]/g, "");
@@ -417,6 +450,56 @@ const AccountSettingsPage = () => {
             Hoàn tất các bước xác minh để bắt đầu đăng bán và nhận thanh toán.
           </p>
         </header>
+
+        {/* Profile Info Edit Card */}
+        <div className="account-settings__card" style={{ marginBottom: "1.5rem" }}>
+          <div className="account-settings__card-body">
+            <div className="account-settings__section">
+              <h2 className="account-settings__section-title">Thông tin hồ sơ</h2>
+              <p className="account-settings__section-desc">Cập nhật tên hiển thị và tên đầy đủ của bạn trên eBay.</p>
+            </div>
+            <div className="account-settings__verifications">
+              <div className="account-settings__verification-item">
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: 480 }}>
+                  <div>
+                    <label style={{ display: "block", fontWeight: 500, marginBottom: 4, fontSize: 14, color: "#374151" }}>
+                      Họ và tên đầy đủ
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.fullName}
+                      onChange={e => setProfileForm(p => ({ ...p, fullName: e.target.value }))}
+                      placeholder="Ví dụ: Nguyễn Văn A"
+                      style={{ width: "100%", padding: "8px 12px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontWeight: 500, marginBottom: 4, fontSize: 14, color: "#374151" }}>
+                      Tên hiển thị (username)
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.displayName}
+                      onChange={e => setProfileForm(p => ({ ...p, displayName: e.target.value }))}
+                      placeholder="Ví dụ: nguyenvana_seller"
+                      style={{ width: "100%", padding: "8px 12px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                    />
+                    <p style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>Đây là tên người khác thấy khi xem hồ sơ của bạn.</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="account-settings__primary-btn"
+                    onClick={handleSaveProfile}
+                    disabled={busy.profile || isLoading}
+                    style={{ alignSelf: "flex-start" }}
+                  >
+                    {busy.profile ? "Đang lưu..." : "Lưu thay đổi"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="account-settings__card">
           <div className="account-settings__card-body">

@@ -133,6 +133,9 @@ services.AddScoped<ICouponRepository, CouponRepository>();
         services.AddScoped<IVolumePricingRepository, VolumePricingRepository>();
         services.AddScoped<ISaleEventRepository, SaleEventRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<ISellerBlacklistRepository, SellerBlacklistRepository>();
+        services.AddScoped<ISupportTicketRepository, SupportTicketRepository>();
+        services.AddScoped<IBuyerFeedbackRepository, BuyerFeedbackRepository>();
 
 
         return services;
